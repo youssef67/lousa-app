@@ -1,0 +1,121 @@
+<script setup lang="ts">
+import type { PropType } from 'vue'
+import type { Playlist } from '~/types/session.type'
+
+const props = defineProps({
+  isOpen: {
+    type: Boolean,
+    required: true
+  },
+  playlists: {
+    type: Object as PropType<Playlist[]>,
+    required: true
+  }
+})
+
+const inputText = ref(null)
+const playlistName = ref('')
+const { runCreatePlaylist } = useSpotifyRepository()
+const toast = useSpecialToast()
+const emit = defineEmits(['update:isOpen', 'proceedResult'])
+
+const closeSlider = () => {
+  playlistName.value = ''
+  emit('update:isOpen', false)
+}
+
+const filteredPlaylists = computed(() => {
+  console.log('filteredPlaylists', props.playlists)
+  if (!playlistName.value) return props.playlists
+  return props.playlists.filter(playlist =>
+    playlist.playlistName
+      .toLowerCase()
+      .includes(playlistName.value.toLowerCase())
+  )
+})
+
+const createPlaylist = async () => {
+  const newPlaylist = await runCreatePlaylist(playlistName.value)
+
+  toast.showSuccess('Playlist créée avec succès')
+  emit('proceedResult', newPlaylist.playlist)
+  closeSlider()
+}
+
+</script>
+
+<template>
+  <USlideover
+    :model-value="isOpen"
+    @update:model-value="emit('update:isOpen', $event)"
+    side="left"
+  >
+    <div class="p-4 flex flex-col h-full">
+      <div class="flex justify-between items-center mb-4">
+        <UIcon name="my-icon:logo-name" size="40" mode="svg" />
+
+        <UButton
+          variant="ghost"
+          icon="i-tabler-x"
+          color="black"
+          class="font-black"
+          @click="closeSlider"
+        />
+      </div>
+
+      <UInput
+        ref="inputText"
+        v-model="playlistName"
+        input-text
+        type="text"
+        placeholder="Rechercher une playlist"
+        required
+        size="sm"
+        icon="i-tabler-search"
+        autocomplete="off"
+        class="flex mt-12"
+        :trailing="true"
+      />
+      <div class="flex-1 overflow-y-auto">
+        <template v-if="filteredPlaylists.length > 0">
+          <div
+            v-for="playlist in filteredPlaylists"
+            :key="playlist.id"
+            class="mt-2 mx-2"
+          >
+            <PlaylistCard :playlists="playlist" />
+          </div>
+        </template>
+        <div v-else class="text-center mt-4 text-gray-500">
+          <p>Aucune playlist trouvée</p>
+          <div v-if="playlistName">
+            <UButton
+            label="créer la playlist"
+            type="submit"
+            variant="solid"
+            size="xl"
+            color="secondary"
+            @click="createPlaylist()"
+          />
+
+          </div>          
+        </div>
+      </div>
+    </div>
+  </USlideover>
+</template>
+
+<style scoped>
+.flex-1::-webkit-scrollbar {
+  width: 8px;
+}
+
+.flex-1::-webkit-scrollbar-thumb {
+  background-color: white;
+  border-radius: 4px;
+}
+
+.flex-1::-webkit-scrollbar-thumb:hover {
+  background-color: #b03032;
+}
+</style>
