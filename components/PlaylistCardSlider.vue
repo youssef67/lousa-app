@@ -12,13 +12,11 @@ const props = defineProps({
 const { runDeletePlaylists } = useSpotifyRepository()
 const sessionStore = useSessionStore()
 const deletePlaylist = async () => {
-  console.log('delete playlist')
   const response = await runDeletePlaylists(props.playlist.id)
   console.log(response)
 }
 
 const selectPlaylist = () => {
-  console.log('select playlist', props.playlist)
   sessionStore.playlistSelected = props.playlist
   props.closeSlider()
 }

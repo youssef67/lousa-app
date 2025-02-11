@@ -96,8 +96,9 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   const updatePlaylistsList = (playlist: Playlist) => {
-    playlistsList.value.push(playlist)
-    console.log('playlits updated')
+    if (playlist !== undefined) {
+      playlistsList.value.push(playlist)
+    }
   }
 
   return {

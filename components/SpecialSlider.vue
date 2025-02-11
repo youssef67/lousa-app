@@ -17,6 +17,8 @@ const inputText = ref(null)
 const playlistName = ref('')
 const { runCreatePlaylist } = useSpotifyRepository()
 const toast = useSpecialToast()
+const sessionStore = useSessionStore()
+const isCreatePlaylistModalOpen = ref(false)
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 
 const closeSlider = () => {
@@ -25,7 +27,9 @@ const closeSlider = () => {
 }
 
 const filteredPlaylists = computed(() => {
-  if (!playlistName.value) return props.playlists
+  if (!playlistName.value) {
+    return props.playlists
+  }
   return props.playlists.filter(playlist =>
     playlist.playlistName
       .toLowerCase()
@@ -33,14 +37,10 @@ const filteredPlaylists = computed(() => {
   )
 })
 
-const createPlaylist = async () => {
-  const newPlaylist = await runCreatePlaylist(playlistName.value)
-
-  toast.showSuccess('Playlist créée avec succès')
-  emit('proceedResult', newPlaylist.playlist)
-  closeSlider()
+const proceedResult = (playlist: Playlist) => {
+  sessionStore.updatePlaylistsList(playlist)
+  isCreatePlaylistModalOpen.value = false
 }
-
 </script>
 
 <template>
@@ -76,32 +76,41 @@ const createPlaylist = async () => {
         :trailing="true"
       />
       <div class="flex-1 overflow-y-auto">
+        <UButton
+          label="créer la playlist"
+          type="submit"
+          variant="solid"
+          size="xl"
+          color="secondary"
+          @click="
+            () => {
+              closeSlider()
+              isCreatePlaylistModalOpen = true
+            }
+          "
+        />
         <template v-if="filteredPlaylists.length > 0">
           <div
             v-for="playlist in filteredPlaylists"
             :key="playlist.id"
             class="mt-2 mx-2"
           >
-            <PlaylistCardSlider :playlist="playlist" :closeSlider="closeSlider"/>
+            <PlaylistCardSlider
+              :playlist="playlist"
+              :closeSlider="closeSlider"
+            />
           </div>
         </template>
         <div v-else class="text-center mt-4 text-gray-500">
           <p>Aucune playlist trouvée</p>
-          <div v-if="playlistName">
-            <UButton
-            label="créer la playlist"
-            type="submit"
-            variant="solid"
-            size="xl"
-            color="secondary"
-            @click="createPlaylist()"
-          />
-
-          </div>          
         </div>
       </div>
     </div>
   </USlideover>
+  <CreatePlaylistModal
+    :is-open="isCreatePlaylistModalOpen"
+    @proceed-result="proceedResult"
+  />
 </template>
 
 <style scoped>

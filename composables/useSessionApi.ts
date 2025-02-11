@@ -6,7 +6,8 @@ import type {
   EditUser,
   GetStreamersListResponse,
   GetSpaceStreamerResponse,
-  DeleteStreamerProfileResponse
+  DeleteStreamerProfileResponse,
+  SetAndGetPlaylistSelectedResponse
 } from '~/types/session.type'
 
 export const useSessionApi = () => {
@@ -116,6 +117,21 @@ export const useSessionApi = () => {
     }
   }
 
+  const setAndGetPlaylistSelected = async (playlistId: string): Promise<SetAndGetPlaylistSelectedResponse> => {
+    try {
+      const response = await fetch('/api/v1/session/playlist/selected', {
+        method: FetchMethod.POST,
+        body: { playlistId },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+
+      return response as SetAndGetPlaylistSelectedResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
 
   return {
     logout,
@@ -124,6 +140,7 @@ export const useSessionApi = () => {
     deleteUser,
     getStreamersList,
     checkIfStreamer,
-    deleteStreamerProfile
+    deleteStreamerProfile,
+    setAndGetPlaylistSelected
   }
 }

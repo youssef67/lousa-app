@@ -20,6 +20,10 @@ export interface EditUserSessionResponse {
   user: UserSession
 }
 
+export interface SetAndGetPlaylistSelectedResponse {
+  playlist: Playlist | null
+}
+
 export interface Session {
   at: string
   di: string

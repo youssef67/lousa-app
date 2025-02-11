@@ -10,14 +10,17 @@ const route = useRoute()
 const config = useRuntimeConfig()
 const { showSuccess } = useSpecialToast()
 const sessionStore = useSessionStore()
+const { runSetAndGetPLaylistSelected } = useSessionRepository()
 const { handleError } = useSpecialError()
 const userName = route.query.username
 
 const isLoading = ref(true)
 const isSlideOverOpen = ref(false)
 const isCreatePlaylistModalOpen = ref(false)
+const currentPlayList = ref<Playlist | null>(null)
 const { runGetAllPlaylists } = useSpotifyRepository()
 const { runLoginSpotifyStreamer } = useAuthRepository()
+const playlistSelected = ref<Playlist | null>(null)
 
 const toggleSlider = () => {
   isSlideOverOpen.value = !isSlideOverOpen.value
@@ -63,14 +66,29 @@ async function closeEventStream(subscription: Subscription) {
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await runGetAllPlaylists()
-    sessionStore.getPlaylistsList(response.playlists)
+    const responseGetPlaylistList = await runGetAllPlaylists()
+    sessionStore.getPlaylistsList(responseGetPlaylistList.playlists)
+
+    const responseGetCurrentPlaylist = await runSetAndGetPLaylistSelected(null)
+
+    currentPlayList.value = responseGetCurrentPlaylist.playlist
+    console.log(responseGetCurrentPlaylist)
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
   } finally {
     isLoading.value = false
   }
 })
+
+watch(
+  () => sessionStore.playlistSelected,
+  async playlist => {
+    if (playlist) {
+      const response = await runSetAndGetPLaylistSelected(playlist.id)
+      currentPlayList.value = response.playlist
+    }
+  }
+)
 </script>
 
 <template>
@@ -115,7 +133,7 @@ onMounted(async () => {
       />
       <div v-if="isLoading">Chargement des playlists...</div>
       <ul v-else>
-        <div v-if="sessionStore.playlistSelected === null">
+        <div v-if="currentPlayList === null">
           <h2>Aucune playlist selectionnée</h2>
           <UButton
             label="Sélectionner une playlist"
@@ -128,8 +146,8 @@ onMounted(async () => {
         </div>
         <div v-else>
           <h2>Playlist selected</h2>
-          <p>{{ sessionStore.playlistSelected.id }}</p>
-          <p>{{ sessionStore.playlistSelected.playlistName }}</p>
+          <p>{{ currentPlayList.id }}</p>
+          <p>{{ currentPlayList.playlistName}}</p>
         </div>
       </ul>
 
