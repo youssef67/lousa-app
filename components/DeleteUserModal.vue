@@ -16,10 +16,8 @@ const { handleError } = useSpecialError()
 const toast = useSpecialToast()
 
 const updateIsOpen = (value: boolean) => {
-  console.log('updateIsOpen', value)
   emit('update:isOpen', value)
   if (!value) {
-    console.log('druss')
     emit('proceedResult')
   }
 }

@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { AuthType } from '~/utils/auth/AuthResult'
-
 const sessionStore = useSessionStore()
 
 onMounted(() => {
-  console.log("default layout mounted")
 })
 </script>
 

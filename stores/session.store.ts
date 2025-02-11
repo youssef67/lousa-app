@@ -1,7 +1,9 @@
-import { UserRole, type Session, type UserSession, type SpotifyUserSession, type Playlist } from '~~/types/session.type'
+import { UserRole, type Session, type UserSession, type SpotifyUserSession, type TwitchUserSession, type AdminSession, type Playlist } from '~~/types/session.type'
 
 export const useSessionStore = defineStore('session', () => {
   const session = ref<Session | null>(null)
+  const playlistsList = ref<Playlist[]>([])
+  const playlistSelected = ref<Playlist | null>(null)
   const { newError } = useSpecialError()
   const { getData, saveData, deleteData } = useSpecialStorage()
 
@@ -45,7 +47,17 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   const updateSessionSpotifyUser = async (spotifyUserUpdated: SpotifyUserSession) => {
-    session.value.spotifyUser = spotifyUserUpdated
+    session.value.user.spotifyUser = spotifyUserUpdated
+    await updateSession(session.value)
+  }
+
+  const updateSessionTwitchUser = async (twitchUserUpdated: TwitchUserSession) => {
+    session.value.user.twitchUser = twitchUserUpdated
+    await updateSession(session.value)
+  }
+
+  const updateSessionAdmin = async (AdminUpdated: AdminSession) => {
+    session.value.admin = AdminUpdated
     await updateSession(session.value)
   }
 
@@ -62,13 +74,30 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   const isSpotifyUserAuthenticated = () => { 
-    return !!session.value?.spotifyUser
+    return !!session.value?.user.spotifyUser
+  }
+
+  const isTwitchUserAuthenticated = () => { 
+    return !!session.value?.user.twitchUser
+  }
+
+  const isTwitchStreamerAuthenticated = () => { 
+    return !!session.value.user.twitchUser?.isStreamer
   }
 
   const clearSession = () => {
     session.value = null
     deleteData(StorageKey.SESSION)
     deleteData(StorageKey.AUTH)
+  }
+
+  const getPlaylistsList = (playlists: Playlist[]) => {
+    playlistsList.value = playlists
+  }
+
+  const updatePlaylistsList = (playlist: Playlist) => {
+    playlistsList.value.push(playlist)
+    console.log('playlits updated')
   }
 
   return {
@@ -82,6 +111,14 @@ export const useSessionStore = defineStore('session', () => {
     clearSession,
     updateSessionSpotifyUser,
     isSpotifyUserAuthenticated,
-    isAdmin
+    isTwitchUserAuthenticated,
+    updateSessionTwitchUser,
+    updateSessionAdmin,
+    isAdmin,
+    isTwitchStreamerAuthenticated,
+    getPlaylistsList,
+    updatePlaylistsList,
+    playlistsList,
+    playlistSelected
   }
 })

@@ -4,7 +4,8 @@ import type {
   SignUpEmailResponse,
   SignUpEmailConfirmResponse,
   LoginEmailConfirmResponse,
-  LoginSpotifyResponse
+  LoginSpotifyResponse,
+  LoginTwitchResponse
 } from '~/types/authentication.type'
 import type { DeviceInput } from '~/types/session.type'
 
@@ -91,6 +92,8 @@ export const useAuthApi = () => {
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
+
+      console.log('loginEmailConfirm response', response)
       return response as LoginEmailConfirmResponse
     } catch (error) {
       await proceedApiError(error)
@@ -110,12 +113,26 @@ export const useAuthApi = () => {
     }
   }
 
+  const loginTwitch = async (): Promise<LoginTwitchResponse> => {
+    try {
+      const response = await fetch('/api/v1/twitch/login', {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as LoginTwitchResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
   return {
     signUpAnonymous,
     loginEmail,
     signUpEmail,
     signUpEmailConfirm,
     loginEmailConfirm,
-    loginSpotify
+    loginSpotify,
+    loginTwitch
   }
 }

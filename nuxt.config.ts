@@ -3,9 +3,12 @@
 export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
   runtimeConfig: {
-    apiHost: process.env.API_HOST,
-    apiEnv: process.env.API_ENV,
-    apiKey: process.env.API_KEY
+    apiKey: process.env.API_KEY,
+    cookieSecret: process.env.COOKIE_SECRET,
+    public: {
+      apiHost: process.env.API_HOST,
+      siteUrl: process.env.SITE_URL
+    }
   },
   modules: [
     '@nuxt/content',

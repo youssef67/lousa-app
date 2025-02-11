@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import type { Playlist } from '~/types/session.type'
 
 const playlists = ref<Playlist[]>([])
 const isLoading = ref(true)
 const isSlideOverOpen = ref(false)
 const isCreatePlaylistModalOpen = ref(false)
-const { pushStreamers } = useSpecialRouter()
 const { runGetAllPlaylists } = useSpotifyRepository()
 
 const toggleSlider = () => {
@@ -48,14 +46,6 @@ onMounted(async () => {
       size="xl"
       color="secondary"
       @click="isCreatePlaylistModalOpen = true"
-    />
-    <UButton
-      label="liste des streamers"
-      type="submit"
-      variant="solid"
-      size="xl"
-      color="secondary"
-      @click="() => pushStreamers()"
     />
     <div v-if="isLoading">Chargement des playlists...</div>
     <ul v-else>

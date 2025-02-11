@@ -3,18 +3,20 @@ import type {
   GetUserSessionResponse,
   EditUserSessionResponse,
   DeleteUserResponse,
-  EditUser
+  EditUser,
+  GetStreamersListResponse,
+  GetSpaceStreamerResponse,
+  DeleteStreamerProfileResponse
 } from '~/types/session.type'
-
 
 export const useSessionApi = () => {
   const { proceedApiError } = useSpecialError()
   const sessionStore = useSessionStore()
   const { fetch } = useSpecialApi()
 
-  const logout = async (): Promise<LogoutResponse> => { 
+  const logout = async (): Promise<LogoutResponse> => {
     try {
-      const response = await fetch('/api/v1/session/logout', { 
+      const response = await fetch('/api/v1/session/logout', {
         method: FetchMethod.POST,
         body: {},
         headers: sessionStore.defaultHeaders(),
@@ -26,9 +28,9 @@ export const useSessionApi = () => {
     }
   }
 
-  const getUserSession = async (): Promise<GetUserSessionResponse> => { 
+  const getUserSession = async (): Promise<GetUserSessionResponse> => {
     try {
-      const response = await fetch('/api/v1/session/user', { 
+      const response = await fetch('/api/v1/session/user', {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
@@ -39,11 +41,13 @@ export const useSessionApi = () => {
     }
   }
 
-  const editUserSession = async (UserData: EditUser): Promise<EditUserSessionResponse> => {
+  const editUserSession = async (
+    UserData: EditUser
+  ): Promise<EditUserSessionResponse> => {
     try {
-      const response = await fetch('/api/v1/session/user', { 
+      const response = await fetch('/api/v1/session/user', {
         method: FetchMethod.PUT,
-        body: {UserData},
+        body: { UserData },
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
@@ -53,9 +57,9 @@ export const useSessionApi = () => {
     }
   }
 
-  const deleteUser  = async (): Promise<DeleteUserResponse> => { 
+  const deleteUser = async (): Promise<DeleteUserResponse> => {
     try {
-      const response = await fetch('/api/v1/session/user/delete', { 
+      const response = await fetch('/api/v1/session/user/delete', {
         method: FetchMethod.POST,
         body: {},
         headers: sessionStore.defaultHeaders(),
@@ -67,10 +71,59 @@ export const useSessionApi = () => {
     }
   }
 
+  const getStreamersList = async (
+    page: number
+  ): Promise<GetStreamersListResponse> => {
+    try {
+      const url = `/api/v1/session/streamers?page=${page}`
+
+      const response = await fetch(url, {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+
+      return response as GetStreamersListResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const checkIfStreamer = async (): Promise<GetSpaceStreamerResponse> => {
+    try {
+      const response = await fetch('/api/v1/session/validate/streamer/profile', {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as GetSpaceStreamerResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const deleteStreamerProfile = async (): Promise<DeleteStreamerProfileResponse> => {
+    try {
+      const response = await fetch('/api/v1/session/streamer/profile/delete', {
+        method: FetchMethod.POST,
+        body: {},
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as DeleteStreamerProfileResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+
   return {
     logout,
     getUserSession,
     editUserSession,
-    deleteUser
+    deleteUser,
+    getStreamersList,
+    checkIfStreamer,
+    deleteStreamerProfile
   }
 }

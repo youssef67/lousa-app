@@ -1,4 +1,4 @@
-import type { UserSession } from './session.type'
+import type { UserSession, TwitchUserSession } from './session.type'
 
 export interface SignUpAnonymousResponse {
   at: string
@@ -24,8 +24,13 @@ export interface LoginEmailConfirmResponse {
   di: string
   rt: string
   user: UserSession
+  twitchUser?: TwitchUserSession
 }
 
 export interface LoginSpotifyResponse {
   urlAuthorize: string
+}
+
+export interface LoginTwitchResponse {
+  url: string
 }

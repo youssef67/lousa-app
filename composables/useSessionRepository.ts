@@ -5,7 +5,7 @@ import type {
 export const useSessionRepository = () => {
   
   const sessionStore = useSessionStore()
-  const { logout, getUserSession, editUserSession, deleteUser } = useSessionApi()
+  const { logout, getUserSession, editUserSession, deleteUser, getStreamersList, checkIfStreamer, deleteStreamerProfile } = useSessionApi()
   const logger = useSpecialLogger()
   // const { getData, saveData, deleteData } = useSpecialStorage()
 
@@ -26,7 +26,6 @@ export const useSessionRepository = () => {
 
   const refreshUserSession = async () => {
     const response = await getUserSession()
-    console.log('call getUserSession - ', response)
     sessionStore.updateSessionUser(response.user)
     sessionStore.updateSessionSpotifyUser(response.spotifyUser)
   }
@@ -41,10 +40,47 @@ export const useSessionRepository = () => {
     }
   }
 
+  const runGetStreamersList = async (page: number) => {
+    try {
+      const response = await getStreamersList(page)
+
+      return response.data
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
+  const runCheckIfStreamer = async () => {
+    const response = await checkIfStreamer()
+
+    try {
+      if (response.result) {
+        return true
+      } else {
+        return false
+      }
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
+  const runDeleteStreamerProfile = async () => { 
+    try {
+      await deleteStreamerProfile()
+    } catch (error) {
+      logger.e('Error logging out', error)
+    } finally {
+      sessionStore.clearSession()
+    }
+  }
+
   return {
     runLogout,
     refreshUserSession,
     runEditUser,
-    runDeleteUser
+    runDeleteUser,
+    runGetStreamersList,
+    runCheckIfStreamer,
+    runDeleteStreamerProfile
   }
 }

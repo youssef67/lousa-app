@@ -13,10 +13,10 @@ onMounted(async () => {
       <div class="text-5xl font-medium w-full">Paramètres</div>
       <div class="text-3xl font-medium w-full">
         <UIcon name="i-heroicons-user-circle" class="icon-baseline" />
-        {{ sessionStore.session?.spotifyUser?.displayName ?? '' }}
+        {{ sessionStore.session?.user.spotifyUser?.displayName ?? '' }}
       </div>
       <p>
-        {{ sessionStore.session?.spotifyUser?.accessToken ?? '' }}
+        {{ sessionStore.session?.user.spotifyUser?.spotifyId ?? '' }}
       </p>
       <div class="text-3xl font-medium w-full" />
     </UContainer>

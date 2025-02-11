@@ -25,7 +25,6 @@ const closeSlider = () => {
 }
 
 const filteredPlaylists = computed(() => {
-  console.log('filteredPlaylists', props.playlists)
   if (!playlistName.value) return props.playlists
   return props.playlists.filter(playlist =>
     playlist.playlistName
@@ -83,7 +82,7 @@ const createPlaylist = async () => {
             :key="playlist.id"
             class="mt-2 mx-2"
           >
-            <PlaylistCard :playlists="playlist" />
+            <PlaylistCardSlider :playlist="playlist" :closeSlider="closeSlider"/>
           </div>
         </template>
         <div v-else class="text-center mt-4 text-gray-500">

@@ -12,7 +12,8 @@ export const useAuthRepository = () => {
     signUpEmail,
     signUpEmailConfirm,
     loginEmailConfirm,
-    loginSpotify
+    loginSpotify,
+    loginTwitch
   } = useAuthApi()
 
   const runSignUpAnonymous = async () => {
@@ -78,7 +79,7 @@ export const useAuthRepository = () => {
     try {
       window.location.href = authUrl
     } catch (error) {
-      throw newError('ERROR_INVALID_DATA', 'AREP-6')
+      throw newError('ERROR_INVALID_DATA', 'ARAS-1')
     }
   }
 
@@ -87,13 +88,33 @@ export const useAuthRepository = () => {
       const response = await loginSpotify()
 
       if(!response.urlAuthorize) {
-        throw newError('ERROR_INVALID_DATA', 'AREP-4')
+        throw newError('ERROR_INVALID_DATA', 'ARAS-2')
       }
 
-      await runAuthenticationSpotify(response.urlAuthorize)
-      return true
+      // await runAuthenticationSpotify(response.urlAuthorize)
+
+      const windowTwitchLogin = window.open(response.urlAuthorize, '_blank')
+
+      return windowTwitchLogin
     } catch (error) {
-      throw newError('ERROR_INVALID_DATA', 'AREP-5')
+      throw newError('ERROR_INVALID_DATA', 'ARAS-3')
+    }
+  }
+
+
+  const runLoginTwitch = async () => {
+    try {
+      const response = await loginTwitch()
+
+      if(!response.url) {
+        throw newError('ERROR_INVALID_DATA', 'ARLT-1')
+      }
+
+      const windowTwitchLogin = window.open(response.url, '_blank')
+
+      return windowTwitchLogin
+    } catch (error) {
+      throw newError('ERROR_INVALID_DATA', 'ARLT-2')
     }
   }
 
@@ -103,6 +124,7 @@ export const useAuthRepository = () => {
     runSignUpEmail,
     runSignUpEmailConfirm,
     runLoginEmailConfirm,
-    runLoginSpotifyStreamer
+    runLoginSpotifyStreamer,
+    runLoginTwitch
   }
 }

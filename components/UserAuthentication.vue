@@ -4,7 +4,7 @@ import { AuthState, AuthType, ConfirmResult, LoginResult, SignUpResult } from '~
 const toast = useSpecialToast()
 
 const authenticationStore = useAuthenticationStore()
-const { pushDashboard } = useSpecialRouter()
+const { pushHome } = useSpecialRouter()
 
 
 const proceedResultLogin = (result: LoginResult) => {
@@ -33,7 +33,7 @@ const proceedResultLoginConfirm = (result: ConfirmResult) => {
     case ConfirmResult.GO_TO_SUCCESS: {
       toast.showSuccess('Vous êtes connecté avec succès')
       authenticationStore.authState = AuthState.NONE
-      pushDashboard()
+      pushHome()
       break
     }
     case ConfirmResult.CANCELLED: {

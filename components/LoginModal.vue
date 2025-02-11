@@ -19,7 +19,6 @@ const { handleError } = useSpecialError()
 const updateIsOpen = (value: boolean) => {
   emit('update:isOpen', value)
   if (!value) {
-    console.log('druss')
     emit('proceedResult', LoginResult.CANCELLED)
   }
 }

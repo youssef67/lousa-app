@@ -47,7 +47,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 onMounted(() => {
   currentUser.value = sessionStore.session.user
 
-  console.log(currentUser.value.dateOfBirth)
   if (currentUser.value) {
     states.value.firstName = currentUser.value.firstName
     states.value.lastName = currentUser.value.lastName

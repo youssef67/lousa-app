@@ -1,14 +1,19 @@
-export interface LogoutResponse { 
+export interface LogoutResponse {
   result: boolean
 }
 
-export interface DeleteUserResponse { 
+export interface DeleteUserResponse {
+  result: boolean
+}
+
+export interface DeleteStreamerProfileResponse {
   result: boolean
 }
 
 export interface GetUserSessionResponse {
   user: UserSession
   spotifyUser?: SpotifyUserSession
+  twitchUser?: TwitchUserSession
 }
 
 export interface EditUserSessionResponse {
@@ -20,7 +25,7 @@ export interface Session {
   di: string
   rt: string
   user: UserSession
-  spotifyUser?: SpotifyUserSession
+  admin?: AdminSession
 }
 
 export interface UserSession {
@@ -30,14 +35,33 @@ export interface UserSession {
   email: string
   dateOfBirth?: string
   role: UserRole
+  twitchUser?: TwitchUserSession
+  spotifyUser?: SpotifyUserSession
+}
+
+export interface SpotifyLoginResponse {
+  spotifyUser: string
 }
 
 export interface SpotifyUserSession {
   spotifyId: string
   displayName: string
   email?: string
-  accessToken: string
-  refreshToken: string
+}
+
+export interface TwitchLoginStreamResponse {
+  twitchUser: string
+}
+
+export interface TwitchUserSession {
+  id: string
+  displayName: string
+  email: string
+  isStreamer?: boolean
+}
+
+export interface AdminSession {
+  dateStreamsLastUpdate: string
 }
 
 export enum UserRole {
@@ -68,7 +92,7 @@ export interface Auth {
   authId: string
 }
 
-export interface LogoutResponse { 
+export interface LogoutResponse {
   result: boolean
 }
 
@@ -81,7 +105,43 @@ export interface CreatePlaylistResponse {
   playlist: Playlist
 }
 
-export interface GetAllPlaylistResponse {
+export interface GetAllPlaylistsResponse {
   playlists: Playlist[]
 }
 
+export interface DeletePlaylistResponse {
+  result: boolean
+}
+
+export interface GetStreamersListResponse {
+  data: {
+    data: Streamer[]
+    meta: {
+      currentPage: number
+      firstPage: number
+      firstPageUrl: string
+      lastPage: number
+      lastPageUrl: string
+      nextPageUrl: string
+      perPage: number
+      previousPageUrl: string
+      total: number
+    }
+  }
+  streamersList: Streamer[]
+}
+
+export interface Streamer {
+  id: string
+  userLogin: string
+  userName: string
+  thumbnailUrl: string
+}
+
+export interface GetStreamerResponse {
+  result: boolean
+}
+
+export interface GetSpaceStreamerResponse {
+  result: boolean
+}
