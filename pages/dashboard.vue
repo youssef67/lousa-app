@@ -5,7 +5,6 @@ const playlists = ref<Playlist[]>([])
 const isLoading = ref(true)
 const isSlideOverOpen = ref(false)
 const isCreatePlaylistModalOpen = ref(false)
-const { runGetAllPlaylists } = useSpotifyRepository()
 
 const toggleSlider = () => {
   isSlideOverOpen.value = !isSlideOverOpen.value
@@ -19,7 +18,6 @@ const proceedResult = (playlist: Playlist) => {
 onMounted(async () => {
   isLoading.value = true
   try {
-    const response = await runGetAllPlaylists()
     playlists.value = response.playlists || []
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
@@ -55,7 +53,7 @@ onMounted(async () => {
       :is-open="isCreatePlaylistModalOpen"
       @proceed-result="proceedResult"
     />
-    <SpecialSlider
+    <SpecialSliderStreamer
       :isOpen="isSlideOverOpen"
       :playlists="playlists"
       @update:isOpen="isSlideOverOpen = $event"

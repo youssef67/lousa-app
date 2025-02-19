@@ -1,15 +1,12 @@
 <script lang="ts" setup>
 import { Subscription, Transmit } from '@adonisjs/transmit-client'
-import {
-  type TwitchLoginStreamResponse,
-  type TwitchUserSession
-} from '~~/types/session.type'
 
 const { showSuccess, showError } = useSpecialToast()
 const config = useRuntimeConfig()
 const sessionStore = useSessionStore()
 const { runLoginTwitch } = useAuthRepository()
-const {runCheckIfStreamer, runDeleteStreamerProfile } = useSessionRepository()
+const { runCheckIfStreamer, runDeleteStreamerProfile } =
+  useSessionRepository()
 
 const { handleError } = useSpecialError()
 
@@ -32,21 +29,18 @@ async function onLoginClick() {
 
   try {
     const newWindow = await runLoginTwitch()
-
     // Mise en place de l'écoute des messages envoyés par le serveur au moment du callback
-    subscription.onMessage(async (data: TwitchLoginStreamResponse) => {
-      const jsonData = JSON.parse(data.twitchUser) as TwitchUserSession
+    subscription.onMessage(async () => {
+      const response = await runCheckIfStreamer()
 
-       
-      const isStreamer = await runCheckIfStreamer()
+      if (response.twitchUser.isStreamer) {
+        await sessionStore.updateSessionTwitchUser(response.twitchUser)
 
-      if (isStreamer) {
-        jsonData.isStreamer = isStreamer
-        await sessionStore.updateSessionTwitchUser(jsonData)
         showSuccess('Vous êtes maintenant connecté à votre espace streamer')
       } else {
         await runDeleteStreamerProfile()
-        showError('Désolé, vous n\'êtes pas autorisé à accéder à cet espace')
+
+        showError("Désolé, vous n'êtes pas autorisé à accéder à cet espace")
       }
 
       // Fermeture de la page de connexion twitch et de la connextion serveur sent events

@@ -32,6 +32,11 @@ export interface Session {
   admin?: AdminSession
 }
 
+export interface SpaceStreamerData {
+  spaceStreamer: SpaceStreamerMainInfo
+  playlists: Playlist[]
+}
+
 export interface UserSession {
   id: string
   firstName?: string
@@ -61,7 +66,7 @@ export interface TwitchUserSession {
   id: string
   displayName: string
   email: string
-  isStreamer?: boolean
+  isStreamer: boolean
 }
 
 export interface AdminSession {
@@ -109,10 +114,6 @@ export interface CreatePlaylistResponse {
   playlist: Playlist
 }
 
-export interface GetAllPlaylistsResponse {
-  playlists: Playlist[]
-}
-
 export interface DeletePlaylistResponse {
   result: boolean
 }
@@ -146,6 +147,18 @@ export interface GetStreamerResponse {
   result: boolean
 }
 
-export interface GetSpaceStreamerResponse {
-  result: boolean
+export interface SpaceStreamerMainInfo {
+  id: string
+  spaceName : string
 }
+
+export interface GetCheckIfStreamerResponse {
+  twitchUser: TwitchUserSession
+}
+
+export interface GetSpaceStreamerDataResponse {
+  spaceStreamer: SpaceStreamerMainInfo
+  playlists: Playlist[]
+}
+
+

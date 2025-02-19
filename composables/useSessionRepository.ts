@@ -10,7 +10,8 @@ export const useSessionRepository = () => {
     getStreamersList,
     checkIfStreamer,
     deleteStreamerProfile,
-    setAndGetPlaylistSelected
+    setAndGetPlaylistSelected,
+    getSpaceStreamerData
   } = useSessionApi()
   const logger = useSpecialLogger()
   // const { getData, saveData, deleteData } = useSpecialStorage()
@@ -33,7 +34,7 @@ export const useSessionRepository = () => {
   const refreshUserSession = async () => {
     const response = await getUserSession()
     sessionStore.updateSessionUser(response.user)
-    sessionStore.updateSessionSpotifyUser(response.spotifyUser)
+    // sessionStore.updateSessionSpotifyUser(response.spotifyUser)
   }
 
   const runDeleteUser = async () => {
@@ -58,16 +59,7 @@ export const useSessionRepository = () => {
 
   const runCheckIfStreamer = async () => {
     const response = await checkIfStreamer()
-
-    try {
-      if (response.result) {
-        return true
-      } else {
-        return false
-      }
-    } catch (error) {
-      logger.e('Error logging out', error)
-    }
+    return response
   }
 
   const runDeleteStreamerProfile = async () => {
@@ -89,6 +81,15 @@ export const useSessionRepository = () => {
     }
   }
 
+  const runGetSpaceStreamerData = async () => {
+    try {
+      const response = await getSpaceStreamerData()
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
   return {
     runLogout,
     refreshUserSession,
@@ -97,6 +98,7 @@ export const useSessionRepository = () => {
     runGetStreamersList,
     runCheckIfStreamer,
     runDeleteStreamerProfile,
-    runSetAndGetPLaylistSelected
+    runSetAndGetPLaylistSelected,
+    runGetSpaceStreamerData
   }
 }

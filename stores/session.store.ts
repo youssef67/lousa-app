@@ -1,8 +1,17 @@
-import { UserRole, type Session, type UserSession, type SpotifyUserSession, type TwitchUserSession, type AdminSession, type Playlist } from '~~/types/session.type'
+import {
+  UserRole,
+  type Session,
+  type UserSession,
+  type SpotifyUserSession,
+  type TwitchUserSession,
+  type AdminSession,
+  type Playlist,
+  type SpaceStreamerData,
+} from '~~/types/session.type'
 
 export const useSessionStore = defineStore('session', () => {
   const session = ref<Session | null>(null)
-  const playlistsList = ref<Playlist[]>([])
+  const spaceStreamer = ref<SpaceStreamerData>()
   const playlistSelected = ref<Playlist | null>(null)
   const { newError } = useSpecialError()
   const { getData, saveData, deleteData } = useSpecialStorage()
@@ -10,7 +19,7 @@ export const useSessionStore = defineStore('session', () => {
   const restoreSession = () => {
     if (session.value) {
       // Session is already open
-      return 
+      return
     }
 
     const sessionFromStorage = getData(StorageKey.SESSION) as Session
@@ -21,7 +30,9 @@ export const useSessionStore = defineStore('session', () => {
     }
   }
 
-  const defaultHeaders = (data: { multipart: boolean } = { multipart: false }): any => {
+  const defaultHeaders = (
+    data: { multipart: boolean } = { multipart: false }
+  ): any => {
     const lang = 'fr'
     const headers = {
       'accept-language': lang
@@ -46,12 +57,16 @@ export const useSessionStore = defineStore('session', () => {
     await updateSession(session.value)
   }
 
-  const updateSessionSpotifyUser = async (spotifyUserUpdated: SpotifyUserSession) => {
+  const updateSessionSpotifyUser = async (
+    spotifyUserUpdated: SpotifyUserSession
+  ) => {
     session.value.user.spotifyUser = spotifyUserUpdated
     await updateSession(session.value)
   }
 
-  const updateSessionTwitchUser = async (twitchUserUpdated: TwitchUserSession) => {
+  const updateSessionTwitchUser = async (
+    twitchUserUpdated: TwitchUserSession
+  ) => {
     session.value.user.twitchUser = twitchUserUpdated
     await updateSession(session.value)
   }
@@ -73,15 +88,15 @@ export const useSessionStore = defineStore('session', () => {
     return !!session.value && session.value.user.role === UserRole.ADMIN
   }
 
-  const isSpotifyUserAuthenticated = () => { 
+  const isSpotifyUserAuthenticated = () => {
     return !!session.value?.user.spotifyUser
   }
 
-  const isTwitchUserAuthenticated = () => { 
+  const isTwitchUserAuthenticated = () => {
     return !!session.value?.user.twitchUser
   }
 
-  const isTwitchStreamerAuthenticated = () => { 
+  const isTwitchStreamerAuthenticated = () => {
     return !!session.value.user.twitchUser?.isStreamer
   }
 
@@ -91,18 +106,34 @@ export const useSessionStore = defineStore('session', () => {
     deleteData(StorageKey.AUTH)
   }
 
-  const getPlaylistsList = (playlists: Playlist[]) => {
-    playlistsList.value = playlists
-  }
-
-  const updatePlaylistsList = (playlist: Playlist) => {
+  const addPlaylistsToList = (playlist: Playlist) => {
     if (playlist !== undefined) {
-      playlistsList.value.push(playlist)
+      spaceStreamer.value?.playlists.push(playlist)
     }
   }
 
+  const deletePlaylistsToList = (playlistIdToDelete: string) => {
+
+    const indexPlaylistToDelete = spaceStreamer.value?.playlists.findIndex(playlist => playlist.id === playlistIdToDelete)
+
+    if (indexPlaylistToDelete === -1) return false
+  
+    spaceStreamer.value?.playlists.splice(indexPlaylistToDelete, 1)
+    return false
+  }
+
+  const updateSpaceStreamerData = async (spaceStreamerData: SpaceStreamerData) => {
+    if(!spaceStreamer.value) { 
+      spaceStreamer.value = {} as SpaceStreamerData
+    }
+
+    spaceStreamer.value = spaceStreamerData
+  }
+
+
   return {
     session,
+    spaceStreamer,
     restoreSession,
     defaultHeaders,
     isSessionOpen,
@@ -117,9 +148,9 @@ export const useSessionStore = defineStore('session', () => {
     updateSessionAdmin,
     isAdmin,
     isTwitchStreamerAuthenticated,
-    getPlaylistsList,
-    updatePlaylistsList,
-    playlistsList,
-    playlistSelected
+    playlistSelected,
+    updateSpaceStreamerData,
+    deletePlaylistsToList,
+    addPlaylistsToList
   }
 })

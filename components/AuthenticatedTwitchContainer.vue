@@ -7,6 +7,12 @@ const props = defineProps({
 })
 
 const sessionStore = useSessionStore()
+const {refreshUserSession } = useSessionRepository()
+
+
+onMounted(() => {
+  refreshUserSession()
+})
 </script>
 
 <template>

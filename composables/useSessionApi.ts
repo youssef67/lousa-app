@@ -5,9 +5,10 @@ import type {
   DeleteUserResponse,
   EditUser,
   GetStreamersListResponse,
-  GetSpaceStreamerResponse,
+  GetCheckIfStreamerResponse,
   DeleteStreamerProfileResponse,
-  SetAndGetPlaylistSelectedResponse
+  SetAndGetPlaylistSelectedResponse,
+  GetSpaceStreamerDataResponse
 } from '~/types/session.type'
 
 export const useSessionApi = () => {
@@ -36,6 +37,7 @@ export const useSessionApi = () => {
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
+
       return response as GetUserSessionResponse
     } catch (error) {
       await proceedApiError(error)
@@ -90,14 +92,14 @@ export const useSessionApi = () => {
     }
   }
 
-  const checkIfStreamer = async (): Promise<GetSpaceStreamerResponse> => {
+  const checkIfStreamer = async (): Promise<GetCheckIfStreamerResponse> => {
     try {
       const response = await fetch('/api/v1/session/validate/streamer/profile', {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
-      return response as GetSpaceStreamerResponse
+      return response as GetCheckIfStreamerResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -132,6 +134,19 @@ export const useSessionApi = () => {
     }
   }
 
+  const getSpaceStreamerData = async (): Promise<GetSpaceStreamerDataResponse> => {
+    try {
+      const response = await fetch('/api/v1/session/streamer/space', {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as GetSpaceStreamerDataResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
 
   return {
     logout,
@@ -141,6 +156,7 @@ export const useSessionApi = () => {
     getStreamersList,
     checkIfStreamer,
     deleteStreamerProfile,
-    setAndGetPlaylistSelected
+    setAndGetPlaylistSelected,
+    getSpaceStreamerData
   }
 }

@@ -11,14 +11,21 @@ const props = defineProps({
 
 const { runDeletePlaylists } = useSpotifyRepository()
 const sessionStore = useSessionStore()
+const toast = useSpecialToast()
 const deletePlaylist = async () => {
   const response = await runDeletePlaylists(props.playlist.id)
-  console.log(response)
+
+  if (response) {
+    sessionStore.deletePlaylistsToList(props.playlist.id)
+    toast.showSuccess('Playlist supprimée avec succès')
+  }
+
 }
 
 const selectPlaylist = () => {
   sessionStore.playlistSelected = props.playlist
   props.closeSlider()
+
 }
 
 </script>

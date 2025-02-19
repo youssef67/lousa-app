@@ -1,6 +1,5 @@
 import type {
   CreatePlaylistResponse,
-  GetAllPlaylistsResponse,
   DeletePlaylistResponse
 } from '~/types/session.type.js'
 
@@ -25,19 +24,6 @@ export const useSpotifyApi = () => {
     }
   }
 
-  const getAllPlaylists = async (): Promise<GetAllPlaylistsResponse> => {
-    try {
-      const response = await fetch('/api/v1/spotify/playlists', {
-        method: FetchMethod.GET,
-        headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
-      })
-      return response as GetAllPlaylistsResponse
-    } catch (error) {
-      await proceedApiError(error)
-    }
-  }
-
   const deletePlaylist = async (
     id: string
   ): Promise<DeletePlaylistResponse> => {
@@ -56,7 +42,6 @@ export const useSpotifyApi = () => {
 
   return {
     createPlaylist,
-    getAllPlaylists,
     deletePlaylist
   }
 }

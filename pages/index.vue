@@ -10,7 +10,7 @@ const { pushSpaceStreamer, pushSpaceViewer, pushCreateSpaceStreamer } =
 const sessionStore = useSessionStore()
 // Fonction pour naviguer vers la page des streamers
 const goToSpaceStreamer = () => {
-  pushSpaceViewer(sessionStore.session.user.id, true)
+  pushSpaceViewer()
 }
 // Fonction pour créer l'espace streamer (ajoute ton username dynamiquement)
 const goToStreamerSpace = () => {
