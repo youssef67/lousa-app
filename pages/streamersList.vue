@@ -1,29 +1,29 @@
 <script lang="ts" setup>
 import type { Streamer } from '~/types/session.type.js'
-import StreamerCard from '~/components/StreamerCard.vue'
-import { useDebounceFn } from '@vueuse/core' // Import du debounce
+import { useDebounceFn } from '@vueuse/core'
 
 const { runGetStreamersList } = useSessionRepository()
-const streamersList = ref<Streamer[]>([])      // Liste paginée pour affichage
-const allStreamersList = ref<Streamer[]>([])   // Contient tous les streamers chargés
-const filteredStreamers = ref<Streamer[]>([])  // Résultat de la recherche
+const streamersList = ref<Streamer[]>([]) // Liste paginée pour affichage
+const allStreamersList = ref<Streamer[]>([]) // Contient tous les streamers chargés
+const filteredStreamers = ref<Streamer[]>([]) // Résultat de la recherche
 const paginatedStreamers = ref<Streamer[]>([]) // Liste finale après recherche + pagination
 const currentPage = ref(1)
 const totalPages = ref(1)
 const searchQuery = ref('')
-const perPage = 20
-const isFetchingAll = ref(false)  // Pour éviter de recharger inutilement
+const perPage = 15
+const isFetchingAll = ref(false) // Pour éviter de recharger inutilement
 
 // Fonction pour charger tous les streamers une seule fois
 const fetchAllStreamers = async () => {
   if (isFetchingAll.value) return
   isFetchingAll.value = true
-  
+
   let page = 1
   let allStreamers: Streamer[] = []
 
   while (true) {
     const response = await runGetStreamersList(page)
+    console.log(response.data)
     allStreamers = [...allStreamers, ...response.data]
 
     if (page >= response.meta.lastPage) break
@@ -39,6 +39,7 @@ const fetchAllStreamers = async () => {
 const fetchStreamers = async (page: number) => {
   const response = await runGetStreamersList(page)
 
+  console.log(response)
   streamersList.value = response.data
   currentPage.value = response.meta.currentPage
   totalPages.value = response.meta.lastPage
@@ -62,8 +63,10 @@ const debouncedSearch = useDebounceFn(() => {
   if (!searchQuery.value) {
     filteredStreamers.value = allStreamersList.value
   } else {
-    filteredStreamers.value = allStreamersList.value.filter((streamer) =>
-      streamer.userLogin.toLowerCase().includes(searchQuery.value.toLowerCase())
+    filteredStreamers.value = allStreamersList.value.filter(streamer =>
+      streamer.twitchUserLogin
+        .toLowerCase()
+        .includes(searchQuery.value.toLowerCase())
     )
   }
 
@@ -107,8 +110,8 @@ const prevPage = () => {
 
     <!-- Champ de recherche avec debounce -->
     <div class="mb-6 flex justify-center">
-      <UInput 
-        v-model="searchQuery" 
+      <UInput
+        v-model="searchQuery"
         placeholder="Rechercher un streamer"
         size="xl"
         class="w-1/2"
@@ -122,29 +125,29 @@ const prevPage = () => {
     </div>
 
     <!-- Boucle sur les streamers pour afficher les cartes -->
-    <div 
-      v-else 
+    <div
+      v-else
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
     >
-      <StreamerCard 
-        v-for="streamer in paginatedStreamers" 
-        :key="streamer.id" 
-        :streamer="streamer"
+      <SpaceStreamerCard
+        v-for="streamer in paginatedStreamers"
+        :key="streamer.id"
+        :spaceStreamer="streamer"
       />
     </div>
 
     <!-- Pagination -->
     <div class="flex justify-center items-center gap-4 mt-6 mb-10">
-      <UButton 
-        label="Précédent" 
-        :disabled="currentPage === 1" 
-        @click="prevPage" 
+      <UButton
+        label="Précédent"
+        :disabled="currentPage === 1"
+        @click="prevPage"
       />
       <span>Page {{ currentPage }} sur {{ totalPages }}</span>
-      <UButton 
-        label="Suivant" 
-        :disabled="currentPage === totalPages" 
-        @click="nextPage" 
+      <UButton
+        label="Suivant"
+        :disabled="currentPage === totalPages"
+        @click="nextPage"
       />
     </div>
   </UContainer>

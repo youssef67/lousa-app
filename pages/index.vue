@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Subscription, Transmit } from '@adonisjs/transmit-client'
-
 definePageMeta({
   middleware: 'auth'
 })
@@ -14,7 +12,7 @@ const goToSpaceStreamer = () => {
 }
 // Fonction pour créer l'espace streamer (ajoute ton username dynamiquement)
 const goToStreamerSpace = () => {
-  pushSpaceStreamer(sessionStore.session.user.email, true)
+  pushSpaceStreamer()
 }
 
 </script>
@@ -54,10 +52,5 @@ const goToStreamerSpace = () => {
         />
       </UCard>
     </section>
-
-    <!-- <CreateSpaceStreamerModal
-      :isOpen="isModalVisible"
-      @proceed-result="proceedResult"
-    /> -->
   </UContainer>
 </template>

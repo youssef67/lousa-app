@@ -77,6 +77,7 @@ export const useSessionApi = () => {
   const getStreamersList = async (
     page: number
   ): Promise<GetStreamersListResponse> => {
+    console.log('getStreamersList')
     try {
       const url = `/api/v1/session/streamers?page=${page}`
 
@@ -88,38 +89,48 @@ export const useSessionApi = () => {
 
       return response as GetStreamersListResponse
     } catch (error) {
+      console.log('error', error)
       await proceedApiError(error)
     }
   }
 
   const checkIfStreamer = async (): Promise<GetCheckIfStreamerResponse> => {
     try {
-      const response = await fetch('/api/v1/session/validate/streamer/profile', {
-        method: FetchMethod.GET,
-        headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
-      })
+      const response = await fetch(
+        '/api/v1/session/validate/streamer/profile',
+        {
+          method: FetchMethod.GET,
+          headers: sessionStore.defaultHeaders(),
+          cache: 'no-cache'
+        }
+      )
       return response as GetCheckIfStreamerResponse
     } catch (error) {
       await proceedApiError(error)
     }
   }
 
-  const deleteStreamerProfile = async (): Promise<DeleteStreamerProfileResponse> => {
-    try {
-      const response = await fetch('/api/v1/session/streamer/profile/delete', {
-        method: FetchMethod.POST,
-        body: {},
-        headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
-      })
-      return response as DeleteStreamerProfileResponse
-    } catch (error) {
-      await proceedApiError(error)
+  const deleteStreamerProfile =
+    async (): Promise<DeleteStreamerProfileResponse> => {
+      try {
+        const response = await fetch(
+          '/api/v1/session/streamer/profile/delete',
+          {
+            method: FetchMethod.POST,
+            body: {},
+            headers: sessionStore.defaultHeaders(),
+            cache: 'no-cache'
+          }
+        )
+        return response as DeleteStreamerProfileResponse
+      } catch (error) {
+        await proceedApiError(error)
+      }
     }
-  }
 
-  const setAndGetPlaylistSelected = async (playlistId: string): Promise<SetAndGetPlaylistSelectedResponse> => {
+  const setAndGetPlaylistSelected = async (
+    playlistId: string
+  ): Promise<SetAndGetPlaylistSelectedResponse> => {
     try {
       const response = await fetch('/api/v1/session/playlist/selected', {
         method: FetchMethod.POST,
@@ -134,19 +145,30 @@ export const useSessionApi = () => {
     }
   }
 
-  const getSpaceStreamerData = async (): Promise<GetSpaceStreamerDataResponse> => {
+  const getSpaceStreamerData = async (
+    twitchUserId: string | null,
+    spaceStreamerId: string | null
+  ): Promise<GetSpaceStreamerDataResponse> => {
     try {
+      // Création de l'objet en filtrant les valeurs null
+      const body = Object.fromEntries(
+        Object.entries({ twitchUserId, spaceStreamerId }).filter(
+          ([_, v]) => v !== null
+        )
+      )
+
       const response = await fetch('/api/v1/session/streamer/space', {
-        method: FetchMethod.GET,
+        method: FetchMethod.POST,
+        body: JSON.stringify(body), // Convertir en JSON
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
+
       return response as GetSpaceStreamerDataResponse
     } catch (error) {
       await proceedApiError(error)
     }
   }
-
 
   return {
     logout,

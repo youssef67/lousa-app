@@ -1,4 +1,3 @@
-
 <script lang="ts" setup>
 import { Subscription, Transmit } from '@adonisjs/transmit-client'
 import {
@@ -11,7 +10,8 @@ const route = useRoute()
 const config = useRuntimeConfig()
 const { showSuccess } = useSpecialToast()
 const sessionStore = useSessionStore()
-const { runSetAndGetPLaylistSelected, runGetSpaceStreamerData } = useSessionRepository()
+const { runSetAndGetPLaylistSelected, runGetSpaceStreamerData } =
+  useSessionRepository()
 const { handleError } = useSpecialError()
 const userName = route.query.username
 
@@ -63,21 +63,22 @@ async function closeEventStream(subscription: Subscription) {
 }
 
 onMounted(async () => {
-  isLoading.value = true
-  try {
-    const spaceData = await runGetSpaceStreamerData()
+  if (sessionStore.isTwitchUserAuthenticated()) {
+    isLoading.value = true
+    try {
+      const spaceData = await runGetSpaceStreamerData(sessionStore.session.user.twitchUser.id, null)
 
-    await sessionStore.updateSpaceStreamerData(spaceData)
+      await sessionStore.updateSpaceStreamerData(spaceData)
 
+      // const responseGetCurrentPlaylist = await runSetAndGetPLaylistSelected(null)
 
-    // const responseGetCurrentPlaylist = await runSetAndGetPLaylistSelected(null)
-
-    // currentPlayList.value = responseGetCurrentPlaylist.playlist
-    // console.log(responseGetCurrentPlaylist)
-  } catch (error) {
-    console.error('Erreur lors du chargement des playlists :', error)
-  } finally {
-    isLoading.value = false
+      // currentPlayList.value = responseGetCurrentPlaylist.playlist
+      // console.log(responseGetCurrentPlaylist)
+    } catch (error) {
+      console.error('Erreur lors du chargement des playlists :', error)
+    } finally {
+      isLoading.value = false
+    }
   }
 })
 
@@ -94,75 +95,79 @@ watch(
 
 <template>
   <UContainer>
-    <div>
-      <h1 class="text-2xl font-bold mb-4">Espace de {{ userName }}</h1>
-    </div>
-    <section
-      v-if="!sessionStore.isSpotifyUserAuthenticated()"
-      class="flex flex-col items-center gap-5 mb-10"
-    >
-      <p class="text-center">
-        Afin de profiter des fonctionnalités de l'espace de {{ userName }}, vous
-        devez vous authentifier avec votre compte Spotify.
-      </p>
-      <UButton
-        label="Se connecter à son compte Spotify"
-        type="submit"
-        variant="solid"
-        size="xl"
-        color="secondary"
-        @click="connectSpotifyAccount"
-      />
-    </section>
-    <UButton
-      label="Mes playlists actives"
-      type="submit"
-      variant="solid"
-      size="xl"
-      color="secondary"
-      @click="toggleSlider"
-    />
-    <UButton
-      label="créer une playlist"
-      :disabled="!sessionStore.isSpotifyUserAuthenticated()"
-      type="submit"
-      variant="solid"
-      size="xl"
-      color="secondary"
-      @click="isCreatePlaylistModalOpen = true"
-    />
-    <div v-if="isLoading">Chargement des playlists...</div>
-    <ul v-else>
-      <div v-if="currentPlayList === null">
-        <h2>Aucune playlist selectionnée</h2>
+    <AuthenticatedTwitchContainer>
+      <div>
+        <h1 class="text-2xl font-bold mb-4">Espace de {{ sessionStore.session.user.email }}</h1>
+      </div>
+      <section
+        v-if="
+          !sessionStore.isSpotifyUserAuthenticated() &&
+          sessionStore.isTwitchUserAuthenticated()
+        "
+        class="flex flex-col items-center gap-5 mb-10"
+      >
+        <p class="text-center">
+          Afin de profiter des fonctionnalités de l'espace de {{ userName }},
+          vous devez vous authentifier avec votre compte Spotify.
+        </p>
         <UButton
-          label="Sélectionner une playlist"
+          label="Se connecter à son compte Spotify"
           type="submit"
           variant="solid"
           size="xl"
           color="secondary"
-          @click="toggleSlider"
+          @click="connectSpotifyAccount"
         />
-      </div>
-      <div v-else>
-        <h2>Playlist selected</h2>
-        <p>{{ currentPlayList.id }}</p>
-        <p>{{ currentPlayList.playlistName }}</p>
-      </div>
-    </ul>
+      </section>
+      <UButton
+        label="Mes playlists actives"
+        type="submit"
+        variant="solid"
+        size="xl"
+        color="secondary"
+        @click="toggleSlider"
+      />
+      <UButton
+        label="créer une playlist"
+        :disabled="!sessionStore.isSpotifyUserAuthenticated()"
+        type="submit"
+        variant="solid"
+        size="xl"
+        color="secondary"
+        @click="isCreatePlaylistModalOpen = true"
+      />
+      <div v-if="isLoading">Chargement des playlists...</div>
+      <ul v-else>
+        <div v-if="currentPlayList === null">
+          <h2>Aucune playlist selectionnée</h2>
+          <UButton
+            label="Sélectionner une playlist"
+            type="submit"
+            variant="solid"
+            size="xl"
+            color="secondary"
+            @click="toggleSlider"
+          />
+        </div>
+        <div v-else>
+          <h2>Playlist selected</h2>
+          <p>{{ currentPlayList.id }}</p>
+          <p>{{ currentPlayList.playlistName }}</p>
+        </div>
+      </ul>
 
-    <CreatePlaylistModal
-      :is-open="isCreatePlaylistModalOpen"
-      @proceed-result="proceedResult"
-    />
-    <SpecialSliderStreamer
-      :isOpen="isSlideOverOpen"
-      :playlists="sessionStore.spaceStreamer?.playlists || []"
-      @update:isOpen="isSlideOverOpen = $event"
-      @proceed-result="proceedResult"
-    />
+      <CreatePlaylistModal
+        :is-open="isCreatePlaylistModalOpen"
+        @proceed-result="proceedResult"
+      />
+      <SpecialSliderStreamer
+        :isOpen="isSlideOverOpen"
+        :playlists="sessionStore.spaceStreamer?.playlists || []"
+        @update:isOpen="isSlideOverOpen = $event"
+        @proceed-result="proceedResult"
+      />
+    </AuthenticatedTwitchContainer>
   </UContainer>
 </template>
-
 
 <style></style>

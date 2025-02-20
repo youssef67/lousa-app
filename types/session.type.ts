@@ -64,9 +64,9 @@ export interface TwitchLoginStreamResponse {
 
 export interface TwitchUserSession {
   id: string
-  displayName: string
+  twitchUserLogin: string
   email: string
-  isStreamer: boolean
+  spaceStreamerId: string
 }
 
 export interface AdminSession {
@@ -108,6 +108,7 @@ export interface LogoutResponse {
 export interface Playlist {
   id: string
   playlistName: string
+  isFavorite: boolean
 }
 
 export interface CreatePlaylistResponse {
@@ -138,9 +139,10 @@ export interface GetStreamersListResponse {
 
 export interface Streamer {
   id: string
-  userLogin: string
-  userName: string
-  thumbnailUrl: string
+  spaceName: string
+  twitchUserId: string
+  twitchUserLogin: string
+  spaceStreamerImg: string
 }
 
 export interface GetStreamerResponse {

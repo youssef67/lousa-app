@@ -97,7 +97,7 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   const isTwitchStreamerAuthenticated = () => {
-    return !!session.value.user.twitchUser?.isStreamer
+    return !!session.value.user.twitchUser?.spaceStreamerId
   }
 
   const clearSession = () => {

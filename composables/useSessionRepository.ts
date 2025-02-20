@@ -48,6 +48,7 @@ export const useSessionRepository = () => {
   }
 
   const runGetStreamersList = async (page: number) => {
+    console.log('runGetStreamersList')
     try {
       const response = await getStreamersList(page)
 
@@ -81,9 +82,9 @@ export const useSessionRepository = () => {
     }
   }
 
-  const runGetSpaceStreamerData = async () => {
+  const runGetSpaceStreamerData = async (twitchUserId: string | null, spaceStreamerId: string | null) => {
     try {
-      const response = await getSpaceStreamerData()
+      const response = await getSpaceStreamerData(twitchUserId, spaceStreamerId)
       return response
     } catch (error) {
       logger.e('Error logging out', error)

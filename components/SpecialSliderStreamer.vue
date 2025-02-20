@@ -10,9 +10,14 @@ const props = defineProps({
   playlists: {
     type: Object as PropType<Playlist[]>,
     required: true
+  },
+  openedByStreamer: {
+    type: Boolean,
+    required: false
   }
 })
 
+console.log(props)
 const inputText = ref(null)
 const playlistName = ref('')
 const sessionStore = useSessionStore()
@@ -75,6 +80,7 @@ const proceedResult = (playlist: Playlist) => {
       />
       <div class="flex-1 overflow-y-auto">
         <UButton
+          v-if="props.openedByStreamer"
           label="créer la playlist"
           type="submit"
           variant="solid"
@@ -96,6 +102,7 @@ const proceedResult = (playlist: Playlist) => {
             <PlaylistCardSlider
               :playlist="playlist"
               :closeSlider="closeSlider"
+              :openedByStreamer="props.openedByStreamer"
             />
           </div>
         </template>

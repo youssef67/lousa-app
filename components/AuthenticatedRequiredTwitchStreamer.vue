@@ -33,7 +33,7 @@ async function onLoginClick() {
     subscription.onMessage(async () => {
       const response = await runCheckIfStreamer()
 
-      if (response.twitchUser.isStreamer) {
+      if (response.twitchUser.spaceStreamerId) {
         await sessionStore.updateSessionTwitchUser(response.twitchUser)
 
         showSuccess('Vous êtes maintenant connecté à votre espace streamer')

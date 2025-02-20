@@ -1,10 +1,12 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+
+
+
+</script>
 
 <template>
   <UContainer>
-    <AuthenticatedTwitchContainer :isStreamerAuthentication="true">
       <SpaceStreamer />
-    </AuthenticatedTwitchContainer>
   </UContainer>
 </template>
 

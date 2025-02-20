@@ -10,6 +10,7 @@ const toggleSlider = () => {
 }
 
 const sessionStore = useSessionStore()
+const { pushStreamers } = useSpecialRouter()
 
 onMounted(async () => {
   isLoading.value = true
@@ -40,7 +41,15 @@ watch(
 
 <template>
   <UContainer> 
-    <h1>Espace viewer {sessionStore.session.user.email}}</h1>
+    <h1>Espace viewer {{ sessionStore.session.user.email}}</h1>
+    <UButton
+        label="Liste des streamers"
+        type="submit"
+        variant="solid"
+        size="xl"
+        color="secondary"
+        @click="pushStreamers()"
+      />
     <UButton
         label="Mes playlists favorites"
         type="submit"
@@ -57,12 +66,12 @@ watch(
         color="secondary"
         @click="toggleSlider"
       />
-    <SpecialSliderViewer
+    <!-- <SpecialSliderViewer
         :isOpen="isSlideOverOpen"
         :favoritePlaylists="sessionStore.playlistsList"
         :favoriteStreamer="sessionStore.playlistsList"
         @update:isOpen="isSlideOverOpen = $event"
-      />
+      /> -->
   </UContainer>
 </template>
 
