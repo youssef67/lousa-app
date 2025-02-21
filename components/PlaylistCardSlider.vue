@@ -13,8 +13,6 @@ const props = defineProps({
   }
 })
 
-console.log(props.playlist.isFavorite)
-
 const { runDeletePlaylists } = useSpotifyRepository()
 const { runAddFavoritePlaylist, runDeleteFavoritePlaylist } =
   useViewerRepository()
@@ -42,7 +40,6 @@ const selectPlaylist = () => {
 const toggleFavoritePlaylist = async () => {
   let playlistInStore = sessionStore.spaceStreamer.playlists.find(playlist => playlist.id === props.playlist.id)
 
-  console.log(playlistInStore.isFavorite)
   if (isFavorite.value) {
     const response = await runDeleteFavoritePlaylist(props.playlist.id)
     if (response) {

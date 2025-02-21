@@ -17,7 +17,6 @@ const props = defineProps({
   }
 })
 
-console.log(props)
 const inputText = ref(null)
 const playlistName = ref('')
 const sessionStore = useSessionStore()

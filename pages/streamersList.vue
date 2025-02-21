@@ -23,7 +23,6 @@ const fetchAllStreamers = async () => {
 
   while (true) {
     const response = await runGetStreamersList(page)
-    console.log(response.data)
     allStreamers = [...allStreamers, ...response.data]
 
     if (page >= response.meta.lastPage) break
@@ -39,7 +38,6 @@ const fetchAllStreamers = async () => {
 const fetchStreamers = async (page: number) => {
   const response = await runGetStreamersList(page)
 
-  console.log(response)
   streamersList.value = response.data
   currentPage.value = response.meta.currentPage
   totalPages.value = response.meta.lastPage

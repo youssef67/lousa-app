@@ -152,6 +152,10 @@ export interface GetStreamerResponse {
 export interface SpaceStreamerMainInfo {
   id: string
   spaceName : string
+  spaceStreamerImg: string
+  twitchUserId: string
+  twitchUserLogin: string
+  isFavoriteSpaceStreamer: boolean
 }
 
 export interface GetCheckIfStreamerResponse {

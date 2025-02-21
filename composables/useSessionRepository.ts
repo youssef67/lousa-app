@@ -48,7 +48,6 @@ export const useSessionRepository = () => {
   }
 
   const runGetStreamersList = async (page: number) => {
-    console.log('runGetStreamersList')
     try {
       const response = await getStreamersList(page)
 

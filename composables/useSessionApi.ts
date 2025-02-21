@@ -77,7 +77,6 @@ export const useSessionApi = () => {
   const getStreamersList = async (
     page: number
   ): Promise<GetStreamersListResponse> => {
-    console.log('getStreamersList')
     try {
       const url = `/api/v1/session/streamers?page=${page}`
 
@@ -89,7 +88,6 @@ export const useSessionApi = () => {
 
       return response as GetStreamersListResponse
     } catch (error) {
-      console.log('error', error)
       await proceedApiError(error)
     }
   }

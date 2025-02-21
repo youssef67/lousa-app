@@ -4,7 +4,9 @@ export const useViewerRepository = () => {
   const sessionStore = useSessionStore()
   const {
     addFavoritePlaylist,
-    deleteFavoritePlaylist
+    deleteFavoritePlaylist,
+    addFavoriteStreamer,
+    deleteFavoriteStreamer
   } = useViewerApi()
   const logger = useSpecialLogger()
   // const { getData, saveData, deleteData } = useSpecialStorage()
@@ -27,8 +29,28 @@ export const useViewerRepository = () => {
     }
   }
 
+  const runAddFavoriteStreamer = async (spaceStreamerId: string) => {
+    try {
+      const response = await addFavoriteStreamer(spaceStreamerId)
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
+  const runDeleteFavoriteStreamer = async (spaceStreamerId: string) => {
+    try {
+      const response = await deleteFavoriteStreamer(spaceStreamerId)
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
   return {
     runAddFavoritePlaylist,
-    runDeleteFavoritePlaylist
+    runDeleteFavoritePlaylist,
+    runAddFavoriteStreamer,
+    runDeleteFavoriteStreamer
   }
 }

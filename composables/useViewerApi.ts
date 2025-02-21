@@ -1,6 +1,8 @@
 import type {
   AddFavoritePlaylistResponse,
-  DeleteFavoritePlaylistResponse
+  DeleteFavoritePlaylistResponse,
+  AddFavoriteStreamerResponse,
+  DeleteFavoriteStreamerResponse
 } from '~/types/viewer.type'
 
 export const useViewerApi = () => {
@@ -36,10 +38,40 @@ export const useViewerApi = () => {
     }
   }
 
+  const addFavoriteStreamer = async (spaceStreamerId: string): Promise<AddFavoriteStreamerResponse> => {
+    try {
+      const response = await fetch('/api/v1/viewer/favorite/streamer/add', {
+        method: FetchMethod.POST,
+        body: {spaceStreamerId},
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as AddFavoriteStreamerResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const deleteFavoriteStreamer = async (spaceStreamerId: string): Promise<DeleteFavoriteStreamerResponse> => {
+    try {
+      const response = await fetch('/api/v1/viewer/favorite/streamer/delete', {
+        method: FetchMethod.POST,
+        body: {spaceStreamerId},
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as DeleteFavoritePlaylistResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
   
 
   return {
     addFavoritePlaylist,
-    deleteFavoritePlaylist
+    deleteFavoritePlaylist,
+    addFavoriteStreamer,
+    deleteFavoriteStreamer
   }
 }

@@ -19,7 +19,6 @@ onMounted(async () => {
     // const responseGetCurrentPlaylist = await runSetAndGetPLaylistSelected(null)
 
     // currentPlayList.value = responseGetCurrentPlaylist.playlist
-    // console.log(responseGetCurrentPlaylist)
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
   } finally {

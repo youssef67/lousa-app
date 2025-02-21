@@ -3,9 +3,13 @@ import type { Streamer } from '~/types/session.type.js'
 
 const props = defineProps<{ spaceStreamer: Streamer }>()
 const { pushSpaceStreamerForViewer } = useSpecialRouter()
+const toast = useSpecialToast()
 
 const goToSpaceStreamer = () => {
-  console.log('space streamer info', props.spaceStreamer.id)
+  if (!props.spaceStreamer.twitchUserId) {
+    toast.showError('Space streamer non disponible')
+    return
+  }
   pushSpaceStreamerForViewer(props.spaceStreamer.id, true)
 }
 

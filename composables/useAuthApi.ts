@@ -93,7 +93,6 @@ export const useAuthApi = () => {
         cache: 'no-cache'
       })
 
-      console.log('loginEmailConfirm response', response)
       return response as LoginEmailConfirmResponse
     } catch (error) {
       await proceedApiError(error)
