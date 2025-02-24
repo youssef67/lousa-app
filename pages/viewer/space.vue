@@ -11,11 +11,15 @@ const toggleSlider = () => {
 
 const sessionStore = useSessionStore()
 const { pushStreamers } = useSpecialRouter()
+const viewerStore = useViewerStore()
+const { runGetViewerData } = useViewerRepository()
 
 onMounted(async () => {
   isLoading.value = true
   try {
+    const viewerData = await runGetViewerData()
 
+    viewerStore.updateViewerData(viewerData)
     // const responseGetCurrentPlaylist = await runSetAndGetPLaylistSelected(null)
 
     // currentPlayList.value = responseGetCurrentPlaylist.playlist
@@ -40,7 +44,7 @@ watch(
 
 <template>
   <UContainer> 
-    <h1>Espace viewer {{ sessionStore.session.user.email}}</h1>
+    <!-- <h1>Espace viewer {{ sessionStore.session.user.email}}</h1> -->
     <UButton
         label="Liste des streamers"
         type="submit"
@@ -50,27 +54,19 @@ watch(
         @click="pushStreamers()"
       />
     <UButton
-        label="Mes playlists favorites"
+        label="Mes favoris"
         type="submit"
         variant="solid"
         size="xl"
         color="secondary"
         @click="toggleSlider"
       />
-      <UButton
-        label="Mes streamers favoris"
-        type="submit"
-        variant="solid"
-        size="xl"
-        color="secondary"
-        @click="toggleSlider"
-      />
-    <!-- <SpecialSliderViewer
+    <SpecialSliderViewer
         :isOpen="isSlideOverOpen"
-        :favoritePlaylists="sessionStore.playlistsList"
-        :favoriteStreamer="sessionStore.playlistsList"
+        :favoritesPlaylists="viewerStore.viewer?.playlistsFavorites || []"
+        :favoritesSpaceStreamers="viewerStore.viewer?.spaceStreamersFavorites || []"
         @update:isOpen="isSlideOverOpen = $event"
-      /> -->
+      />
   </UContainer>
 </template>
 

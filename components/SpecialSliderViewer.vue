@@ -1,46 +1,68 @@
 <script setup lang="ts">
-import type { PropType } from 'vue'
-import type { Playlist } from '~/types/session.type'
+import type { PlaylistData, SpaceStreamerData } from '~/types/viewer.type'
 
 const props = defineProps({
   isOpen: {
     type: Boolean,
     required: true
   },
-  playlists: {
-    type: Object as PropType<Playlist[]>,
+  favoritesPlaylists: {
+    type: Object as PropType<PlaylistData[]>,
+    required: true
+  },
+  favoritesSpaceStreamers: {
+    type: Object as PropType<SpaceStreamerData[]>,
     required: true
   }
 })
 
 const inputText = ref(null)
-const playlistName = ref('')
-const { runCreatePlaylist } = useSpotifyRepository()
+const dataName = ref('')
 const toast = useSpecialToast()
-const sessionStore = useSessionStore()
-const isCreatePlaylistModalOpen = ref(false)
+const dataToDisplay = ref(null)
+const dataTypeToDisplay = ref('playlists')
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
+const { pushStreamers } = useSpecialRouter()
 
 const closeSlider = () => {
-  playlistName.value = ''
+  dataName.value = ''
   emit('update:isOpen', false)
 }
 
-const filteredPlaylists = computed(() => {
-  if (!playlistName.value) {
-    return props.playlists
+const filteredData = computed(() => {
+  if (dataTypeToDisplay.value === 'playlists') {
+    if (!dataName.value) {
+      return props.favoritesPlaylists
+    }
+    return props.favoritesPlaylists.filter(playlist =>
+      playlist.playlistName.toLowerCase().includes(dataName.value.toLowerCase())
+    )
+  } else {
+    if (!dataName.value) {
+      return props.favoritesSpaceStreamers
+    }
+    return props.favoritesSpaceStreamers.filter(spaceStreamer =>
+      spaceStreamer.spaceName
+        .toLowerCase()
+        .includes(dataName.value.toLowerCase())
+    )
   }
-  return props.playlists.filter(playlist =>
-    playlist.playlistName
-      .toLowerCase()
-      .includes(playlistName.value.toLowerCase())
-  )
 })
 
-const proceedResult = (playlist: Playlist) => {
-  sessionStore.updatePlaylistsList(playlist)
-  isCreatePlaylistModalOpen.value = false
+const toggleDataType = () => {
+  dataTypeToDisplay.value = dataTypeToDisplay.value === 'playlists' ? 'spaceStreamers' : 'playlists'
+  dataName.value = ''
 }
+
+onMounted(() => {
+  if (props.favoritesPlaylists.length > 0) {
+    dataToDisplay.value = props.favoritesPlaylists as PlaylistData[]
+  } else {
+    if (props.favoritesSpaceStreamers.length > 0) {
+      dataToDisplay.value = props.favoritesSpaceStreamers as SpaceStreamerData[]
+    }
+  }
+})
 </script>
 
 <template>
@@ -64,7 +86,7 @@ const proceedResult = (playlist: Playlist) => {
 
       <UInput
         ref="inputText"
-        v-model="playlistName"
+        v-model="dataName"
         input-text
         type="text"
         placeholder="Rechercher une playlist"
@@ -77,40 +99,42 @@ const proceedResult = (playlist: Playlist) => {
       />
       <div class="flex-1 overflow-y-auto">
         <UButton
-          label="créer la playlist"
+          :label="dataTypeToDisplay === 'playlists' ? 'Voir les streamers' : 'Voir les playlists'"
           type="submit"
           variant="solid"
           size="xl"
           color="secondary"
-          @click="
-            () => {
-              closeSlider()
-              isCreatePlaylistModalOpen = true
-            }
-          "
+          @click="toggleDataType"
         />
-        <template v-if="filteredPlaylists.length > 0">
-          <div
-            v-for="playlist in filteredPlaylists"
-            :key="playlist.id"
-            class="mt-2 mx-2"
-          >
-            <PlaylistCardSlider
-              :playlist="playlist"
+        <template v-if="filteredData.length > 0">
+          <div v-for="item in filteredData" :key="item.id" class="mt-2 mx-2">
+            <FavoritePlaylistCardSlider
+              v-if="dataTypeToDisplay === 'playlists'"
+              :item="item as PlaylistData"
+              :closeSlider="closeSlider"
+            />
+            <FavoriteSpaceStreamerCardSlider
+              v-else
+              :item="item as SpaceStreamerData"
               :closeSlider="closeSlider"
             />
           </div>
         </template>
         <div v-else class="text-center mt-4 text-gray-500">
-          <p>Aucune playlist trouvée</p>
+          <p v-if="dataTypeToDisplay==='playlists'">Aucune playlist en favoris</p>
+          <p v-else">Aucun espace de streamer en favoris</p>
+          <UButton
+        label="Liste des streamers"
+        type="submit"
+        variant="solid"
+        size="xl"
+        color="secondary"
+        @click="pushStreamers()"
+      />
         </div>
       </div>
     </div>
   </USlideover>
-  <CreatePlaylistModal
-    :is-open="isCreatePlaylistModalOpen"
-    @proceed-result="proceedResult"
-  />
 </template>
 
 <style scoped>

@@ -56,11 +56,6 @@ onMounted(async () => {
     } else {
       favoriteIcon.value = 'heroicons:heart'
     }
-    // await sessionStore.updateSpaceStreamerData(spaceData)
-
-    // const responseGetCurrentPlaylist = await runSetAndGetPLaylistSelected(null)
-
-    // currentPlayList.value = responseGetCurrentPlaylist.playlist
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
   } finally {
