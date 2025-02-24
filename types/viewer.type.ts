@@ -14,25 +14,46 @@ export interface DeleteFavoriteStreamerResponse {
   result: boolean
 }
 
-export interface GetViewerDataResponse {
-  spaceStreamersFavorites: SpaceStreamerData[]
-  playlistsFavorites: PlaylistData[]
+export interface DeleteFavoriteStreamerResponse {
+  result: boolean
 }
 
 export interface ViewerData {
-  spaceStreamersFavorites: SpaceStreamerData[]
-  playlistsFavorites: PlaylistData[]
+  playlistSelected: Playlist | null
 }
 
-export interface SpaceStreamerData {
+export interface GetViewerDataResponse {
+  data: Viewer
+}
+
+export interface Viewer {
+  favorites : {
+    spaceStreamers: SpaceStreamer[]
+    playlists: Playlist[]
+  }
+  viewerData: ViewerData
+}
+
+export interface SpaceStreamer {
   id: string,
   spaceName: string,
   spaceStreamerImg: string,
 }
 
-export interface PlaylistData {
+export interface Playlist {
   id: string,
   playlistName: string,
   spaceStreamerName: string
   spaceStreamerImg: string,
+}
+
+
+export interface SetAndGetPlaylistSelectedResponse {
+  data: Playlist | null
+}
+
+export interface Playlist {
+  id: string
+  playlistName: string
+  isFavorite: boolean
 }

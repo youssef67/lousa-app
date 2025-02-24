@@ -20,6 +20,8 @@ export const useSessionStore = defineStore('session', () => {
     if (session.value) {
       // Session is already open
       return
+    } else {
+      session.value = getData(StorageKey.SESSION) as Session
     }
 
     const sessionFromStorage = getData(StorageKey.SESSION) as Session

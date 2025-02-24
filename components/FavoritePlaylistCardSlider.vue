@@ -1,22 +1,28 @@
 <script lang="ts" setup>
-import type { PlaylistData, SpaceStreamerData } from '~/types/viewer.type'
+import type { Playlist, SpaceStreamer } from '~/types/viewer.type'
 
 const props = defineProps({
   item: {
-    type: Object as PropType<PlaylistData>,
+    type: Object as PropType<Playlist>,
     required: true
   },
   closeSlider: Function,
 })
 
-const { runAddFavoritePlaylist, runDeleteFavoritePlaylist } =
+const { runDeleteFavoritePlaylist } =
   useViewerRepository()
 const viewerStore = useViewerStore()
 const toast = useSpecialToast()
+const { runGetViewerData, runSetAndGetPLaylistSelected } = useViewerRepository()
 
-const selectPlaylist = () => {
-  viewerStore.playlistSelected = props.item
-  props.closeSlider()
+
+const selectPlaylist = async () => {
+  const response = await runSetAndGetPLaylistSelected(props.item.id)
+
+  if (response) {
+    await viewerStore.updatePlaylistSelected(response.data)
+    props.closeSlider()
+  }
 }
 
 const deletePlaylistFromFavorites = () => {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Playlist } from '~/types/session.type'
+import type { Playlist } from '~/types/viewer.type'
 
 const isLoading = ref(true)
 const isSlideOverOpen = ref(false)
@@ -18,11 +18,14 @@ onMounted(async () => {
   isLoading.value = true
   try {
     const viewerData = await runGetViewerData()
+    sessionStore.restoreSession()
+    await viewerStore.updateViewerData(viewerData.data)
 
-    viewerStore.updateViewerData(viewerData)
-    // const responseGetCurrentPlaylist = await runSetAndGetPLaylistSelected(null)
 
-    // currentPlayList.value = responseGetCurrentPlaylist.playlist
+    if (viewerData.data.viewerData?.playlistSelected) {
+      await updateCurrentPlaylist(viewerData.data.viewerData?.playlistSelected)
+    } 
+
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
   } finally {
@@ -30,22 +33,25 @@ onMounted(async () => {
   }
 })
 
+const updateCurrentPlaylist = async (playlist: Playlist) => {
+  currentPlayList.value = playlist
+}
+
 watch(
-  () => sessionStore.playlistSelected,
+  () => viewerStore.playlistSelected,
   async playlist => {
     if (playlist) {
-      // const response = await runSetAndGetPLaylistSelected(playlist.id)
-      // currentPlayList.value = response.playlist
+      await updateCurrentPlaylist(viewerStore.playlistSelected)
     }
   }
 )
-
 </script>
 
 <template>
-  <UContainer> 
-    <!-- <h1>Espace viewer {{ sessionStore.session.user.email}}</h1> -->
-    <UButton
+  <UContainer v-if="!isLoading">
+    <h1>Espace viewer {{ sessionStore.session?.user.email }}</h1>
+    <section>
+      <UButton
         label="Liste des streamers"
         type="submit"
         variant="solid"
@@ -53,7 +59,7 @@ watch(
         color="secondary"
         @click="pushStreamers()"
       />
-    <UButton
+      <UButton
         label="Mes favoris"
         type="submit"
         variant="solid"
@@ -61,12 +67,22 @@ watch(
         color="secondary"
         @click="toggleSlider"
       />
+    </section>
+    <h2 v-if="currentPlayList">
+      {{
+        currentPlayList.playlistName || 'Aucune playlist sélectionnée'
+      }}
+    </h2>
+
+    <section></section>
     <SpecialSliderViewer
-        :isOpen="isSlideOverOpen"
-        :favoritesPlaylists="viewerStore.viewer?.playlistsFavorites || []"
-        :favoritesSpaceStreamers="viewerStore.viewer?.spaceStreamersFavorites || []"
-        @update:isOpen="isSlideOverOpen = $event"
-      />
+      :isOpen="isSlideOverOpen"
+      :favoritesPlaylists="viewerStore.viewer?.favorites.playlists || []"
+      :favoritesSpaceStreamers="
+        viewerStore.viewer?.favorites.spaceStreamers || []
+      "
+      @update:isOpen="isSlideOverOpen = $event"
+    />
   </UContainer>
 </template>
 

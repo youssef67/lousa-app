@@ -3,7 +3,8 @@ import type {
   DeleteFavoritePlaylistResponse,
   AddFavoriteStreamerResponse,
   DeleteFavoriteStreamerResponse,
-  GetViewerDataResponse
+  GetViewerDataResponse,
+  SetAndGetPlaylistSelectedResponse
 } from '~/types/viewer.type'
 
 export const useViewerApi = () => {
@@ -75,27 +76,42 @@ export const useViewerApi = () => {
     }
   }
 
-  const getViewerData =
-    async (): Promise<GetViewerDataResponse> => {
-      try {
-        // Création de l'objet en filtrant les valeurs null
-        const response = await fetch('/api/v1/viewer', {
-          method: FetchMethod.GET,
-          headers: sessionStore.defaultHeaders(),
-          cache: 'no-cache'
-        })
-
-        return response as GetViewerDataResponse
-      } catch (error) {
-        await proceedApiError(error)
-      }
+  const getViewerData = async (): Promise<GetViewerDataResponse> => {
+    try {
+      // Création de l'objet en filtrant les valeurs null
+      const response = await fetch('/api/v1/viewer', {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as GetViewerDataResponse
+    } catch (error) {
+      await proceedApiError(error)
     }
+  }
+
+  const setAndGetPlaylistSelected = async (
+    playlistId: string
+  ): Promise<SetAndGetPlaylistSelectedResponse> => {
+    try {
+      const response = await fetch('/api/v1/viewer/playlist/selected', {
+        method: FetchMethod.POST,
+        body: { playlistId },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as SetAndGetPlaylistSelectedResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
 
   return {
     addFavoritePlaylist,
     deleteFavoritePlaylist,
     addFavoriteStreamer,
     deleteFavoriteStreamer,
-    getViewerData
+    getViewerData,
+    setAndGetPlaylistSelected
   }
 }

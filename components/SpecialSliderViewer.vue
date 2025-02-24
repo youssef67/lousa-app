@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PlaylistData, SpaceStreamerData } from '~/types/viewer.type'
+import type { Playlist, SpaceStreamer } from '~/types/viewer.type'
 
 const props = defineProps({
   isOpen: {
@@ -7,11 +7,11 @@ const props = defineProps({
     required: true
   },
   favoritesPlaylists: {
-    type: Object as PropType<PlaylistData[]>,
+    type: Object as PropType<Playlist[]>,
     required: true
   },
   favoritesSpaceStreamers: {
-    type: Object as PropType<SpaceStreamerData[]>,
+    type: Object as PropType<SpaceStreamer[]>,
     required: true
   }
 })
@@ -56,10 +56,10 @@ const toggleDataType = () => {
 
 onMounted(() => {
   if (props.favoritesPlaylists.length > 0) {
-    dataToDisplay.value = props.favoritesPlaylists as PlaylistData[]
+    dataToDisplay.value = props.favoritesPlaylists as Playlist[]
   } else {
     if (props.favoritesSpaceStreamers.length > 0) {
-      dataToDisplay.value = props.favoritesSpaceStreamers as SpaceStreamerData[]
+      dataToDisplay.value = props.favoritesSpaceStreamers as SpaceStreamer[]
     }
   }
 })
@@ -110,19 +110,19 @@ onMounted(() => {
           <div v-for="item in filteredData" :key="item.id" class="mt-2 mx-2">
             <FavoritePlaylistCardSlider
               v-if="dataTypeToDisplay === 'playlists'"
-              :item="item as PlaylistData"
+              :item="item as Playlist"
               :closeSlider="closeSlider"
             />
             <FavoriteSpaceStreamerCardSlider
               v-else
-              :item="item as SpaceStreamerData"
+              :item="item as SpaceStreamer"
               :closeSlider="closeSlider"
             />
           </div>
         </template>
         <div v-else class="text-center mt-4 text-gray-500">
           <p v-if="dataTypeToDisplay==='playlists'">Aucune playlist en favoris</p>
-          <p v-else">Aucun espace de streamer en favoris</p>
+          <p v-else>Aucun espace de streamer en favoris</p>
           <UButton
         label="Liste des streamers"
         type="submit"

@@ -3,9 +3,8 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { pushSpaceStreamer, pushSpaceViewer, pushCreateSpaceStreamer } =
+const { pushSpaceStreamer, pushSpaceViewer } =
   useSpecialRouter()
-const sessionStore = useSessionStore()
 // Fonction pour naviguer vers la page des streamers
 const goToSpaceStreamer = () => {
   pushSpaceViewer()
