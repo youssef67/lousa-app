@@ -57,3 +57,37 @@ export interface Playlist {
   playlistName: string
   isFavorite: boolean
 }
+
+export interface Track {
+  id: string
+  name: string
+  artists: string
+  album: string
+  cover: string
+  url: string
+}
+
+export interface PlaylistTrack {
+  id: string
+  spotifyTrackId: string
+  trackId: string
+  trackName: string
+  artistName: string
+  album: string
+  cover: string
+  url: string
+  position: number
+  votes: number
+}
+
+export interface SearchTracksResponse {
+  foundTracks: Track[]
+}
+
+export interface addTracksResponse {
+  newPlaylistTrack: PlaylistTrack
+}
+
+export interface getPlaylistTracksResponse {
+  playlistsTracks: PlaylistTrack[]
+}

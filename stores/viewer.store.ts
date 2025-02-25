@@ -1,5 +1,5 @@
 import {
-  type ViewerData,
+  type PlaylistTrack,
   type Playlist,
   type Viewer
 } from '~~/types/viewer.type'
@@ -7,6 +7,7 @@ import {
 export const useViewerStore = defineStore('viewer', () => {
   const viewer = ref<Viewer>()
   const playlistSelected = ref<Playlist | null>(null)
+  const playlistTracks = ref<PlaylistTrack[]>([])
   const { newError } = useSpecialError()
 
   const updateViewerData = async (viewerData: Viewer) => {
@@ -40,12 +41,23 @@ export const useViewerStore = defineStore('viewer', () => {
     playlistSelected.value = playlist
   }
 
+  const initializePlaylistTracks = async (tracks: PlaylistTrack[]) => {
+    playlistTracks.value = tracks
+  }
+
+  const addPlaylistTracks = async (track: PlaylistTrack) => {
+    playlistTracks.value.push(track)
+  }
+
   return {
     viewer,
     updateViewerData,
     playlistSelected,
+    playlistTracks,
     updateFavoritesPlaylistsList,
     updateSpacesStreamersList,
-    updatePlaylistSelected
+    updatePlaylistSelected,
+    initializePlaylistTracks,
+    addPlaylistTracks
   }
 })

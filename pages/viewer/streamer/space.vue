@@ -9,7 +9,7 @@ const isFavoriteStreamer = ref(false)
 const favoriteIcon = ref(null)
 const isSlideOverOpen = ref(false)
 
-const { runGetSpaceStreamerData } = useSessionRepository()
+const { runGetSpaceStreamerData } = useStreamerRepository()
 const { runAddFavoriteStreamer, runDeleteFavoriteStreamer } =
   useViewerRepository()
 const toast = useSpecialToast()

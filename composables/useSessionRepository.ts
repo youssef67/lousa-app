@@ -7,11 +7,7 @@ export const useSessionRepository = () => {
     getUserSession,
     editUserSession,
     deleteUser,
-    getStreamersList,
-    checkIfStreamer,
-    deleteStreamerProfile,
-    setAndGetPlaylistSelected,
-    getSpaceStreamerData
+    getStreamersList
   } = useSessionApi()
   const logger = useSpecialLogger()
   // const { getData, saveData, deleteData } = useSpecialStorage()
@@ -57,48 +53,11 @@ export const useSessionRepository = () => {
     }
   }
 
-  const runCheckIfStreamer = async () => {
-    const response = await checkIfStreamer()
-    return response
-  }
-
-  const runDeleteStreamerProfile = async () => {
-    try {
-      await deleteStreamerProfile()
-    } catch (error) {
-      logger.e('Error logging out', error)
-    } finally {
-      sessionStore.clearSession()
-    }
-  }
-
-  const runSetAndGetPLaylistSelected = async (playlistId: string) => {
-    try {
-      const response = await setAndGetPlaylistSelected(playlistId)
-      return response
-    } catch (error) {
-      logger.e('Error logging out', error)
-    }
-  }
-
-  const runGetSpaceStreamerData = async (twitchUserId: string | null, spaceStreamerId: string | null) => {
-    try {
-      const response = await getSpaceStreamerData(twitchUserId, spaceStreamerId)
-      return response
-    } catch (error) {
-      logger.e('Error logging out', error)
-    }
-  }
-
   return {
     runLogout,
     refreshUserSession,
     runEditUser,
     runDeleteUser,
-    runGetStreamersList,
-    runCheckIfStreamer,
-    runDeleteStreamerProfile,
-    runSetAndGetPLaylistSelected,
-    runGetSpaceStreamerData
+    runGetStreamersList
   }
 }

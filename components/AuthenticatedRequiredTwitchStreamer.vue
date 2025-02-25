@@ -6,7 +6,7 @@ const config = useRuntimeConfig()
 const sessionStore = useSessionStore()
 const { runLoginTwitch } = useAuthRepository()
 const { runCheckIfStreamer, runDeleteStreamerProfile } =
-  useSessionRepository()
+  useStreamerRepository()
 
 const { handleError } = useSpecialError()
 

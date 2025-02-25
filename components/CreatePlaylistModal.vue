@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { LoginResult } from '~/utils/auth/AuthResult'
-
 const props = defineProps({
   isOpen: {
     type: Boolean,

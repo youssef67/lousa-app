@@ -4,7 +4,11 @@ import type {
   AddFavoriteStreamerResponse,
   DeleteFavoriteStreamerResponse,
   GetViewerDataResponse,
-  SetAndGetPlaylistSelectedResponse
+  SetAndGetPlaylistSelectedResponse,
+  SearchTracksResponse,
+  Track,
+  getPlaylistTracksResponse,
+  addTracksResponse
 } from '~/types/viewer.type'
 
 export const useViewerApi = () => {
@@ -106,12 +110,67 @@ export const useViewerApi = () => {
     }
   }
 
+  const searchTrack = async (
+    playlistId: string,
+    trackName: string
+  ): Promise<SearchTracksResponse> => {
+    try {
+      const url = `/api/v1/viewer/track/search?playlistId=${playlistId}&trackName=${trackName}`
+
+      const response = await fetch(url, {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as SearchTracksResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const addTrack = async (
+    playlistId: string,
+    track: Track
+  ): Promise<addTracksResponse> => {
+    try {
+      const response = await fetch('/api/v1/viewer/track/add', {
+        method: FetchMethod.POST,
+        body: { playlistId, track },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as addTracksResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const getPlaylistTracks = async (
+    playlistId: string,
+  ): Promise<getPlaylistTracksResponse> => {
+    try {
+      const url = `/api/v1/viewer/playlist?playlistId=${playlistId}`
+
+      const response = await fetch(url, {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as getPlaylistTracksResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
   return {
     addFavoritePlaylist,
     deleteFavoritePlaylist,
     addFavoriteStreamer,
     deleteFavoriteStreamer,
     getViewerData,
-    setAndGetPlaylistSelected
+    setAndGetPlaylistSelected,
+    searchTrack,
+    addTrack,
+    getPlaylistTracks
   }
 }

@@ -1,4 +1,5 @@
 import type { EditUser } from '~/types/session.type'
+import type { Track } from '~/types/viewer.type'
 
 export const useViewerRepository = () => {
   const sessionStore = useSessionStore()
@@ -8,7 +9,10 @@ export const useViewerRepository = () => {
     addFavoriteStreamer,
     deleteFavoriteStreamer,
     getViewerData,
-    setAndGetPlaylistSelected
+    setAndGetPlaylistSelected,
+    searchTrack,
+    addTrack,
+    getPlaylistTracks
   } = useViewerApi()
   const logger = useSpecialLogger()
   // const { getData, saveData, deleteData } = useSpecialStorage()
@@ -67,12 +71,42 @@ export const useViewerRepository = () => {
     }
   }
 
+  const runSearchTrack = async (playlistId: string, trackName: string) => {
+    try {
+      const response = await searchTrack(playlistId, trackName)
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
+  const runAddTrack = async (playlistId: string, track: Track) => {
+    try {
+      const response = await addTrack(playlistId, track)
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
+  const runGetPlaylistTracks = async (playlistId: string) => {
+    try {
+      const response = await getPlaylistTracks(playlistId)
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
   return {
     runAddFavoritePlaylist,
     runDeleteFavoritePlaylist,
     runAddFavoriteStreamer,
     runDeleteFavoriteStreamer,
     runGetViewerData,
-    runSetAndGetPLaylistSelected
+    runSetAndGetPLaylistSelected,
+    runSearchTrack,
+    runAddTrack,
+    runGetPlaylistTracks
   }
 }

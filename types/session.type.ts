@@ -6,9 +6,7 @@ export interface DeleteUserResponse {
   result: boolean
 }
 
-export interface DeleteStreamerProfileResponse {
-  result: boolean
-}
+
 
 export interface GetUserSessionResponse {
   user: UserSession
@@ -156,10 +154,6 @@ export interface SpaceStreamerMainInfo {
   twitchUserId: string
   twitchUserLogin: string
   isFavoriteSpaceStreamer: boolean
-}
-
-export interface GetCheckIfStreamerResponse {
-  twitchUser: TwitchUserSession
 }
 
 export interface GetSpaceStreamerDataResponse {
