@@ -6,8 +6,6 @@ export interface DeleteUserResponse {
   result: boolean
 }
 
-
-
 export interface GetUserSessionResponse {
   user: UserSession
   spotifyUser?: SpotifyUserSession
@@ -37,10 +35,10 @@ export interface SpaceStreamerData {
 
 export interface UserSession {
   id: string
+  userName?: string
   firstName?: string
   lastName?: string
   email: string
-  dateOfBirth?: string
   role: UserRole
   twitchUser?: TwitchUserSession
   spotifyUser?: SpotifyUserSession
@@ -63,6 +61,13 @@ export interface TwitchLoginStreamResponse {
 export interface TwitchUserSession {
   id: string
   twitchUserLogin: string
+  email: string
+  spaceStreamerId: string
+}
+
+export interface TwitchCallBackTransmit {
+  id: string
+  displayName: string
   email: string
   spaceStreamerId: string
 }
@@ -149,7 +154,7 @@ export interface GetStreamerResponse {
 
 export interface SpaceStreamerMainInfo {
   id: string
-  spaceName : string
+  spaceName: string
   spaceStreamerImg: string
   twitchUserId: string
   twitchUserLogin: string
@@ -160,5 +165,3 @@ export interface GetSpaceStreamerDataResponse {
   spaceStreamer: SpaceStreamerMainInfo
   playlists: Playlist[]
 }
-
-

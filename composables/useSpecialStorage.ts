@@ -1,6 +1,7 @@
 export enum StorageKey {
   SESSION = 'session',
-  AUTH = 'auth'
+  AUTH = 'auth',
+  VIEWER = 'viewer'
 }
 
 export const useSpecialStorage = () => {

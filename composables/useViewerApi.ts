@@ -7,8 +7,10 @@ import type {
   SetAndGetPlaylistSelectedResponse,
   SearchTracksResponse,
   Track,
-  getPlaylistTracksResponse,
-  addTracksResponse
+  GetPlaylistTracksResponse,
+  AddTracksResponse,
+  CompleteProfileResponse,
+  CheckUserNameAvailabilityResponse
 } from '~/types/viewer.type'
 
 export const useViewerApi = () => {
@@ -131,7 +133,7 @@ export const useViewerApi = () => {
   const addTrack = async (
     playlistId: string,
     track: Track
-  ): Promise<addTracksResponse> => {
+  ): Promise<AddTracksResponse> => {
     try {
       const response = await fetch('/api/v1/viewer/track/add', {
         method: FetchMethod.POST,
@@ -139,7 +141,7 @@ export const useViewerApi = () => {
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
-      return response as addTracksResponse
+      return response as AddTracksResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -147,7 +149,7 @@ export const useViewerApi = () => {
 
   const getPlaylistTracks = async (
     playlistId: string,
-  ): Promise<getPlaylistTracksResponse> => {
+  ): Promise<GetPlaylistTracksResponse> => {
     try {
       const url = `/api/v1/viewer/playlist?playlistId=${playlistId}`
 
@@ -156,7 +158,40 @@ export const useViewerApi = () => {
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
-      return response as getPlaylistTracksResponse
+      return response as GetPlaylistTracksResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const completeProfile = async (
+    userName: string,
+  ): Promise<CompleteProfileResponse> => {
+    try {
+      const response = await fetch('/api/v1/viewer/profile', {
+        method: FetchMethod.POST,
+        body: { userName },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as CompleteProfileResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const checkUserNameAvailability = async (
+    userName: string,
+  ): Promise<CheckUserNameAvailabilityResponse> => {
+    try {
+      const url = `/api/v1/viewer/profile?userName=${userName}`
+
+      const response = await fetch(url, {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as CheckUserNameAvailabilityResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -171,6 +206,8 @@ export const useViewerApi = () => {
     setAndGetPlaylistSelected,
     searchTrack,
     addTrack,
-    getPlaylistTracks
+    getPlaylistTracks,
+    completeProfile,
+    checkUserNameAvailability
   }
 }

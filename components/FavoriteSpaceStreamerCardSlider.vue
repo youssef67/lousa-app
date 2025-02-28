@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import type { PlaylistData, SpaceStreamerData } from '~/types/viewer.type'
+import type { SpaceStreamer } from '~/types/viewer.type'
 
 const props = defineProps({
   item: {
-    type: Object as PropType<SpaceStreamerData>,
+    type: Object as PropType<SpaceStreamer>,
     required: true
   },
   closeSlider: Function
 })
 
-const { runAddFavoritePlaylist, runDeleteFavoriteStreamer } =
+const { runDeleteFavoriteStreamer } =
   useViewerRepository()
 const { pushSpaceStreamerForViewer } = useSpecialRouter()
 
@@ -31,7 +31,7 @@ const deleteStreamerFromFavorites = () => {
   >
     <h2>{{ item.spaceName }}</h2>
     <UAvatar :src="item.spaceStreamerImg" alt="Avatar" />
-    <p>Nombre de musique : 0</p>
+    <p>Nombre de playlits : {{ item.nbPlaylists }}</p>
     <p>Nombre de followers: 0</p>
     <div class="flex flex-col gap-2 mt-2 w-full">
       <UButton

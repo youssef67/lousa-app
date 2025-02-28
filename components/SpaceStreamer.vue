@@ -67,7 +67,6 @@ onMounted(async () => {
     isLoading.value = true
     try {
       const spaceData = await runGetSpaceStreamerData(sessionStore.session.user.twitchUser.id, null)
-      console.log('spaceData', sessionStore.session.user.twitchUser.id)
       await sessionStore.updateSpaceStreamerData(spaceData)
 
       // const responseGetCurrentPlaylist = await runSetAndGetPLaylistSelected(null)

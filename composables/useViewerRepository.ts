@@ -12,7 +12,9 @@ export const useViewerRepository = () => {
     setAndGetPlaylistSelected,
     searchTrack,
     addTrack,
-    getPlaylistTracks
+    getPlaylistTracks,
+    completeProfile,
+    checkUserNameAvailability
   } = useViewerApi()
   const logger = useSpecialLogger()
   // const { getData, saveData, deleteData } = useSpecialStorage()
@@ -98,6 +100,24 @@ export const useViewerRepository = () => {
     }
   }
 
+  const runCompleteProfile = async (userName: string) => {
+    try {
+      const response = await completeProfile(userName)
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
+  const runCheckUserNameAvailability = async (userName: string) => {
+    try {
+      const response = await checkUserNameAvailability(userName)
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
   return {
     runAddFavoritePlaylist,
     runDeleteFavoritePlaylist,
@@ -107,6 +127,8 @@ export const useViewerRepository = () => {
     runSetAndGetPLaylistSelected,
     runSearchTrack,
     runAddTrack,
-    runGetPlaylistTracks
+    runGetPlaylistTracks,
+    runCompleteProfile,
+    runCheckUserNameAvailability
   }
 }

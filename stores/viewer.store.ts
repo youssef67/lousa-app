@@ -1,36 +1,33 @@
 import {
   type PlaylistTrack,
   type Playlist,
-  type Viewer
+  type ViewerData
 } from '~~/types/viewer.type'
 
 export const useViewerStore = defineStore('viewer', () => {
-  const viewer = ref<Viewer>()
+  const viewerData = ref<ViewerData | null>(null)
   const playlistSelected = ref<Playlist | null>(null)
   const playlistTracks = ref<PlaylistTrack[]>([])
   const { newError } = useSpecialError()
 
-  const updateViewerData = async (viewerData: Viewer) => {
-    if(!viewer.value) { 
-      viewer.value = {} as Viewer
+  const updateViewerData = async (data: ViewerData) => {
+    if(!viewerData.value) { 
+      viewerData.value = data
     }
-
-    viewer.value = viewerData
   }
 
   const updateFavoritesPlaylistsList = async (playlistIdToDelete: string) => {
-    const indexPlaylistToDelete = viewer.value?.favorites.spaceStreamers.findIndex(playlist => playlist.id === playlistIdToDelete)
+    const indexPlaylistToDelete = viewerData.value.playlistsFavorites.findIndex(playlist => playlist.id === playlistIdToDelete)
     if (indexPlaylistToDelete === -1) return false
   
-    viewer.value?.favorites.playlists.splice(indexPlaylistToDelete, 1)
-
+    viewerData.value?.playlistsFavorites.splice(indexPlaylistToDelete, 1)
   }
 
   const updateSpacesStreamersList = async (spaceStreamerId: string) => {
-    const indexSpaceStreamerToDelete = viewer.value?.favorites.spaceStreamers.findIndex(spaceStreamer => spaceStreamer.id === spaceStreamerId)
+    const indexSpaceStreamerToDelete = viewerData.value.spaceStreamersFavorites.findIndex(spaceStreamer => spaceStreamer.id === spaceStreamerId)
     if (indexSpaceStreamerToDelete === -1) return false
   
-    viewer.value?.favorites.spaceStreamers.splice(indexSpaceStreamerToDelete, 1)
+    viewerData.value.spaceStreamersFavorites.splice(indexSpaceStreamerToDelete, 1)
   }
 
   const updatePlaylistSelected = async (playlist: Playlist) => {
@@ -50,7 +47,7 @@ export const useViewerStore = defineStore('viewer', () => {
   }
 
   return {
-    viewer,
+    viewerData,
     updateViewerData,
     playlistSelected,
     playlistTracks,
@@ -58,6 +55,6 @@ export const useViewerStore = defineStore('viewer', () => {
     updateSpacesStreamersList,
     updatePlaylistSelected,
     initializePlaylistTracks,
-    addPlaylistTracks
+    addPlaylistTracks,
   }
 })

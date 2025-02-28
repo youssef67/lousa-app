@@ -37,6 +37,8 @@ const updateIsOpen = (value: boolean) => {
     emit('proceedResult')
   }
 }
+
+
 </script>
 
 <template>

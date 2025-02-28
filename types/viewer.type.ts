@@ -1,3 +1,5 @@
+import type { UserSession } from './session.type'
+
 export interface AddFavoritePlaylistResponse {
   result: boolean
 }
@@ -19,34 +21,29 @@ export interface DeleteFavoriteStreamerResponse {
 }
 
 export interface ViewerData {
-  playlistSelected: Playlist | null
+  spaceStreamersFavorites: SpaceStreamer[]
+  playlistsFavorites: Playlist[]
+  isPlaylistSelected: Playlist | null
 }
 
 export interface GetViewerDataResponse {
-  data: Viewer
-}
-
-export interface Viewer {
-  favorites : {
-    spaceStreamers: SpaceStreamer[]
-    playlists: Playlist[]
-  }
-  viewerData: ViewerData
+  data: ViewerData
 }
 
 export interface SpaceStreamer {
-  id: string,
-  spaceName: string,
-  spaceStreamerImg: string,
+  id: string
+  spaceName: string
+  spaceStreamerImg: string
+  nbPlaylists: number
 }
 
 export interface Playlist {
-  id: string,
-  playlistName: string,
+  id: string
+  playlistName: string
   spaceStreamerName: string
-  spaceStreamerImg: string,
+  spaceStreamerImg: string
+  nbTracks: number
 }
-
 
 export interface SetAndGetPlaylistSelectedResponse {
   data: Playlist | null
@@ -78,16 +75,26 @@ export interface PlaylistTrack {
   url: string
   position: number
   votes: number
+  user: UserSession
 }
 
 export interface SearchTracksResponse {
   foundTracks: Track[]
 }
 
-export interface addTracksResponse {
+export interface AddTracksResponse {
   newPlaylistTrack: PlaylistTrack
 }
 
-export interface getPlaylistTracksResponse {
+export interface CompleteProfileResponse {
+  result: UserSession
+}
+
+export interface CheckUserNameAvailabilityResponse {
+  result: boolean
+}
+
+export interface GetPlaylistTracksResponse {
   playlistsTracks: PlaylistTrack[]
+  playlistSelected: Playlist
 }

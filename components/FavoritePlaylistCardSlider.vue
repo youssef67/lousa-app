@@ -13,7 +13,7 @@ const { runDeleteFavoritePlaylist } =
   useViewerRepository()
 const viewerStore = useViewerStore()
 const toast = useSpecialToast()
-const { runGetViewerData, runSetAndGetPLaylistSelected } = useViewerRepository()
+const { runSetAndGetPLaylistSelected } = useViewerRepository()
 
 
 const selectPlaylist = async () => {
@@ -44,7 +44,7 @@ const deletePlaylistFromFavorites = () => {
       :src="item.spaceStreamerImg"
       alt="Avatar"
     />
-    <p>Nombre de musique : 0</p>
+    <p>Nombre de musique : {{ item.nbTracks }}</p>
     <p>Nombre de followers: 0</p>
   
     <div class="flex flex-col gap-2 mt-2 w-full">

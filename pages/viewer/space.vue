@@ -9,7 +9,6 @@ const toggleSlider = () => {
   isSlideOverOpen.value = !isSlideOverOpen.value
 }
 
-const sessionStore = useSessionStore()
 const trackName = ref('Avant tu riais')
 
 const { pushStreamers } = useSpecialRouter()
@@ -26,8 +25,9 @@ const proceedResult = () => {
 }
 
 async function searchTrack() {
+
   try {
-    const playlistId = viewerStore.viewer.viewerData.playlistSelected.id
+    const playlistId = viewerStore.viewerData.isPlaylistSelected.id
     const response = await runSearchTrack(playlistId, trackName.value)
 
     if (response.foundTracks.length > 0) {
@@ -49,20 +49,18 @@ onMounted(async () => {
   isLoading.value = true
   try {
     const viewerData = await runGetViewerData()
-    sessionStore.restoreSession()
     await viewerStore.updateViewerData(viewerData.data)
 
-    if (viewerData.data.viewerData?.playlistSelected) {
-      await updateCurrentPlaylist(viewerData.data.viewerData?.playlistSelected)
+
+    const isPlaylistSelected = viewerData.data.isPlaylistSelected
+    if (isPlaylistSelected) {
+      await updateCurrentPlaylist(isPlaylistSelected)
+      const response = await runGetPlaylistTracks(isPlaylistSelected.id)
+      console.log('response', response)
+      if (response.playlistsTracks.length > 0) {
+        await viewerStore.initializePlaylistTracks(response.playlistsTracks)
+      }
     }
-
-    const response = await runGetPlaylistTracks(
-      viewerStore.viewer.viewerData.playlistSelected.id
-    )
-    await viewerStore.initializePlaylistTracks(response.playlistsTracks)
-
-    console.log(viewerStore.playlistTracks)
-    console.log('response', response)
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
   } finally {
@@ -74,7 +72,9 @@ watch(
   () => viewerStore.playlistSelected,
   async playlist => {
     if (playlist) {
-      await updateCurrentPlaylist(viewerStore.playlistSelected)
+      await updateCurrentPlaylist(playlist)
+      const response = await runGetPlaylistTracks(playlist.id)
+      await viewerStore.initializePlaylistTracks(response.playlistsTracks)
     }
   }
 )
@@ -89,7 +89,7 @@ watch(
 
 <template>
   <UContainer v-if="!isLoading">
-    <h1>Espace viewer {{ sessionStore.session?.user.email }}</h1>
+    <!-- <h1>Espace viewer {{ sessionStore.session?.user.email }}</h1> -->
     <section class="flex gap-2">
       <UButton
         label="Liste des streamers"
@@ -135,29 +135,35 @@ watch(
         {{ currentPlayList.playlistName || 'Aucune playlist sélectionnée' }}
       </h2>
       <div v-if="!isLoading">
-        <div v-if="viewerStore.playlistTracks.length > 0">
-          <div v-for="track in viewerStore.playlistTracks" :key="track.id" class="mt-2 mx-2">
-            <PlaylistTrackRow :tracks="track" />
-          </div>
-          
+        <div
+          v-if="viewerStore.playlistTracks.length > 0"
+          class="divide-y divide-gray-700"
+        >
+          <PlaylistTrackRow
+            v-for="track in viewerStore.playlistTracks"
+            :key="track.id"
+            :track="track"
+          />
         </div>
-       
       </div>
     </section>
-    <TrackValidationModal
-      :isOpen="isTracksValidationModalOpen"
-      :foundTracks="foundTracks || []"
-      :playlistId="viewerStore.viewer?.viewerData?.playlistSelected?.id"
-      @proceed-result="proceedResult"
-    />
-    <SpecialSliderViewer
-      :is-open="isSlideOverOpen"
-      :favoritesPlaylists="viewerStore.viewer?.favorites.playlists || []"
-      :favoritesSpaceStreamers="
-        viewerStore.viewer?.favorites.spaceStreamers || []
-      "
-      @update:isOpen="isSlideOverOpen = $event"
-    />
+    <section v-if="viewerStore.viewerData">
+      <TrackValidationModal
+        v-if="viewerStore.viewerData.isPlaylistSelected"
+        :isOpen="isTracksValidationModalOpen"
+        :foundTracks="foundTracks || []"
+        :playlistId="viewerStore.viewerData.isPlaylistSelected.id"
+        @proceed-result="proceedResult"
+      />
+      <SpecialSliderViewer
+        :is-open="isSlideOverOpen"
+        :favoritesPlaylists="viewerStore.viewerData.playlistsFavorites || []"
+        :favoritesSpaceStreamers="
+          viewerStore.viewerData.spaceStreamersFavorites || []
+        "
+        @update:isOpen="isSlideOverOpen = $event"
+      />
+    </section>
   </UContainer>
 </template>
 
