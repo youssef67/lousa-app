@@ -3,14 +3,14 @@ import type {
   DeleteFavoritePlaylistResponse,
   AddFavoriteStreamerResponse,
   DeleteFavoriteStreamerResponse,
-  GetViewerDataResponse,
   SetAndGetPlaylistSelectedResponse,
   SearchTracksResponse,
   Track,
   GetPlaylistTracksResponse,
   AddTracksResponse,
   CompleteProfileResponse,
-  CheckUserNameAvailabilityResponse
+  CheckUserNameAvailabilityResponse,
+  getFavoritesResponse
 } from '~/types/viewer.type'
 
 export const useViewerApi = () => {
@@ -82,27 +82,12 @@ export const useViewerApi = () => {
     }
   }
 
-  const getViewerData = async (): Promise<GetViewerDataResponse> => {
-    try {
-      // Création de l'objet en filtrant les valeurs null
-      const response = await fetch('/api/v1/viewer', {
-        method: FetchMethod.GET,
-        headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
-      })
-      return response as GetViewerDataResponse
-    } catch (error) {
-      await proceedApiError(error)
-    }
-  }
-
   const setAndGetPlaylistSelected = async (
     playlistId: string
   ): Promise<SetAndGetPlaylistSelectedResponse> => {
     try {
-      const response = await fetch('/api/v1/viewer/playlist/selected', {
-        method: FetchMethod.POST,
-        body: { playlistId },
+      const response = await fetch(`/api/v1/viewer/playlist/select?playlistId=${playlistId}`, {
+        method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
@@ -148,7 +133,7 @@ export const useViewerApi = () => {
   }
 
   const getPlaylistTracks = async (
-    playlistId: string,
+    playlistId: string
   ): Promise<GetPlaylistTracksResponse> => {
     try {
       const url = `/api/v1/viewer/playlist?playlistId=${playlistId}`
@@ -165,7 +150,7 @@ export const useViewerApi = () => {
   }
 
   const completeProfile = async (
-    userName: string,
+    userName: string
   ): Promise<CompleteProfileResponse> => {
     try {
       const response = await fetch('/api/v1/viewer/profile', {
@@ -181,7 +166,7 @@ export const useViewerApi = () => {
   }
 
   const checkUserNameAvailability = async (
-    userName: string,
+    userName: string
   ): Promise<CheckUserNameAvailabilityResponse> => {
     try {
       const url = `/api/v1/viewer/profile?userName=${userName}`
@@ -197,17 +182,30 @@ export const useViewerApi = () => {
     }
   }
 
+  const getFavorites = async (): Promise<getFavoritesResponse> => {
+    try {
+      const response = await fetch('/api/v1/viewer/favorites', {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as getFavoritesResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
   return {
     addFavoritePlaylist,
     deleteFavoritePlaylist,
     addFavoriteStreamer,
     deleteFavoriteStreamer,
-    getViewerData,
     setAndGetPlaylistSelected,
     searchTrack,
     addTrack,
     getPlaylistTracks,
     completeProfile,
-    checkUserNameAvailability
+    checkUserNameAvailability,
+    getFavorites
   }
 }

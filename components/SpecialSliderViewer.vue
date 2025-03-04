@@ -1,65 +1,79 @@
 <script setup lang="ts">
-import type { Playlist, SpaceStreamer } from '~/types/viewer.type'
+import type { PlaylistFavorite, SpaceStreamerFavorite } from '~/types/viewer.type'
 
-const props = defineProps({
+defineProps({
   isOpen: {
     type: Boolean,
-    required: true
-  },
-  favoritesPlaylists: {
-    type: Object as PropType<Playlist[]>,
-    required: true
-  },
-  favoritesSpaceStreamers: {
-    type: Object as PropType<SpaceStreamer[]>,
     required: true
   }
 })
 
 const inputText = ref(null)
 const dataName = ref('')
+const favoritesPlaylists = ref<PlaylistFavorite[]>([])
+const favoritesSpaceStreamers = ref<SpaceStreamerFavorite[]>([])
 const toast = useSpecialToast()
-const dataToDisplay = ref(null)
-const dataTypeToDisplay = ref('playlists')
-const emit = defineEmits(['update:isOpen', 'proceedResult'])
+const displayPlaylist = ref(true) // true = Playlists, false = Streamers
+const emit = defineEmits(['update:isOpen', 'changePlaylist'])
 const { pushStreamers } = useSpecialRouter()
+const { runGetFavorites } = useViewerRepository()
 
 const closeSlider = () => {
   dataName.value = ''
   emit('update:isOpen', false)
 }
 
-const filteredData = computed(() => {
-  if (dataTypeToDisplay.value === 'playlists') {
-    if (!dataName.value) {
-      return props.favoritesPlaylists
-    }
-    return props.favoritesPlaylists.filter(playlist =>
-      playlist.playlistName.toLowerCase().includes(dataName.value.toLowerCase())
-    )
-  } else {
-    if (!dataName.value) {
-      return props.favoritesSpaceStreamers
-    }
-    return props.favoritesSpaceStreamers.filter(spaceStreamer =>
-      spaceStreamer.spaceName
-        .toLowerCase()
-        .includes(dataName.value.toLowerCase())
-    )
+const selectPlaylist = (value: PlaylistFavorite) => {
+  emit('update:isOpen', false)
+  if (value) {
+    emit('changePlaylist', value)
   }
+}
+
+const deletePlaylistFromFavorites = (playlistToDelete: PlaylistFavorite) => {
+  favoritesPlaylists.value = favoritesPlaylists.value.filter(
+    playlist => playlist.id !== playlistToDelete.id
+  )
+  toast.showSuccess('Playlist retirée des favoris')
+}
+
+const deleteStreamerFromFavorites = (spaceStreamerToDelete: SpaceStreamerFavorite) => {
+  favoritesSpaceStreamers.value = favoritesSpaceStreamers.value.filter(
+    streamer => streamer.id !== spaceStreamerToDelete.id
+  )
+  toast.showSuccess('Streamer retiré des favoris')
+}
+
+const filteredData = computed(() => {
+  if (!dataName.value) {
+    return displayPlaylist.value ? favoritesPlaylists.value : favoritesSpaceStreamers.value
+  }
+  
+  return displayPlaylist.value
+    ? favoritesPlaylists.value.filter(playlist =>
+        playlist.playlistName.toLowerCase().includes(dataName.value.toLowerCase())
+      )
+    : favoritesSpaceStreamers.value.filter(streamer =>
+        streamer.spaceName.toLowerCase().includes(dataName.value.toLowerCase())
+      )
 })
 
 const toggleDataType = () => {
-  dataTypeToDisplay.value = dataTypeToDisplay.value === 'playlists' ? 'spaceStreamers' : 'playlists'
+  displayPlaylist.value = !displayPlaylist.value
   dataName.value = ''
 }
 
-onMounted(() => {
-  if (props.favoritesPlaylists.length > 0) {
-    dataToDisplay.value = props.favoritesPlaylists as Playlist[]
-  } else {
-    if (props.favoritesSpaceStreamers.length > 0) {
-      dataToDisplay.value = props.favoritesSpaceStreamers as SpaceStreamer[]
+onMounted(async () => {
+  const response = await runGetFavorites()
+
+  if (response) {
+    favoritesPlaylists.value = response.playlistsFavorites
+    favoritesSpaceStreamers.value = response.spaceStreamersFavorites
+  }
+
+  for (const playlist of favoritesPlaylists.value) {
+    if (playlist.isSelected) {
+      emit('changePlaylist', playlist)
     }
   }
 })
@@ -89,48 +103,51 @@ onMounted(() => {
         v-model="dataName"
         input-text
         type="text"
-        placeholder="Rechercher une playlist"
+        :placeholder="displayPlaylist ? 'Rechercher une playlist' : 'Rechercher un streamer'"
         required
         size="sm"
         icon="i-tabler-search"
         autocomplete="off"
         class="flex mt-12"
-        :trailing="true"
       />
+
       <div class="flex-1 overflow-y-auto">
         <UButton
-          :label="dataTypeToDisplay === 'playlists' ? 'Voir les streamers' : 'Voir les playlists'"
-          type="submit"
+          :label="displayPlaylist ? 'Voir les streamers favoris' : 'Voir les playlists favorites'"
           variant="solid"
           size="xl"
           color="secondary"
+          class="mb-4"
           @click="toggleDataType"
         />
+
         <template v-if="filteredData.length > 0">
           <div v-for="item in filteredData" :key="item.id" class="mt-2 mx-2">
             <FavoritePlaylistCardSlider
-              v-if="dataTypeToDisplay === 'playlists'"
-              :item="item as Playlist"
-              :closeSlider="closeSlider"
+              v-if="displayPlaylist"
+              :item="item as PlaylistFavorite"
+              @select-playlist="selectPlaylist"
+              @delete-favorites="deletePlaylistFromFavorites"
             />
             <FavoriteSpaceStreamerCardSlider
               v-else
-              :item="item as SpaceStreamer"
+              :item="item as SpaceStreamerFavorite"
               :closeSlider="closeSlider"
+              @delete-favorites="deleteStreamerFromFavorites"
             />
           </div>
         </template>
+
         <div v-else class="text-center mt-4 text-gray-500">
-          <p v-if="dataTypeToDisplay==='playlists'">Aucune playlist en favoris</p>
-          <p v-else>Aucun espace de streamer en favoris</p>
+          <p v-if="displayPlaylist">Aucune playlist en favoris</p>
+          <p v-else>Aucun streamer en favoris</p>
           <UButton
-        label="Liste des streamers"
-        type="submit"
-        variant="solid"
-        size="xl"
-        color="secondary"
-        @click="pushStreamers()"
-      />
+            label="Liste des streamers"
+            variant="solid"
+            size="xl"
+            color="secondary"
+            @click="pushStreamers()"
+          />
         </div>
       </div>
     </div>

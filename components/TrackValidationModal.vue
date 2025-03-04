@@ -17,7 +17,6 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 const { runAddTrack } = useViewerRepository()
-const viewerStore = useViewerStore()
 const toast = useSpecialToast()
 
 const handleTrackValidation = async (trackChosen: Track) => {
@@ -25,7 +24,7 @@ const handleTrackValidation = async (trackChosen: Track) => {
   const response = await runAddTrack(props.playlistId, trackChosen)
 
   if(response) {
-    await viewerStore.addPlaylistTracks(response.newPlaylistTrack)
+    emit('proceedResult', response.newPlaylistTrack)
     updateIsOpen(false)
     toast.showSuccess('Son choisi')
   }
@@ -34,7 +33,7 @@ const handleTrackValidation = async (trackChosen: Track) => {
 const updateIsOpen = (value: boolean) => {
   emit('update:isOpen', value)
   if (!value) {
-    emit('proceedResult')
+    emit('proceedResult', null)
   }
 }
 

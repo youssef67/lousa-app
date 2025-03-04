@@ -1,29 +1,20 @@
 <script lang="ts" setup>
-import type { SpaceStreamer } from '~/types/viewer.type'
+import type { SpaceStreamerFavorite } from '~/types/viewer.type'
 
 const props = defineProps({
   item: {
-    type: Object as PropType<SpaceStreamer>,
+    type: Object as PropType<SpaceStreamerFavorite>,
     required: true
   },
   closeSlider: Function
 })
 
-const { runDeleteFavoriteStreamer } =
-  useViewerRepository()
 const { pushSpaceStreamerForViewer } = useSpecialRouter()
-
-const viewerStore = useViewerStore()
-const toast = useSpecialToast()
-
-const deleteStreamerFromFavorites = () => {
-  const response = runDeleteFavoriteStreamer(props.item.id)
-
-  if (response) {
-    viewerStore.updateSpacesStreamersList(props.item.id)
-    toast.showSuccess('Playlist retirée des favoris')
-  }
+const emit = defineEmits(['deleteFavorites'])
+const deleteFavorites = async () => {
+  emit('deleteFavorites', props.item)
 }
+
 </script>
 <template>
   <div
@@ -52,7 +43,7 @@ const deleteStreamerFromFavorites = () => {
         color="secondary"
         class="w-full"
         icon="heroicons:trash"
-        @click="deleteStreamerFromFavorites"
+        @click="deleteFavorites"
       />
     </div>
   </div>

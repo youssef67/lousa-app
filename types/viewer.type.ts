@@ -1,5 +1,7 @@
 import type { UserSession } from './session.type'
 
+// RESPONSES TYPES
+
 export interface AddFavoritePlaylistResponse {
   result: boolean
 }
@@ -20,34 +22,52 @@ export interface DeleteFavoriteStreamerResponse {
   result: boolean
 }
 
-export interface ViewerData {
-  spaceStreamersFavorites: SpaceStreamer[]
-  playlistsFavorites: Playlist[]
-  isPlaylistSelected: Playlist | null
+export interface SetAndGetPlaylistSelectedResponse {
+  playlistSelectedData: Playlist | null
 }
 
-export interface GetViewerDataResponse {
-  data: ViewerData
+export interface SearchTracksResponse {
+  foundTracks: Track[]
 }
 
-export interface SpaceStreamer {
+export interface AddTracksResponse {
+  newPlaylistTrack: PlaylistTrack
+}
+
+export interface CompleteProfileResponse {
+  result: UserSession
+}
+
+export interface CheckUserNameAvailabilityResponse {
+  result: boolean
+}
+
+export interface getFavoritesResponse {
+  spaceStreamersFavorites: SpaceStreamerFavorite[]
+  playlistsFavorites: PlaylistFavorite[]
+}
+
+export interface GetPlaylistTracksResponse {
+  playlistsTracks: PlaylistTrack[]
+  playlistSelected: Playlist
+}
+
+export interface SpaceStreamerFavorite {
   id: string
   spaceName: string
   spaceStreamerImg: string
   nbPlaylists: number
 }
 
-export interface Playlist {
+export interface PlaylistFavorite {
   id: string
   playlistName: string
   spaceStreamerName: string
   spaceStreamerImg: string
   nbTracks: number
+  isSelected: boolean
 }
 
-export interface SetAndGetPlaylistSelectedResponse {
-  data: Playlist | null
-}
 
 export interface Playlist {
   id: string
@@ -78,23 +98,8 @@ export interface PlaylistTrack {
   user: UserSession
 }
 
-export interface SearchTracksResponse {
-  foundTracks: Track[]
-}
 
-export interface AddTracksResponse {
-  newPlaylistTrack: PlaylistTrack
-}
 
-export interface CompleteProfileResponse {
-  result: UserSession
-}
 
-export interface CheckUserNameAvailabilityResponse {
-  result: boolean
-}
 
-export interface GetPlaylistTracksResponse {
-  playlistsTracks: PlaylistTrack[]
-  playlistSelected: Playlist
-}
+

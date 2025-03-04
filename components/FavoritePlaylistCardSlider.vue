@@ -1,38 +1,29 @@
 <script lang="ts" setup>
-import type { Playlist, SpaceStreamer } from '~/types/viewer.type'
+import type { PlaylistFavorite } from '~/types/viewer.type'
 
 const props = defineProps({
   item: {
-    type: Object as PropType<Playlist>,
+    type: Object as PropType<PlaylistFavorite>,
     required: true
   },
-  closeSlider: Function,
+  closeSlider: Function
 })
 
-const { runDeleteFavoritePlaylist } =
-  useViewerRepository()
-const viewerStore = useViewerStore()
-const toast = useSpecialToast()
+const emit = defineEmits(['selectPlaylist', 'deleteFavorites'])
 const { runSetAndGetPLaylistSelected } = useViewerRepository()
-
 
 const selectPlaylist = async () => {
   const response = await runSetAndGetPLaylistSelected(props.item.id)
 
   if (response) {
-    await viewerStore.updatePlaylistSelected(response.data)
-    props.closeSlider()
+    emit('selectPlaylist', response.playlistSelectedData)
   }
 }
 
-const deletePlaylistFromFavorites = () => {
-  const response = runDeleteFavoritePlaylist(props.item.id)
-
-  if (response) {
-    viewerStore.updateFavoritesPlaylistsList(props.item.id)
-    toast.showSuccess('Playlist retirée des favoris')
-  }
+const deleteFavorites = async () => {
+  emit('deleteFavorites', props.item)
 }
+
 </script>
 <template>
   <div
@@ -40,13 +31,10 @@ const deletePlaylistFromFavorites = () => {
   >
     <h2>{{ item.playlistName }}</h2>
     <h3>{{ item.spaceStreamerName }}</h3>
-    <UAvatar
-      :src="item.spaceStreamerImg"
-      alt="Avatar"
-    />
+    <UAvatar :src="item.spaceStreamerImg" alt="Avatar" />
     <p>Nombre de musique : {{ item.nbTracks }}</p>
     <p>Nombre de followers: 0</p>
-  
+
     <div class="flex flex-col gap-2 mt-2 w-full">
       <UButton
         label="Sélectionner"
@@ -66,7 +54,7 @@ const deletePlaylistFromFavorites = () => {
         color="secondary"
         class="w-full"
         icon="heroicons:trash"
-        @click="deletePlaylistFromFavorites"
+        @click="deleteFavorites"
       />
     </div>
   </div>
