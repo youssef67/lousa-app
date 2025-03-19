@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { useDebounceFn } from '@vueuse/core'
+import { Subscription, Transmit } from '@adonisjs/transmit-client'
+import type { TwitchCallBackTransmit } from '~/types/session.type'
 
 const props = defineProps({
   isOpen: {
@@ -10,9 +12,12 @@ const props = defineProps({
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 
 const userName = ref('')
+const config = useRuntimeConfig()
+const { runLoginTwitch } = useAuthRepository()
 const isUserNameValid = ref(false) // Pour gérer l'activation du bouton
 const isChecking = ref(false) // Indique si la vérification est en cours
 const isError = ref(false)
+const ErrorMessage = ref('')
 const { runCompleteProfile, runCheckUserNameAvailability } =
   useViewerRepository()
 
@@ -20,11 +25,19 @@ const { handleError } = useSpecialError()
 const sessionStore = useSessionStore()
 const { showSuccess, showError } = useSpecialToast()
 
+const closeModal = () => {
+  emit('update:isOpen', false)
+}
+
 const updateIsOpen = (value: boolean) => {
   emit('update:isOpen', value)
   if (!value) {
-    emit('proceedResult')
+    emit('proceedResult', value)
   }
+}
+
+async function closeEventStream(subscription: Subscription) {
+  await subscription.delete()
 }
 
 async function onCompleteClick() {
@@ -34,17 +47,46 @@ async function onCompleteClick() {
     if (response.result) {
       sessionStore.updateSessionUser(response.result)
       showSuccess('Profil complété avec succès')
+      updateIsOpen(false)
     } else {
-      showError("Erreur lors de l'ajout du titre")
+      ErrorMessage.value = 'Erreur lors de la complétion du profil'
     }
-    updateIsOpen(false)
   } catch (error) {
     handleError(error)
   }
 }
 
 async function onTwitchLoginClick() {
-  updateIsOpen(false)
+  const transmit = new Transmit({
+    baseUrl: `${config.public.siteUrl}/api/v1`
+  })
+
+  const subscription = transmit.subscription(
+    `authentication/twitch/${sessionStore.session.user.id}`
+  )
+
+  await subscription.create()
+
+  try {
+    const newWindow = await runLoginTwitch()
+    // Mise en place de l'écoute des messages envoyés par le serveur au moment du callback
+    subscription.onMessage(async (data: TwitchCallBackTransmit) => {
+      const response = await runCompleteProfile(data.displayName)
+
+      if (response.result.userName) {
+        await sessionStore.updateSessionUser(response.result)
+        showSuccess('Profil complété avec succès avec votre userName Twitch')
+        updateIsOpen(false)
+      } else {
+        isError.value = true
+      }
+      // // Fermeture de la page de connexion twitch et de la connextion serveur sent events
+      newWindow?.close()
+      await closeEventStream(subscription)
+    })
+  } catch (error) {
+    handleError(error)
+  }
 }
 
 // Fonction de vérification de l'username (simulée)
@@ -78,7 +120,10 @@ watch(userName, () => {
 </script>
 
 <template>
-  <UModal :model-value="isOpen" @update:model-value="updateIsOpen">
+  <UModal
+    :model-value="isOpen"
+    @update:model-value="emit('update:isOpen', $event)"
+  >
     <div class="p-4">
       <div class="relative flex flex-grow">
         <p class="mx-auto font-bold text-3xl">Complétez votre profil</p>
@@ -88,7 +133,7 @@ watch(userName, () => {
           color="black"
           size="xl"
           class="absolute top-0 right-0"
-          @click="updateIsOpen(false)"
+          @click="closeModal()"
         />
       </div>
 
@@ -122,7 +167,7 @@ watch(userName, () => {
           class="flex mt-12"
         />
         <p v-if="isError" class="text-red-500">
-          Désolé, ce UserName est déjà pris
+          {{ ErrorMessage }}
         </p>
 
         <UButton

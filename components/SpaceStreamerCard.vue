@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { Streamer } from '~/types/session.type.js'
+import type { SpaceStreamerProfile } from '~/types/streamer.type.js'
 
-const props = defineProps<{ spaceStreamer: Streamer }>()
+const props = defineProps<{ spaceStreamer: SpaceStreamerProfile }>()
 const { pushSpaceStreamerForViewer } = useSpecialRouter()
 const toast = useSpecialToast()
 

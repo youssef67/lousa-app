@@ -1,25 +1,10 @@
-export interface GetSpaceStreamerDataResponse {
-  spaceStreamer: SpaceStreamerMainInfo
-  playlists: Playlist[]
-}
+import { type PlaylistStreamer } from './playlist.type.js'
+import { type TwitchUserSession } from './twitch.type.js'
 
-export interface SpaceStreamerMainInfo {
-  id: string
-  spaceName: string
-  spaceStreamerImg: string
-  twitchUserId: string
-  twitchUserLogin: string
-  isFavoriteSpaceStreamer: boolean
-}
-
-export interface Playlist {
-  id: string
-  playlistName: string
-  isFavorite: boolean
-}
-
-export interface SetAndGetPlaylistSelectedResponse {
-  playlist: Playlist | null
+export interface GetStreamerProfileResponse {
+  spaceStreamerProfile: SpaceStreamerProfile
+  playlists: PlaylistStreamer[]
+  playlistSelected: PlaylistStreamer
 }
 
 export interface GetCheckIfStreamerResponse {
@@ -27,12 +12,26 @@ export interface GetCheckIfStreamerResponse {
 }
 
 export interface DeleteStreamerProfileResponse {
-    result: boolean
-  }
-
-export interface TwitchUserSession {
-  id: string
-  twitchUserLogin: string
-  email: string
-  spaceStreamerId: string
+  result: boolean
 }
+
+export interface SpaceStreamerProfile {
+  id: string
+  spaceName: string
+  spaceStreamerImg: string
+  twitchUserId: string
+  twitchUserLogin: string
+}
+
+export interface SetAndGetPlaylistSelectedResponse {
+  playlistSelected: PlaylistStreamer
+}
+
+export interface AddStreamerResponse {
+  result: boolean
+}
+
+export interface UpdateStreamersListResponse {
+  dateLastUpdate: string
+}
+

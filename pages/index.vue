@@ -11,7 +11,7 @@ const config = useRuntimeConfig()
 const isCompleteUserNameModalOpen = ref(false)
 const { runLoginTwitch } = useAuthRepository()
 const { showSuccess, showError } = useSpecialToast()
-const { runCompleteProfile, runGetViewerData } = useViewerRepository()
+const { runCompleteProfile } = useViewerRepository()
 const { handleError } = useSpecialError()
 const { pushSpaceStreamer, pushSpaceViewer } = useSpecialRouter()
 
@@ -31,38 +31,10 @@ async function closeEventStream(subscription: Subscription) {
   await subscription.delete()
 }
 
-const proceedResult = async () => {
-  isCompleteUserNameModalOpen.value = false
+const proceedResult = async (value: boolean) => {
 
-  const transmit = new Transmit({
-    baseUrl: `${config.public.siteUrl}/api/v1`
-  })
-
-  const subscription = transmit.subscription(
-    `authentication/twitch/${sessionStore.session.user.id}`
-  )
-
-  await subscription.create()
-
-  try {
-    const newWindow = await runLoginTwitch()
-    // Mise en place de l'écoute des messages envoyés par le serveur au moment du callback
-    subscription.onMessage(async (data: TwitchCallBackTransmit) => {
-      const response = await runCompleteProfile(data.displayName)
-
-      if (response.result.userName) {
-        await sessionStore.updateSessionUser(response.result)
-        showSuccess('Profil complété avec succès avec votre userName Twitch')
-        pushSpaceViewer()
-      } else {
-        showError("Désolé, ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre.")
-      }
-      // // Fermeture de la page de connexion twitch et de la connextion serveur sent events
-      newWindow?.close()
-      await closeEventStream(subscription)
-    })
-  } catch (error) {
-    handleError(error)
+  if (!value) {
+    return 
   }
 }
 </script>
@@ -104,7 +76,7 @@ const proceedResult = async () => {
 
       <CompleteUserNameModal
         :is-open="isCompleteUserNameModalOpen"
-        @proceed-result="proceedResult"
+        @update:isOpen="isCompleteUserNameModalOpen = $event" 
       />
     </section>
   </UContainer>

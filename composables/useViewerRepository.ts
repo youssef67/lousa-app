@@ -1,4 +1,4 @@
-import type { Track } from '~/types/viewer.type'
+import type { Track } from '~/types/playlist.type'
 
 export const useViewerRepository = () => {
   const {
@@ -12,7 +12,8 @@ export const useViewerRepository = () => {
     getPlaylistTracks,
     completeProfile,
     checkUserNameAvailability,
-    getFavorites
+    getFavorites,
+    getStreamerProfile
   } = useViewerApi()
   const logger = useSpecialLogger()
   // const { getData, saveData, deleteData } = useSpecialStorage()
@@ -116,6 +117,15 @@ export const useViewerRepository = () => {
     }
   }
 
+  const runGetStreamerProfile = async (spaceStreamerId: string) => {
+    try {
+      const response = await getStreamerProfile(spaceStreamerId)
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
   return {
     runAddFavoritePlaylist,
     runDeleteFavoritePlaylist,
@@ -127,6 +137,7 @@ export const useViewerRepository = () => {
     runGetPlaylistTracks,
     runCompleteProfile,
     runCheckUserNameAvailability,
-    runGetFavorites
+    runGetFavorites,
+    runGetStreamerProfile
   }
 }

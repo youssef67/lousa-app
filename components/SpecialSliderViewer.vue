@@ -16,7 +16,7 @@ const toast = useSpecialToast()
 const displayPlaylist = ref(true) // true = Playlists, false = Streamers
 const emit = defineEmits(['update:isOpen', 'changePlaylist'])
 const { pushStreamers } = useSpecialRouter()
-const { runGetFavorites } = useViewerRepository()
+const { runGetFavorites, runDeleteFavoritePlaylist } = useViewerRepository()
 
 const closeSlider = () => {
   dataName.value = ''
@@ -31,6 +31,13 @@ const selectPlaylist = (value: PlaylistFavorite) => {
 }
 
 const deletePlaylistFromFavorites = (playlistToDelete: PlaylistFavorite) => {
+  const response = runDeleteFavoritePlaylist(playlistToDelete.id)
+
+  if (!response) {
+    toast.showError('Erreur lors de la suppression de la playlist')
+    return
+  }
+  
   favoritesPlaylists.value = favoritesPlaylists.value.filter(
     playlist => playlist.id !== playlistToDelete.id
   )

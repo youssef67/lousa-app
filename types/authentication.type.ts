@@ -1,4 +1,5 @@
-import type { UserSession, TwitchUserSession } from './session.type'
+import type { UserSession } from './session.type'
+import type { TwitchUserSession } from './twitch.type'
 
 export interface SignUpAnonymousResponse {
   at: string

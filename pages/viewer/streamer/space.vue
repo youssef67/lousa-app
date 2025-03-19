@@ -1,63 +1,53 @@
 <script lang="ts" setup>
-import type { Playlist } from '~/types/session.type'
+import type { PlaylistViewer } from '~/types/playlist.type'
+import type { SpaceStreamerProfile } from '~/types/streamer.type'
 
 const route = useRoute()
-const spaceStreamerId = route.query.streamer as string
-const sessionStore = useSessionStore()
+const spaceStreamerId = computed(() => route.query.streamer as string | undefined)
+
+const spaceStreamerProfile = ref<SpaceStreamerProfile | null>(null)
+const playlists = ref<PlaylistViewer[]>([])
 const isLoading = ref(true)
 const isFavoriteStreamer = ref(false)
-const favoriteIcon = ref(null)
-const isSlideOverOpen = ref(false)
 
-const { runGetSpaceStreamerData } = useStreamerRepository()
-const { runAddFavoriteStreamer, runDeleteFavoriteStreamer } =
-  useViewerRepository()
+const { runGetStreamerProfile, runAddFavoriteStreamer, runDeleteFavoriteStreamer } = useViewerRepository()
 const toast = useSpecialToast()
 
-const proceedResult = (playlist: Playlist) => {
-  sessionStore.addPlaylistsToList(playlist)
-}
-
-const toggleSlider = () => {
-  isSlideOverOpen.value = !isSlideOverOpen.value
-}
-
 const toggleFavoriteStreamer = async () => {
+  if (!spaceStreamerId.value) return
+
   if (isFavoriteStreamer.value) {
-    const response = await runDeleteFavoriteStreamer(spaceStreamerId)
+    const response = await runDeleteFavoriteStreamer(spaceStreamerId.value)
     if (response) {
       isFavoriteStreamer.value = false
-      favoriteIcon.value = 'heroicons:heart'
       toast.showSuccess('Space streamer retiré des favoris')
     }
   } else {
-    const response = await runAddFavoriteStreamer(spaceStreamerId)
+    const response = await runAddFavoriteStreamer(spaceStreamerId.value)
     if (response) {
       isFavoriteStreamer.value = true
-      favoriteIcon.value = 'heroicons:heart-20-solid'
       toast.showSuccess('Space streamer ajouté aux favoris')
     }
   }
 }
 
-
-onMounted(async () => {
+// Surveille les changements de `spaceStreamerId` pour éviter un appel API avec `undefined`
+watchEffect(async () => {
+  if (!spaceStreamerId.value) return
+  
   isLoading.value = true
+
   try {
-
-    const spaceData = await runGetSpaceStreamerData(null, spaceStreamerId)
-    await sessionStore.updateSpaceStreamerData(spaceData)
-
-    isFavoriteStreamer.value =
-      sessionStore.spaceStreamer.spaceStreamer.isFavoriteSpaceStreamer
-
-    if (isFavoriteStreamer.value) {
-      favoriteIcon.value = 'heroicons:heart-20-solid'
+    const response = await runGetStreamerProfile(spaceStreamerId.value)
+    if (response) {
+      spaceStreamerProfile.value = response.spaceStreamerProfile || null
+      playlists.value = response.playlists || []
+      isFavoriteStreamer.value = !!response.isFavoriteStreamer
     } else {
-      favoriteIcon.value = 'heroicons:heart'
+      console.error("Aucune donnée reçue pour ce streamer.")
     }
-  } catch (error) {
-    console.error('Erreur lors du chargement des playlists :', error)
+  } catch (err) {
+    console.error("Erreur lors de la récupération du profil:", err)
   } finally {
     isLoading.value = false
   }
@@ -66,35 +56,37 @@ onMounted(async () => {
 
 <template>
   <UContainer>
-    <!-- <h1>Space Streamer of {{sessionStore.spaceStreamer.spaceStreamer.spaceName}} for viewer</h1> -->
-    <section>
-      <UButton
-      label="Les playlists du streamer"
-      type="submit"
-      variant="solid"
-      size="xl"
-      color="secondary"
-      @click="toggleSlider"
-    />
-    <UButton
-      label="Ajouter ce streamer à mes favoris"
-      type="submit"
-      variant="solid"
-      size="xl"
-      color="secondary"
-      :icon="favoriteIcon"
-      @click="toggleFavoriteStreamer"
-    />
-    </section>
-   
-    <SpecialSliderStreamer
-      :isOpen="isSlideOverOpen"
-      :playlists="sessionStore.spaceStreamer?.playlists || []"
-      :openedByStreamer="false"
-      @update:isOpen="isSlideOverOpen = $event"
-      @proceed-result="proceedResult"
-    />
+    <template v-if="isLoading">
+      <p>Chargement en cours...</p>
+    </template>
+
+    <template v-else-if="!spaceStreamerProfile">
+      <p>Erreur : impossible de charger le profil du Space Streamer.</p>
+    </template>
+
+    <template v-else>
+      <UAvatar :src="spaceStreamerProfile?.spaceStreamerImg" alt="Avatar" />
+      <h1>Space Streamer of {{ spaceStreamerProfile?.spaceName }}</h1>
+
+      <section>
+        <UButton
+          :label="isFavoriteStreamer ? 'Retirer ce streamer de mes favoris' : 'Ajouter ce streamer à mes favoris'"
+          type="submit"
+          variant="solid"
+          size="xl"
+          color="secondary"
+          :icon="isFavoriteStreamer ? 'i-heroicons-heart-20-solid' : 'i-heroicons-heart'"
+          @click="toggleFavoriteStreamer"
+        />
+      </section>
+
+      <section v-if="playlists.length">
+        <div v-for="playlist in playlists" :key="playlist.id" class="mt-2 mx-2">
+          <PlaylistCard :playlist="playlist" />
+        </div>
+      </section>
+
+      <p v-else>Aucune playlist disponible.</p>
+    </template>
   </UContainer>
 </template>
-
-<style></style>

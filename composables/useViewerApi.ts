@@ -5,13 +5,15 @@ import type {
   DeleteFavoriteStreamerResponse,
   SetAndGetPlaylistSelectedResponse,
   SearchTracksResponse,
-  Track,
   GetPlaylistTracksResponse,
   AddTracksResponse,
   CompleteProfileResponse,
   CheckUserNameAvailabilityResponse,
-  getFavoritesResponse
+  GetFavoritesResponse,
+  GetStreamerProfileResponse
+
 } from '~/types/viewer.type'
+import type  { Track } from '~/types/playlist.type'
 
 export const useViewerApi = () => {
   const { proceedApiError } = useSpecialError()
@@ -182,14 +184,28 @@ export const useViewerApi = () => {
     }
   }
 
-  const getFavorites = async (): Promise<getFavoritesResponse> => {
+  const getFavorites = async (): Promise<GetFavoritesResponse> => {
     try {
       const response = await fetch('/api/v1/viewer/favorites', {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
-      return response as getFavoritesResponse
+      return response as GetFavoritesResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const getStreamerProfile = async (spaceStreamerId: string): Promise<GetStreamerProfileResponse> => {
+    try {
+      const url = `/api/v1/viewer/streamer?spaceStreamerId=${spaceStreamerId}`
+      const response = await fetch(url, {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as GetStreamerProfileResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -206,6 +222,7 @@ export const useViewerApi = () => {
     getPlaylistTracks,
     completeProfile,
     checkUserNameAvailability,
-    getFavorites
+    getFavorites,
+    getStreamerProfile
   }
 }

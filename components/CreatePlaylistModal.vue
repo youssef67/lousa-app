@@ -13,7 +13,7 @@ const emit = defineEmits(['update:isOpen', 'proceedResult'])
 const toast = useSpecialToast()
 
 
-const { runCreatePlaylist } = useSpotifyRepository()
+const { runCreatePlaylist } = useStreamerRepository()
 const { handleError } = useSpecialError()
 
 const updateIsOpen = (value: boolean) => {

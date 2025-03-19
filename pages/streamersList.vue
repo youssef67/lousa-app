@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import type { Streamer } from '~/types/session.type.js'
+import type { SpaceStreamerProfile  } from '~/types/streamer.type.js'
 import { useDebounceFn } from '@vueuse/core'
 
 const { runGetStreamersList } = useSessionRepository()
-const streamersList = ref<Streamer[]>([]) // Liste paginée pour affichage
-const allStreamersList = ref<Streamer[]>([]) // Contient tous les streamers chargés
-const filteredStreamers = ref<Streamer[]>([]) // Résultat de la recherche
-const paginatedStreamers = ref<Streamer[]>([]) // Liste finale après recherche + pagination
+const streamersList = ref<SpaceStreamerProfile[]>([]) // Liste paginée pour affichage
+const allStreamersList = ref<SpaceStreamerProfile[]>([]) // Contient tous les streamers chargés
+const filteredStreamers = ref<SpaceStreamerProfile[]>([]) // Résultat de la recherche
+const paginatedStreamers = ref<SpaceStreamerProfile[]>([]) // Liste finale après recherche + pagination
 const currentPage = ref(1)
 const totalPages = ref(1)
 const searchQuery = ref('')
@@ -19,7 +19,7 @@ const fetchAllStreamers = async () => {
   isFetchingAll.value = true
 
   let page = 1
-  let allStreamers: Streamer[] = []
+  let allStreamers: SpaceStreamerProfile[] = []
 
   while (true) {
     const response = await runGetStreamersList(page)

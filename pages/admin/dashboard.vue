@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const { runUpdateStreamersList } = useTwitchRepository()
+const { runUpdateStreamersList } = useStreamerRepository()
 const sessionStore = useSessionStore()
 const isModalVisible = ref(false)
 

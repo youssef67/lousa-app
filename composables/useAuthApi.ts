@@ -101,8 +101,8 @@ export const useAuthApi = () => {
 
   const loginSpotify = async (): Promise<LoginSpotifyResponse> => {
     try {
-      const response = await fetch('/api/v1/auth/login/spotify/streamer', {
-        method: FetchMethod.GET,
+      const response = await fetch('/api/v1/auth/login/spotify', {
+        method: FetchMethod.POST,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
@@ -114,8 +114,8 @@ export const useAuthApi = () => {
 
   const loginTwitch = async (): Promise<LoginTwitchResponse> => {
     try {
-      const response = await fetch('/api/v1/twitch/login', {
-        method: FetchMethod.GET,
+      const response = await fetch('/api/v1/auth/login/twitch', {
+        method: FetchMethod.POST,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })

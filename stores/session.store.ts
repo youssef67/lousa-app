@@ -2,23 +2,19 @@ import {
   UserRole,
   type Session,
   type UserSession,
-  type SpotifyUserSession,
-  type TwitchUserSession,
   type AdminSession,
-  type Playlist,
-  type SpaceStreamerData,
 } from '~~/types/session.type'
+import { type SpotifyUserSession } from '~/types/spotify.type'
+import { type TwitchUserSession } from '~/types/twitch.type'
 
 export const useSessionStore = defineStore('session', () => {
   const session = ref<Session | null>(null)
-  const spaceStreamer = ref<SpaceStreamerData>()
-  const playlistSelected = ref<Playlist | null>(null)
   const { newError } = useSpecialError()
   const { getData, saveData, deleteData } = useSpecialStorage()
 
+  // SESSION
   const restoreSession = () => {
     if (session.value) {
-      // Session is already open
       return
     }
 
@@ -47,6 +43,7 @@ export const useSessionStore = defineStore('session', () => {
     return headers
   }
 
+  // SESSION
   const updateSession = async (sessionUpdated: Session) => {
     saveData(StorageKey.SESSION, sessionUpdated)
     session.value = sessionUpdated
@@ -54,20 +51,6 @@ export const useSessionStore = defineStore('session', () => {
 
   const updateSessionUser = async (userUpdated: UserSession) => {
     session.value.user = userUpdated
-    await updateSession(session.value)
-  }
-
-  const updateSessionSpotifyUser = async (
-    spotifyUserUpdated: SpotifyUserSession
-  ) => {
-    session.value.user.spotifyUser = spotifyUserUpdated
-    await updateSession(session.value)
-  }
-
-  const updateSessionTwitchUser = async (
-    twitchUserUpdated: TwitchUserSession
-  ) => {
-    session.value.user.twitchUser = twitchUserUpdated
     await updateSession(session.value)
   }
 
@@ -88,8 +71,19 @@ export const useSessionStore = defineStore('session', () => {
     return !!session.value && session.value.user.role === UserRole.ADMIN
   }
 
-  const isSpotifyUserAuthenticated = () => {
-    return !!session.value?.user.spotifyUser
+  const clearSession = () => {
+    session.value = null
+    deleteData(StorageKey.SESSION)
+    deleteData(StorageKey.AUTH)
+  }
+
+
+  //TWITCH
+  const updateSessionTwitchUser = async (
+    twitchUserUpdated: TwitchUserSession
+  ) => {
+    session.value.user.twitchUser = twitchUserUpdated
+    await updateSession(session.value)
   }
 
   const isTwitchUserAuthenticated = () => {
@@ -100,40 +94,20 @@ export const useSessionStore = defineStore('session', () => {
     return !!session.value.user.twitchUser?.spaceStreamerId
   }
 
-  const clearSession = () => {
-    session.value = null
-    deleteData(StorageKey.SESSION)
-    deleteData(StorageKey.AUTH)
+  //SPOTIFY
+  const updateSessionSpotifyUser = async (
+    spotifyUserUpdated: SpotifyUserSession
+  ) => {
+    session.value.user.spotifyUser = spotifyUserUpdated
+    await updateSession(session.value)
   }
 
-  const addPlaylistsToList = (playlist: Playlist) => {
-    if (playlist !== undefined) {
-      spaceStreamer.value?.playlists.push(playlist)
-    }
+  const isSpotifyUserAuthenticated = () => {
+    return !!session.value?.user.spotifyUser
   }
-
-  const deletePlaylistsToList = (playlistIdToDelete: string) => {
-
-    const indexPlaylistToDelete = spaceStreamer.value?.playlists.findIndex(playlist => playlist.id === playlistIdToDelete)
-
-    if (indexPlaylistToDelete === -1) return false
-  
-    spaceStreamer.value?.playlists.splice(indexPlaylistToDelete, 1)
-    return false
-  }
-
-  const updateSpaceStreamerData = async (spaceStreamerData: SpaceStreamerData) => {
-    if(!spaceStreamer.value) { 
-      spaceStreamer.value = {} as SpaceStreamerData
-    }
-
-    spaceStreamer.value = spaceStreamerData
-  }
-
 
   return {
     session,
-    spaceStreamer,
     restoreSession,
     defaultHeaders,
     isSessionOpen,
@@ -148,9 +122,6 @@ export const useSessionStore = defineStore('session', () => {
     updateSessionAdmin,
     isAdmin,
     isTwitchStreamerAuthenticated,
-    playlistSelected,
-    updateSpaceStreamerData,
-    deletePlaylistsToList,
-    addPlaylistsToList
+    // playlistSelected,
   }
 })

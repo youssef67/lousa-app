@@ -16,6 +16,8 @@ useHead({
     lang: 'fr'
   }
 })
+console.log('Anonymous sign up')
+
 
 onMounted(async () => {
   if (sessionStore.isSessionOpen()) {

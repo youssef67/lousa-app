@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { type Track, type Playlist, type PlaylistTrack } from '~/types/viewer.type'
+import { type Track, type PlaylistViewer, type PlaylistTrack } from '~/types/playlist.type'
 
 const isLoading = ref(true)
 const isSlideOverOpen = ref(false)
-const currentPlayList = ref<Playlist | null>(null)
+const currentPlayList = ref<PlaylistViewer | null>(null)
 const trackName = ref('Avant tu riais')
 const { pushStreamers } = useSpecialRouter()
 const isTracksValidationModalOpen = ref(false)
@@ -26,7 +26,7 @@ const toggleSlider = () => {
   isSlideOverOpen.value = !isSlideOverOpen.value;
 }
 
-const changePlaylist = async (playlist: Playlist) => {
+const changePlaylist = async (playlist: PlaylistViewer) => {
   isLoading.value = true
 
   currentPlayList.value = playlist

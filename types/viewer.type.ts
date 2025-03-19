@@ -1,4 +1,6 @@
 import type { UserSession } from './session.type'
+import type { SpaceStreamerProfile } from './streamer.type'
+import type { PlaylistViewer, Track, PlaylistTrack } from './playlist.type'
 
 // RESPONSES TYPES
 
@@ -23,7 +25,7 @@ export interface DeleteFavoriteStreamerResponse {
 }
 
 export interface SetAndGetPlaylistSelectedResponse {
-  playlistSelectedData: Playlist | null
+  playlistSelectedData: PlaylistViewer | null
 }
 
 export interface SearchTracksResponse {
@@ -42,15 +44,22 @@ export interface CheckUserNameAvailabilityResponse {
   result: boolean
 }
 
-export interface getFavoritesResponse {
+export interface GetFavoritesResponse {
   spaceStreamersFavorites: SpaceStreamerFavorite[]
   playlistsFavorites: PlaylistFavorite[]
 }
 
 export interface GetPlaylistTracksResponse {
   playlistsTracks: PlaylistTrack[]
-  playlistSelected: Playlist
+  playlistSelected: PlaylistViewer
 }
+
+export interface GetStreamerProfileResponse {
+  spaceStreamerProfile: SpaceStreamerProfile
+  playlists: PlaylistViewer[]
+  isFavoriteStreamer: boolean
+}
+
 
 export interface SpaceStreamerFavorite {
   id: string
@@ -69,34 +78,7 @@ export interface PlaylistFavorite {
 }
 
 
-export interface Playlist {
-  id: string
-  playlistName: string
-  isFavorite: boolean
-}
 
-export interface Track {
-  id: string
-  name: string
-  artists: string
-  album: string
-  cover: string
-  url: string
-}
-
-export interface PlaylistTrack {
-  id: string
-  spotifyTrackId: string
-  trackId: string
-  trackName: string
-  artistName: string
-  album: string
-  cover: string
-  url: string
-  position: number
-  votes: number
-  user: UserSession
-}
 
 
 

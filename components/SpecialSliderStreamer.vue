@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
-import type { Playlist } from '~/types/session.type'
+import type { PlaylistStreamer } from '~/types/playlist.type'
 
 const props = defineProps({
   isOpen: {
@@ -8,7 +8,7 @@ const props = defineProps({
     required: true
   },
   playlists: {
-    type: Object as PropType<Playlist[]>,
+    type: Object as PropType<PlaylistStreamer[]>,
     required: true
   },
   openedByStreamer: {
@@ -19,7 +19,8 @@ const props = defineProps({
 
 const inputText = ref(null)
 const playlistName = ref('')
-const sessionStore = useSessionStore()
+const streamerStore = useStreamerStore()
+
 const isCreatePlaylistModalOpen = ref(false)
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 
@@ -39,8 +40,8 @@ const filteredPlaylists = computed(() => {
   )
 })
 
-const proceedResult = (playlist: Playlist) => {
-  sessionStore.addPlaylistsToList(playlist)
+const proceedResult = (playlist: PlaylistStreamer) => {
+  streamerStore.addPlaylistsToList(playlist)
   isCreatePlaylistModalOpen.value = false
 }
 </script>
@@ -98,10 +99,9 @@ const proceedResult = (playlist: Playlist) => {
             :key="playlist.id"
             class="mt-2 mx-2"
           >
-            <PlaylistCardSlider
+            <PlaylistCardSliderStreamer
               :playlist="playlist"
               :closeSlider="closeSlider"
-              :openedByStreamer="props.openedByStreamer"
             />
           </div>
         </template>

@@ -1,4 +1,3 @@
-import { useAuthenticationStore } from '~/stores/authentication.store'
 import type { ApiError } from '~/utils/ApiError'
 
 

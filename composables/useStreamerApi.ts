@@ -1,37 +1,30 @@
 import type {
-  GetSpaceStreamerDataResponse,
   SetAndGetPlaylistSelectedResponse,
   GetCheckIfStreamerResponse,
-  DeleteStreamerProfileResponse
+  DeleteStreamerProfileResponse,
+  GetStreamerProfileResponse,
+  AddStreamerResponse,
+  UpdateStreamersListResponse
 } from '~/types/streamer.type'
+import type {
+  CreatePlaylistResponse,
+  DeletePlaylistResponse
+} from '~/types/playlist.type.js'
 
 export const useStreamerApi = () => {
   const { proceedApiError } = useSpecialError()
   const sessionStore = useSessionStore()
   const { fetch } = useSpecialApi()
 
-  
-
-  const getSpaceStreamerData = async (
-    twitchUserId: string | null,
-    spaceStreamerId: string | null
-  ): Promise<GetSpaceStreamerDataResponse> => {
+  const getStreamerProfile = async (): Promise<GetStreamerProfileResponse> => {
     try {
-      // Création de l'objet en filtrant les valeurs null
-      const body = Object.fromEntries(
-        Object.entries({ twitchUserId, spaceStreamerId }).filter(
-          ([_, v]) => v !== null
-        )
-      )
-
-      const response = await fetch('/api/v1/session/streamer/space', {
-        method: FetchMethod.POST,
-        body: JSON.stringify(body), // Convertir en JSON
+      const response = await fetch('/api/v1/streamer', {
+        method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
 
-      return response as GetSpaceStreamerDataResponse
+      return response as GetStreamerProfileResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -41,7 +34,7 @@ export const useStreamerApi = () => {
     playlistId: string
   ): Promise<SetAndGetPlaylistSelectedResponse> => {
     try {
-      const response = await fetch('/api/v1/session/playlist/selected', {
+      const response = await fetch('/api/v1/streamer/playlist/selected', {
         method: FetchMethod.POST,
         body: { playlistId },
         headers: sessionStore.defaultHeaders(),
@@ -55,14 +48,11 @@ export const useStreamerApi = () => {
   }
   const checkIfStreamer = async (): Promise<GetCheckIfStreamerResponse> => {
     try {
-      const response = await fetch(
-        '/api/v1/session/validate/streamer/profile',
-        {
-          method: FetchMethod.GET,
-          headers: sessionStore.defaultHeaders(),
-          cache: 'no-cache'
-        }
-      )
+      const response = await fetch('/api/v1/streamer/profile/validation', {
+        method: FetchMethod.POST,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
       return response as GetCheckIfStreamerResponse
     } catch (error) {
       await proceedApiError(error)
@@ -72,25 +62,88 @@ export const useStreamerApi = () => {
   const deleteStreamerProfile =
     async (): Promise<DeleteStreamerProfileResponse> => {
       try {
-        const response = await fetch(
-          '/api/v1/session/streamer/profile/delete',
-          {
-            method: FetchMethod.POST,
-            body: {},
-            headers: sessionStore.defaultHeaders(),
-            cache: 'no-cache'
-          }
-        )
+        const response = await fetch('/api/v1/streamer/profile/delete', {
+          method: FetchMethod.POST,
+          body: {},
+          headers: sessionStore.defaultHeaders(),
+          cache: 'no-cache'
+        })
         return response as DeleteStreamerProfileResponse
       } catch (error) {
         await proceedApiError(error)
       }
     }
 
+  const createPlaylist = async (
+    playlistName: string
+  ): Promise<CreatePlaylistResponse> => {
+    try {
+      const response = await fetch('/api/v1/streamer/playlist', {
+        method: FetchMethod.POST,
+        body: { playlistName },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as CreatePlaylistResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const deletePlaylist = async (
+    id: string
+  ): Promise<DeletePlaylistResponse> => {
+    try {
+      const response = await fetch('/api/v1/streamer/playlist', {
+        method: FetchMethod.DELETE,
+        body: { id },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as DeletePlaylistResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const addStreamer = async (
+    nameStreamer: string
+  ): Promise<AddStreamerResponse> => {
+    try {
+      const response = await fetch('/api/v1/streamer/add', {
+        method: FetchMethod.POST,
+        body: { nameStreamer },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as AddStreamerResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const updateStreamersList =
+    async (): Promise<UpdateStreamersListResponse> => {
+      try {
+        const response = await fetch('/api/v1/streamers/list/update', {
+          method: FetchMethod.POST,
+          headers: sessionStore.defaultHeaders(),
+          cache: 'no-cache'
+        })
+        return response as UpdateStreamersListResponse
+      } catch (error) {
+        await proceedApiError(error)
+      }
+    }
+
   return {
-    getSpaceStreamerData,
     setAndGetPlaylistSelected,
     checkIfStreamer,
-    deleteStreamerProfile
+    deleteStreamerProfile,
+    getStreamerProfile,
+    createPlaylist,
+    deletePlaylist,
+    addStreamer,
+    updateStreamersList
   }
 }
