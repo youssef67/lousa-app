@@ -1,6 +1,6 @@
 import type { UserSession } from './session.type'
 import type { SpaceStreamerProfile } from './streamer.type'
-import type { PlaylistViewer, Track, PlaylistTrack } from './playlist.type'
+import type { PlaylistViewer } from './playlist.type'
 
 // RESPONSES TYPES
 
@@ -24,18 +24,6 @@ export interface DeleteFavoriteStreamerResponse {
   result: boolean
 }
 
-export interface SetAndGetPlaylistSelectedResponse {
-  playlistSelectedData: PlaylistViewer | null
-}
-
-export interface SearchTracksResponse {
-  foundTracks: Track[]
-}
-
-export interface AddTracksResponse {
-  newPlaylistTrack: PlaylistTrack
-}
-
 export interface CompleteProfileResponse {
   result: UserSession
 }
@@ -47,11 +35,6 @@ export interface CheckUserNameAvailabilityResponse {
 export interface GetFavoritesResponse {
   spaceStreamersFavorites: SpaceStreamerFavorite[]
   playlistsFavorites: PlaylistFavorite[]
-}
-
-export interface GetPlaylistTracksResponse {
-  playlistsTracks: PlaylistTrack[]
-  playlistSelected: PlaylistViewer
 }
 
 export interface GetStreamerProfileResponse {

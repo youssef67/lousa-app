@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 // Importation d'une image locale
-import pro from '@nuxt/ui-pro/modules/pro'
 import playlistImage from '~/assets/images/playlist-placeholder.webp'
 import type { PlaylistViewer } from '~/types/playlist.type'
 

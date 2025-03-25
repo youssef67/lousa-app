@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Track } from '~/types/viewer.type'
+import type { Track } from '~/types/playlist.type'
 
 const props = defineProps({
   track: {
@@ -16,7 +16,7 @@ async function chooseTrack() {
 
 <template>
   <div class="flex flex-row">
-    <h1>{{ props.track.name }}</h1>
+    <h1>{{ props.track.trackName }}</h1>
     <UButton
       label="Choisir ce son"
       variant="solid"

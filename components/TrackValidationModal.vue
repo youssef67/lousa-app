@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Track } from '~/types/viewer.type'
+import type { Track } from '~/types/playlist.type'
 
 const props = defineProps({
   isOpen: {
@@ -16,17 +16,20 @@ const props = defineProps({
   }
 })
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
-const { runAddTrack } = useViewerRepository()
+const { runAddPendingTrack } = usePlaylistRepository()
 const toast = useSpecialToast()
 
-const handleTrackValidation = async (trackChosen: Track) => {
+const pendingTrackValidation = async (trackChosen: Track) => {
+  const response = await runAddPendingTrack(
+    props.playlistId,
+    trackChosen
+  )
 
-  const response = await runAddTrack(props.playlistId, trackChosen)
-
-  if(response) {
-    emit('proceedResult', response.newPlaylistTrack)
+  if (response) {
     updateIsOpen(false)
-    toast.showSuccess('Son choisi')
+    toast.showSuccess("Son en liste d'attente")
+  } else {
+    toast.showError("Erreur lors de l'ajout de la chanson en liste d'attente")
   }
 }
 
@@ -36,8 +39,6 @@ const updateIsOpen = (value: boolean) => {
     emit('proceedResult', null)
   }
 }
-
-
 </script>
 
 <template>
@@ -55,8 +56,11 @@ const updateIsOpen = (value: boolean) => {
         />
       </div>
 
-      <div v-for="item in props.foundTracks" :key="item.id" class="mt-2 mx-2">
-        <TrackInfoCard :track="item" @track-validation="handleTrackValidation"/>
+      <div v-for="item in props.foundTracks" :key="item.trackId" class="mt-2 mx-2">
+        <TrackInfoCard
+          :track="item"
+          @track-validation="pendingTrackValidation"
+        />
       </div>
     </div>
   </UModal>

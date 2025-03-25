@@ -1,5 +1,28 @@
 import type { UserSession } from './session.type.js'
 
+export interface SearchTracksResponse {
+  foundTracks: Track[]
+}
+
+export interface AddTracksResponse {
+  playlistTracksUpdated: PlaylistTrack[]
+}
+
+export interface RefreshVersusResponse {
+  result: boolean
+}
+
+export interface AddPendingTracksResponse {
+  result: true
+}
+
+export interface GetPlaylistTracksResponse {
+  playlistsTracks: BroadcastTrack[]
+  playlistInfo: playlistInfo
+  playlistsPendingTracks: PlaylistTrack[]
+  versus: Versus
+}
+
 export interface PlaylistStreamer {
   id: string
   playlistName: string
@@ -12,6 +35,14 @@ export interface PlaylistViewer {
   isFavorite: boolean
 }
 
+export interface playlistInfo {
+  id: string
+  playlistName: string
+  spaceStreamerId: string
+  spaceStreamerName: string
+  spaceStreamerImg: string
+}
+
 export interface CreatePlaylistResponse {
   playlist: PlaylistStreamer
 }
@@ -21,9 +52,10 @@ export interface DeletePlaylistResponse {
 }
 
 export interface Track {
-  id: string
-  name: string
-  artists: string
+  trackId?: string
+  spotifyTrackId?: string
+  trackName: string
+  artistName: string
   album: string
   cover: string
   url: string
@@ -40,5 +72,45 @@ export interface PlaylistTrack {
   url: string
   position: number
   votes: number
+  score: number
   user: UserSession
+}
+
+export interface BroadcastTrack { 
+  playlistTrackId: string,
+    trackId: string,
+    spotifyTrackId: string,
+    trackName: string,
+    artistName: string,
+    album: string,
+    cover: string,
+    url: string,
+    vote: number,
+    score: number,
+    position: number,
+    user: {
+      id: string,
+      userName: string | null,
+    },
+}
+
+export interface Versus {
+  id: string
+  closingDate: string
+  firstTrack: VersusTrack
+  secondTrack: VersusTrack
+}
+
+export interface VersusTrack {
+  trackId: string
+  spotifyTrackId: string
+  trackName: string
+  artistName: string
+  album: string
+  cover: string
+  url: string
+  user: {
+    id: string
+    userName: string | null
+  }
 }

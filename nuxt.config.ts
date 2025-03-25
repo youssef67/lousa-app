@@ -17,7 +17,8 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/ui',
     '@pinia/nuxt',
-    '@nuxtjs/device'
+    '@nuxtjs/device',
+    '@vueuse/motion/nuxt'
   ],
   icon: {
     customCollections: [

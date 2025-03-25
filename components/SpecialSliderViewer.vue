@@ -23,7 +23,7 @@ const closeSlider = () => {
   emit('update:isOpen', false)
 }
 
-const selectPlaylist = (value: PlaylistFavorite) => {
+const selectPlaylist = (value: string) => {
   emit('update:isOpen', false)
   if (value) {
     emit('changePlaylist', value)
@@ -80,7 +80,7 @@ onMounted(async () => {
 
   for (const playlist of favoritesPlaylists.value) {
     if (playlist.isSelected) {
-      emit('changePlaylist', playlist)
+      emit('changePlaylist', playlist.id)
     }
   }
 })

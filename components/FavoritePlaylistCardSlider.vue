@@ -10,14 +10,17 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['selectPlaylist', 'deleteFavorites'])
-const { runSetAndGetPLaylistSelected } = useViewerRepository()
+// const { runSetAndGetPLaylistSelected } = useViewerRepository()
 
 const selectPlaylist = async () => {
-  const response = await runSetAndGetPLaylistSelected(props.item.id)
+  // const response = await runSetAndGetPLaylistSelected(props.item.id)
 
-  if (response) {
-    emit('selectPlaylist', response.playlistSelectedData)
-  }
+  // console.log(response)
+  // if (response) {
+    // emit('selectPlaylist', response.playlistSelectedData)
+  // }
+  emit('selectPlaylist', props.item.id)
+
 }
 
 const deleteFavorites = async () => {
