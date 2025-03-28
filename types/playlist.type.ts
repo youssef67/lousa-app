@@ -19,8 +19,7 @@ export interface AddPendingTracksResponse {
 export interface GetPlaylistTracksResponse {
   playlistsTracks: BroadcastTrack[]
   playlistInfo: playlistInfo
-  playlistsPendingTracks: PlaylistTrack[]
-  versus: Versus
+  currentTracksVersus: TracksVersus
 }
 
 export interface PlaylistStreamer {
@@ -76,27 +75,34 @@ export interface PlaylistTrack {
   user: UserSession
 }
 
-export interface BroadcastTrack { 
-  playlistTrackId: string,
-    trackId: string,
-    spotifyTrackId: string,
-    trackName: string,
-    artistName: string,
-    album: string,
-    cover: string,
-    url: string,
-    vote: number,
-    score: number,
-    position: number,
-    user: {
-      id: string,
-      userName: string | null,
-    },
+export interface AddTrackResponse {
+  playlistTracksUpdated: BroadcastTrack[]
+  cleanVersus: TracksVersus
 }
 
-export interface Versus {
+export interface BroadcastTrack {
+  playlistTrackId: string
+  trackId: string
+  spotifyTrackId: string
+  trackName: string
+  artistName: string
+  album: string
+  cover: string
+  url: string
+  vote: number
+  score: number
+  position: number
+  user: {
+    id: string
+    userName: string | null
+  }
+}
+
+export interface TracksVersus {
   id: string
   closingDate: string
+  firstTrackScore: number
+  secondTrackScore: number
   firstTrack: VersusTrack
   secondTrack: VersusTrack
 }

@@ -31,12 +31,12 @@ export const usePlaylistApi = () => {
 
   const addTrack = async (
     versusId: string,
-    winnerTrack: { trackId: string, score: number, userId: string, spotifyTrackId: string }
+    spotifyTrackId: string | null
   ): Promise<void> => {
     try {
       await fetch('/api/v1/playlist/track/add', {
         method: FetchMethod.POST,
-        body: { versusId, winnerTrack },
+        body: { versusId, spotifyTrackId },
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })

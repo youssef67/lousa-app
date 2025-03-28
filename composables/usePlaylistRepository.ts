@@ -19,9 +19,9 @@ export const usePlaylistRepository = () => {
     }
   }
 
-  const runAddTrack = async (versusId: string, winnerTrack: { trackId: string, score: number, userId: string, spotifyTrackId: string}) => {
+  const runAddTrack = async (versusId: string, spotifyTrackId: string | null) => {
     try {
-      await addTrack(versusId, winnerTrack)
+      await addTrack(versusId, spotifyTrackId)
     } catch (error) {
       logger.e('Error logging out', error)
     }

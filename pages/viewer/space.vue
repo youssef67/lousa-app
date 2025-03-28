@@ -4,8 +4,9 @@ import type {
   Track,
   PlaylistTrack,
   playlistInfo,
-  Versus,
-  BroadcastTrack
+  TracksVersus,
+  BroadcastTrack,
+  AddTrackResponse
 } from '~/types/playlist.type'
 
 const isLoading = ref(true)
@@ -18,8 +19,7 @@ const isTracksValidationModalOpen = ref(false)
 const foundTracks = ref<Track[]>(null)
 const toast = useSpecialToast()
 const playlistTracks = ref<BroadcastTrack[]>([])
-const pendingTracks = ref<PlaylistTrack[]>([])
-const versus = ref<Versus>(null)
+const currentTracksVersus = ref<TracksVersus>(null)
 const subscriptionInstance = ref<Subscription | null>(null)
 
 const { runSearchTrack, runGetPlaylistTracks, runRefreshVersus } =
@@ -42,11 +42,12 @@ const changePlaylist = async (playlistId: string) => {
 
   const response = await runGetPlaylistTracks(playlistId)
 
+  console.log('changePlaylist', response)
+
   if (response) {
     currentPlayListInfo.value = response.playlistInfo
     playlistTracks.value = response.playlistsTracks
-    pendingTracks.value = response.playlistsPendingTracks
-    versus.value = response.versus
+    currentTracksVersus.value = response.currentTracksVersus
 
     await setTransmitSubscription(playlistId)
   }
@@ -86,10 +87,10 @@ async function setTransmitSubscription(playlistId: string) {
   await subscription.create()
 
   subscription.onMessage(
-    async (data: { playlistTracksUpdated: BroadcastTrack[] }) => {
+    async (data: AddTrackResponse ) => {
       console.log('subscription.onMessage', data)
       playlistTracks.value = data.playlistTracksUpdated
-      await runRefreshVersus(playlistId)
+      currentTracksVersus.value = data.cleanVersus
     }
   )
 }
@@ -154,7 +155,7 @@ onUnmounted(async () => {
           >
             <PlaylistTrackRow
               v-for="track in playlistTracks"
-              :key="track.id"
+              :key="track.trackId"
               :track="track"
             />
           </div>
@@ -163,9 +164,16 @@ onUnmounted(async () => {
       </div>
       <div v-else>Aucune Playlist selectionnée</div>
     </section>
-    <section v-if="versus">
+    <section>
       <h2>Battle</h2>
-      <PendingTrackSection :versus="versus" />
+      <div v-if="currentTracksVersus">
+        <TracksVersusSection :currentTracksVersus="currentTracksVersus" />
+      </div>
+      <div v-else>
+        <div class="text-center text-white text-sm py-6">
+          🎵 En attente de nouveaux morceaux pour lancer un battle...
+        </div>
+      </div>
     </section>
     <TrackValidationModal
       :isOpen="isTracksValidationModalOpen"
