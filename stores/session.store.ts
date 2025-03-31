@@ -2,10 +2,10 @@ import {
   UserRole,
   type Session,
   type UserSession,
-  type AdminSession,
+  type AdminSession
 } from '~~/types/session.type'
-import { type SpotifyUserSession } from '~/types/spotify.type'
-import { type TwitchUserSession } from '~/types/twitch.type'
+import type { SpotifyUserSession } from '~/types/spotify.type'
+import type { TwitchUserSession } from '~/types/twitch.type'
 
 export const useSessionStore = defineStore('session', () => {
   const session = ref<Session | null>(null)
@@ -77,8 +77,7 @@ export const useSessionStore = defineStore('session', () => {
     deleteData(StorageKey.AUTH)
   }
 
-
-  //TWITCH
+  // TWITCH
   const updateSessionTwitchUser = async (
     twitchUserUpdated: TwitchUserSession
   ) => {
@@ -94,7 +93,7 @@ export const useSessionStore = defineStore('session', () => {
     return !!session.value.user.twitchUser?.spaceStreamerId
   }
 
-  //SPOTIFY
+  // SPOTIFY
   const updateSessionSpotifyUser = async (
     spotifyUserUpdated: SpotifyUserSession
   ) => {
@@ -121,7 +120,6 @@ export const useSessionStore = defineStore('session', () => {
     updateSessionTwitchUser,
     updateSessionAdmin,
     isAdmin,
-    isTwitchStreamerAuthenticated,
-    // playlistSelected,
+    isTwitchStreamerAuthenticated
   }
 })

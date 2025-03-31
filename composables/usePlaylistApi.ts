@@ -2,9 +2,10 @@ import type {
   SearchTracksResponse,
   GetPlaylistTracksResponse,
   AddPendingTracksResponse,
-  LikeTracksResponse
+  LikeTracksResponse,
+  Track,
+  SpecialLikeTracksResponse
 } from '~/types/playlist.type'
-import type  { Track } from '~/types/playlist.type'
 
 export const usePlaylistApi = () => {
   const { proceedApiError } = useSpecialError()
@@ -29,14 +30,11 @@ export const usePlaylistApi = () => {
     }
   }
 
-  const addTrack = async (
-    versusId: string,
-    spotifyTrackId: string | null
-  ): Promise<void> => {
+  const addTrack = async (versusId: string): Promise<void> => {
     try {
       await fetch('/api/v1/playlist/track/add', {
         method: FetchMethod.POST,
-        body: { versusId, spotifyTrackId },
+        body: { versusId },
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
@@ -82,12 +80,13 @@ export const usePlaylistApi = () => {
 
   const likeTrack = async (
     tracksVersusId: string,
-    track: number
+    trackId: string,
+    targetTrack: number
   ): Promise<LikeTracksResponse> => {
     try {
       const response = await fetch('/api/v1/playlist/track/like', {
         method: FetchMethod.POST,
-        body: { tracksVersusId, track },
+        body: { tracksVersusId, trackId, targetTrack },
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
@@ -96,13 +95,31 @@ export const usePlaylistApi = () => {
       await proceedApiError(error)
     }
   }
-  
+
+  const specialLikeTrack = async (
+    tracksVersusId: string,
+    targetTrack: number,
+    amount: number
+  ): Promise<SpecialLikeTracksResponse> => {
+    try {
+      const response = await fetch('/api/v1/playlist/track/special/like', {
+        method: FetchMethod.POST,
+        body: { tracksVersusId, targetTrack, amount },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as SpecialLikeTracksResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
 
   return {
     searchTrack,
     addTrack,
     addPendingTrack,
     getPlaylistTracks,
-    likeTrack
+    likeTrack,
+    specialLikeTrack
   }
 }

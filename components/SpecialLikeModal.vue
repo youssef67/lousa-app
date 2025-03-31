@@ -1,20 +1,22 @@
 <script lang="ts" setup>
-import type { UserSession } from '~/types/session.type'
-
 const props = defineProps({
   isOpen: {
     type: Boolean,
     required: true
+  },
+  amountCurrency: {
+    type: Number,
+    required: true
   }
-  // user: {
-  //   type: Object as PropType<UserSession>,
-  //   required: true
-  // }
 })
 
-const emit = defineEmits(['update:isOpen', 'proceedResult'])
+console.log('SpecialLikeModal', props)
 
-const amount = ref(25)
+const emit = defineEmits(['update:isOpen', 'proceedResult'])
+const sessionStore = useSessionStore()
+
+const amount = ref(0)
+const totalCurrency = ref(sessionStore.session.user.amountVirtualCurrency)
 const loading = ref(false)
 
 const updateIsOpen = (value: boolean) => {
@@ -27,11 +29,22 @@ const updateIsOpen = (value: boolean) => {
 const onSubmitClick = async () => {
   loading.value = true
   try {
-    // emit('submit', amount.value)
-    // emit('update:isOpen', false)
+    emit('proceedResult', amount.value)
   } finally {
     loading.value = false
   }
+}
+
+const setZero = () => {
+  amount.value = 0
+}
+
+const setMax = () => {
+  amount.value = totalCurrency.value
+}
+
+const setHalf = () => {
+  amount.value = Math.floor(totalCurrency.value / 2)
 }
 </script>
 
@@ -52,13 +65,28 @@ const onSubmitClick = async () => {
         />
       </div>
       <div id="content" class="flex flex-col w-full py-6 gap-6">
+        <p>Crédit disponible : {{ props.amountCurrency }} Louz</p>
+
+        <div class="flex gap-4 justify-center">
+          <UButton label="Zero" @click="setZero" />
+          <UButton label="Max" @click="setMax" />
+          <UButton label="Moitié" @click="setHalf" />
+        </div>
+
         <div class="flex flex-col items-center gap-4">
           <input
             type="range"
             min="0"
-            max="50"
+            :max="totalCurrency"
             v-model="amount"
             class="w-full accent-purple-600"
+          />
+          <UInput
+            type="number"
+            :max="totalCurrency"
+            min="0"
+            v-model="amount"
+            class="w-full text-center rounded px-2 py-1"
           />
           <div class="text-lg font-medium">🎯 {{ amount }} Louz</div>
         </div>
@@ -70,6 +98,7 @@ const onSubmitClick = async () => {
           size="xl"
           color="secondary"
           class="flex"
+          :loading="loading"
           @click="onSubmitClick()"
         />
       </div>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Subscription, Transmit } from '@adonisjs/transmit-client'
+import { type Subscription, Transmit } from '@adonisjs/transmit-client'
 import type {
   Track,
   playlistInfo,
@@ -21,9 +21,12 @@ const foundTracks = ref<Track[]>(null)
 const toast = useSpecialToast()
 const playlistTracks = ref<BroadcastTrack[]>([])
 const currentTracksVersus = ref<TracksVersus>(null)
-const playlistUpdatedInstance = ref<Subscription | null>(null)
-const likedTracksInstance = ref<Subscription | null>(null)
 const scoreAndLikes = ref<ScoreAndLikes>()
+const sessionStore = useSessionStore()
+const { showSuccess } = useSpecialToast()
+
+let playlistUpdatedInstance: Subscription | null = null
+let likedTracksInstance: Subscription | null = null
 
 const { runSearchTrack, runGetPlaylistTracks } = usePlaylistRepository()
 const { handleError } = useSpecialError()
@@ -51,6 +54,8 @@ const changePlaylist = async (playlistId: string) => {
     playlistTracks.value = response.playlistsTracks
     currentTracksVersus.value = response.currentTracksVersus
     scoreAndLikes.value = response.scoreAndLikes
+
+    sessionStore.updateSessionUser(response.user)
 
     await setTransmitSubscription(playlistId, response.currentTracksVersus)
   }
@@ -90,39 +95,43 @@ async function setTransmitSubscription(
     `playlist/updated/${playlistId}`
   )
 
-  playlistUpdatedInstance.value = playlistUpdated
+  playlistUpdatedInstance = playlistUpdated
 
   await playlistUpdated.create()
 
   playlistUpdated.onMessage(async (data: AddTrackResponse) => {
+    console.log('playlistUpdated', data)
     playlistTracks.value = data.playlistTracksUpdated
     currentTracksVersus.value = data.nextTracksVersus
+    scoreAndLikes.value = data.scoreAndLikes
   })
 
   if (tracksVersus) {
-    console.log('if tracksVersus', tracksVersus)
     const likeUpdated = transmit.subscription(
       `playlist/like/${tracksVersus.id}`
     )
-    likedTracksInstance.value = likeUpdated
+    likedTracksInstance = likeUpdated
     await likeUpdated.create()
 
     likeUpdated.onMessage(async (data: LikeTrackResponse) => {
-      console.log('likeUpdated.onMessage', data.scoreAndLikes)
       scoreAndLikes.value = data.scoreAndLikes
+      if (data.user && data.user.id === sessionStore.session.user.id) {
+        sessionStore.updateSessionUser(data.user)
+        showSuccess('Merci pour votre vote et votre soutien à votre streamer !')
+      }
     })
   }
 }
 
 onUnmounted(async () => {
-  if (playlistUpdatedInstance.value) {
-    console.log('closeEventStream 1', playlistUpdatedInstance.value)
-    await closeEventStream(playlistUpdatedInstance.value as any)
+  if (playlistUpdatedInstance) {
+    console.log('closeEventStream 1', playlistUpdatedInstance)
+    await closeEventStream(playlistUpdatedInstance)
   }
 
-  if (likedTracksInstance.value) {
-    console.log('closeEventStream 2', likedTracksInstance.value)
-    await closeEventStream(likedTracksInstance.value as any)
+  if (likedTracksInstance) {
+    console.log('closeEventStream 2', likedTracksInstance)
+    await closeEventStream(likedTracksInstance)
   }
 })
 </script>
@@ -202,7 +211,6 @@ onUnmounted(async () => {
       </div>
       <div v-else>Aucune Playlist selectionnée</div>
     </section>
-    <section></section>
     <TrackValidationModal
       :isOpen="isTracksValidationModalOpen"
       :foundTracks="foundTracks || []"

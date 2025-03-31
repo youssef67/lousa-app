@@ -18,7 +18,6 @@ const isDark = computed({
 </script>
 
 <template>
-
   <ClientOnly v-if="!colorMode?.forced">
     <UButton
       :icon="isDark ? appConfig.ui.icons.light : appConfig.ui.icons.dark"
@@ -36,8 +35,4 @@ const isDark = computed({
   </ClientOnly>
 </template>
 
-
-
-<style>
-
-</style>
+<style></style>

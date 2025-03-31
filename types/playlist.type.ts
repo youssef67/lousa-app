@@ -20,11 +20,17 @@ export interface LikeTracksResponse {
   result: true
 }
 
+export interface SpecialLikeTracksResponse {
+  user: UserSession
+  scoreAndLikes: ScoreAndLikes
+}
+
 export interface GetPlaylistTracksResponse {
   playlistsTracks: BroadcastTrack[]
   playlistInfo: playlistInfo
   currentTracksVersus: TracksVersus
   scoreAndLikes: ScoreAndLikes
+  user: UserSession
 }
 
 export interface PlaylistStreamer {
@@ -41,9 +47,11 @@ export interface PlaylistViewer {
 
 export interface ScoreAndLikes {
   firstTrackScore: number
-  firstTrackAlreadyLiked: boolean
+  firstTrackAlreadyLiked?: boolean
+  specialLikeFirstTrack: number
   secondTrackScore: number
-  secondTrackAlreadyLiked: boolean
+  secondTrackAlreadyLiked?: boolean
+  specialLikeSecondTrack: number
   nbLikesFirstTrack: number
   nbLikesSecondTrack: number
 }
@@ -97,6 +105,7 @@ export interface AddTrackResponse {
 
 export interface LikeTrackResponse {
   scoreAndLikes: ScoreAndLikes
+  user?: UserSession
 }
 
 export interface BroadcastTrack {
@@ -110,6 +119,7 @@ export interface BroadcastTrack {
   url: string
   vote: number
   score: number
+  specialScore: number
   position: number
   user: {
     id: string

@@ -12,7 +12,6 @@ const loading = ref(false)
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 const toast = useSpecialToast()
 
-
 const { runCreatePlaylist } = useStreamerRepository()
 const { handleError } = useSpecialError()
 

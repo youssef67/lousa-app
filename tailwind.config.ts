@@ -9,7 +9,7 @@ export default <Partial<Config>>{
         large: '40px'
       },
       colors: {
-        lousatest: {
+        'lousatest': {
           light: '#505010',
           DEFAULT: '#FF0010',
           dark: '#00994A'
@@ -60,7 +60,7 @@ export default <Partial<Config>>{
           900: '#773217',
           950: '#40170a'
         },
-        secondary: {
+        'secondary': {
           50: '#F9F4F4',
           100: '#F4E9E9',
           200: '#E2C7C8',

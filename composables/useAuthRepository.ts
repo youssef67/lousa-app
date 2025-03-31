@@ -75,19 +75,11 @@ export const useAuthRepository = () => {
     sessionStore.updateSession(response)
   }
 
-  const runAuthenticationSpotify = async (authUrl: string) => {
-    try {
-      window.location.href = authUrl
-    } catch (error) {
-      throw newError('ERROR_INVALID_DATA', 'ARAS-1')
-    }
-  }
-
   const runLoginSpotifyStreamer = async () => {
     try {
       const response = await loginSpotify()
 
-      if(!response.urlAuthorize) {
+      if (!response.urlAuthorize) {
         throw newError('ERROR_INVALID_DATA', 'ARAS-2')
       }
 
@@ -96,24 +88,23 @@ export const useAuthRepository = () => {
       const windowTwitchLogin = window.open(response.urlAuthorize, '_blank')
 
       return windowTwitchLogin
-    } catch (error) {
+    } catch {
       throw newError('ERROR_INVALID_DATA', 'ARAS-3')
     }
   }
-
 
   const runLoginTwitch = async () => {
     try {
       const response = await loginTwitch()
 
-      if(!response.url) {
+      if (!response.url) {
         throw newError('ERROR_INVALID_DATA', 'ARLT-1')
       }
 
       const windowTwitchLogin = window.open(response.url, '_blank')
 
       return windowTwitchLogin
-    } catch (error) {
+    } catch {
       throw newError('ERROR_INVALID_DATA', 'ARLT-2')
     }
   }

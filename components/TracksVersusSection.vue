@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { type TracksVersus, type ScoreAndLikes } from '~/types/playlist.type'
 import { DateTime } from 'luxon'
+import type { TracksVersus, ScoreAndLikes } from '~/types/playlist.type'
 
 const props = defineProps({
   currentTracksVersus: {
@@ -17,21 +17,42 @@ const hasEnded = ref(false)
 const scoreFirstTrack = ref(props.scoreAndLikes.firstTrackScore)
 const isUseSpecialLikeModalOpen = ref(false)
 const scoreSecondTrack = ref(props.scoreAndLikes.secondTrackScore)
-const { runAddTrack, runLikeTrack } = usePlaylistRepository()
-const emit = defineEmits(['updateTracks'])
+const { runAddTrack, runLikeTrack, runSpecialLikeTrack } =
+  usePlaylistRepository()
+const sessionStore = useSessionStore()
+const targetTrack = ref(0)
+const labelFirstTrack = ref(
+  `Utiliser des louz - ${props.scoreAndLikes.specialLikeFirstTrack}`
+)
+const labelSecondTrack = ref(
+  `Utiliser des louz - ${props.scoreAndLikes.specialLikeSecondTrack}`
+)
+const specialLikeFirstTrack = ref(props.scoreAndLikes.specialLikeFirstTrack)
+const specialLikeSecondTrack = ref(props.scoreAndLikes.specialLikeSecondTrack)
+defineEmits(['updateTracks'])
 
 // Animation state
 const animateFirst = ref(false)
 const animateSecond = ref(false)
 
-const proceedResult = () => {
+const proceedResult = async (amount: number) => {
   isUseSpecialLikeModalOpen.value = false
+
+  if (amount !== undefined && targetTrack.value !== 0) {
+    await runSpecialLikeTrack(
+      props.currentTracksVersus.id,
+      targetTrack.value,
+      amount
+    )
+  }
+
+  targetTrack.value = 0
 }
 
-const handleSpecialLike = (track: number) => {
+const handleSpecialLike = (value: number) => {
+  targetTrack.value = value
   animateFirst.value = true
   setTimeout(() => (animateFirst.value = false), 200)
-
   isUseSpecialLikeModalOpen.value = true
 }
 
@@ -41,23 +62,11 @@ const onCountdownFinished = async () => {
   console.log('🎉 Le duel est terminé !')
   clearInterval(interval)
 
-  // Déterminer la chanson gagnante
-  const winnerTrack =
-    scoreFirstTrack.value > scoreSecondTrack.value
-      ? { spotifyTrackId: props.currentTracksVersus.firstTrack.spotifyTrackId }
-      : scoreSecondTrack.value > scoreFirstTrack.value
-      ? { spotifyTrackId: props.currentTracksVersus.firstTrack.spotifyTrackId }
-      : { spotifyTrackId: null }
-
-  await runAddTrack(props.currentTracksVersus.id, winnerTrack.spotifyTrackId)
+  await runAddTrack(props.currentTracksVersus.id)
 }
 
-const likeTrack = async (track: number) => {
-  console.log('❤️')
-  console.log('trackId', track)
-  const response = await runLikeTrack(props.currentTracksVersus.id, track)
-
-  console.log('response', response)
+const likeTrack = async (trackId: string, targetTrack: number) => {
+  await runLikeTrack(props.currentTracksVersus.id, trackId, targetTrack)
 }
 
 const updateCountdown = () => {
@@ -128,6 +137,22 @@ watch(
     scoreSecondTrack.value = newScoreAndLikes.secondTrackScore
   }
 )
+
+watch(
+  () => props.scoreAndLikes.specialLikeFirstTrack,
+  newSpecialLikeFirstTrack => {
+    specialLikeFirstTrack.value = newSpecialLikeFirstTrack
+    labelFirstTrack.value = `Utiliser des louz - ${newSpecialLikeFirstTrack}`
+  }
+)
+
+watch(
+  () => props.scoreAndLikes.specialLikeSecondTrack,
+  newSpecialLikeSecondTrack => {
+    specialLikeSecondTrack.value = newSpecialLikeSecondTrack
+    labelSecondTrack.value = `Utiliser des louz - ${newSpecialLikeSecondTrack}`
+  }
+)
 </script>
 
 <template>
@@ -140,10 +165,14 @@ watch(
     >
       <!-- Premier Track -->
       <div class="flex-1 text-center">
+        Proposé par
+        <span class="text-white">{{
+          props.currentTracksVersus.firstTrack.user.userName
+        }}</span>
         <img
           :src="currentTracksVersus.firstTrack.cover"
           alt="Cover 1"
-          class="w-16 h-16 mx-auto rounded-md shadow-md"
+          class="w-16 h-16 mx-auto rounded-md shadow-md mt-2"
         />
         <h4 class="text-white text-xs font-semibold mt-1">
           {{ currentTracksVersus.firstTrack.trackName }}
@@ -157,24 +186,41 @@ watch(
 
         <!-- Vote button -->
         <div class="flex flex-row justify-center items-center gap-2 mt-2">
-          <UPopover>
+          <div
+            v-if="
+              sessionStore.session.user.id ===
+              props.currentTracksVersus.firstTrack.user.id
+            "
+          >
             <UButton
-              label="Utiliser des louz"
-              color="primary"
-              variant="solid"
+              :class="[
+                'p-1 rounded-full transition duration-200',
+                animateSecond ? 'scale-105' : 'scale-100'
+              ]"
               icon="i-tabler-music-up"
+              :label="labelFirstTrack"
+              @click="() => handleSpecialLike(1)"
             />
-            <template #content>
-              <div class="p-4 w-48 text-white">
-                Tu peux utiliser 1 Louz ici !
-              </div>
-            </template>
-          </UPopover>
+          </div>
+          <div v-else>
+            <div v-if="props.scoreAndLikes.specialLikeFirstTrack > 0">
+              <UButton
+                class="p-1 rounded-full heartbeat"
+                icon="i-tabler-flame"
+                color="pink"
+                variant="soft"
+              >
+                Coup spécial reçu 💖
+              </UButton>
+            </div>
+          </div>
 
           <UButton
             class="p-1 rounded-full"
             icon="i-tabler-music-heart"
-            @click="() => likeTrack(1)"
+            @click="
+              () => likeTrack(props.currentTracksVersus.firstTrack.trackId, 1)
+            "
           >
             {{ props.scoreAndLikes.nbLikesFirstTrack }} likes /
             {{
@@ -195,10 +241,14 @@ watch(
 
       <!-- Deuxième Track -->
       <div class="flex-1 text-center">
+        Proposé par
+        <span class="text-white">{{
+          props.currentTracksVersus.secondTrack.user.userName
+        }}</span>
         <img
           :src="currentTracksVersus.secondTrack.cover"
           alt="Cover 2"
-          class="w-16 h-16 mx-auto rounded-md shadow-md"
+          class="w-16 h-16 mx-auto rounded-md shadow-md mt-2"
         />
         <h4 class="text-white text-xs font-semibold mt-1">
           {{ currentTracksVersus.secondTrack.trackName }}
@@ -211,20 +261,39 @@ watch(
         </div>
 
         <div class="flex flex-row justify-center items-center gap-2 mt-2">
-          <UButton
-            @click="() => handleSpecialLike(2)"
-            :class="[
-              'p-1 rounded-full transition duration-200',
-              animateSecond ? 'scale-105' : 'scale-100'
-            ]"
-            icon="i-tabler-music-up"
+          <div
+            v-if="
+              sessionStore.session.user.id ===
+              props.currentTracksVersus.secondTrack.user.id
+            "
           >
-            Utiliser des louz
-          </UButton>
+            <UButton
+              :class="[
+                'p-1 rounded-full transition duration-200',
+                animateSecond ? 'scale-105' : 'scale-100'
+              ]"
+              icon="i-tabler-music-up"
+              :label="labelSecondTrack"
+              @click="() => handleSpecialLike(2)"
+            />
+          </div>
+          <div v-else>
+            <div v-if="props.scoreAndLikes.specialLikeSecondTrack > 0">
+              <UButton
+                class="p-1 rounded-full heartbeat"
+                icon="i-tabler-flame"
+                color="pink"
+                variant="soft"
+                label="Coup spécial reçu 💖"
+              />
+            </div>
+          </div>
           <UButton
             class="p-1 rounded-full"
             icon="i-tabler-music-heart"
-            @click="() => likeTrack(2)"
+            @click="
+              () => likeTrack(props.currentTracksVersus.secondTrack.trackId, 2)
+            "
           >
             {{ props.scoreAndLikes.nbLikesSecondTrack }} likes /
             {{
@@ -259,6 +328,29 @@ watch(
   </div>
   <SpecialLikeModal
     :is-open="isUseSpecialLikeModalOpen"
+    :amountCurrency="sessionStore.session.user.amountVirtualCurrency"
     @proceed-result="proceedResult"
   />
 </template>
+
+<style scoped>
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.02);
+  }
+}
+
+.heartbeat {
+  animation: heartbeat 1s infinite;
+}
+</style>

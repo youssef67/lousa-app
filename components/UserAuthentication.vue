@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { AuthState, AuthType, ConfirmResult, LoginResult, SignUpResult } from '~/utils/auth/AuthResult'
+import {
+  AuthState,
+  AuthType,
+  ConfirmResult,
+  LoginResult,
+  SignUpResult
+} from '~/utils/auth/AuthResult'
 
 const toast = useSpecialToast()
 
 const authenticationStore = useAuthenticationStore()
 const { pushHome } = useSpecialRouter()
-
 
 const proceedResultLogin = (result: LoginResult) => {
   switch (result) {
@@ -44,7 +49,7 @@ const proceedResultLoginConfirm = (result: ConfirmResult) => {
 }
 
 const proceedResultSignUp = (result: SignUpResult) => {
-  switch(result) {
+  switch (result) {
     case SignUpResult.GO_TO_LOGIN: {
       authenticationStore.authState = AuthState.LOGIN
       break
@@ -57,7 +62,7 @@ const proceedResultSignUp = (result: SignUpResult) => {
       authenticationStore.authState = AuthState.NONE
       break
     }
-  } 
+  }
 }
 
 const proceedResultSignUpConfirm = (result: ConfirmResult) => {
@@ -101,8 +106,4 @@ const proceedResultSignUpConfirm = (result: ConfirmResult) => {
   />
 </template>
 
-
-
-<style>
-
-</style>
+<style></style>

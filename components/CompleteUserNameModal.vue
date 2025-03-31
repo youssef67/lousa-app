@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { useDebounceFn } from '@vueuse/core'
-import { Subscription, Transmit } from '@adonisjs/transmit-client'
+import { Transmit, type Subscription } from '@adonisjs/transmit-client'
 import type { TwitchCallBackTransmit } from '~/types/session.type'
 
-const props = defineProps({
+defineProps({
   isOpen: {
     type: Boolean,
     required: true
@@ -18,12 +18,11 @@ const isUserNameValid = ref(false) // Pour gérer l'activation du bouton
 const isChecking = ref(false) // Indique si la vérification est en cours
 const isError = ref(false)
 const ErrorMessage = ref('')
-const { runCompleteProfile, runCheckUserNameAvailability } =
-  useViewerRepository()
+const { runCompleteProfile, runCheckUserNameAvailability } = useViewerRepository()
 
 const { handleError } = useSpecialError()
 const sessionStore = useSessionStore()
-const { showSuccess, showError } = useSpecialToast()
+const { showSuccess } = useSpecialToast()
 
 const closeModal = () => {
   emit('update:isOpen', false)

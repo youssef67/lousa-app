@@ -3,8 +3,7 @@ import type { PlaylistStreamer } from '~/types/playlist.type'
 
 const sessionStore = useSessionStore()
 const streamerStore = useStreamerStore()
-const { runSetAndGetPLaylistSelected, runGetStreamerProfile } =
-  useStreamerRepository()
+const { runGetStreamerProfile } = useStreamerRepository()
 
 const isLoading = ref(true)
 const isSlideOverOpen = ref(false)

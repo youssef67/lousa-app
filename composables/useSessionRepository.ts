@@ -30,7 +30,6 @@ export const useSessionRepository = () => {
   const refreshUserSession = async () => {
     const response = await getUserSession()
     sessionStore.updateSessionUser(response.user)
-    // sessionStore.updateSessionSpotifyUser(response.spotifyUser)
   }
 
   const runDeleteUser = async () => {

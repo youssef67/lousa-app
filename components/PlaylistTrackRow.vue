@@ -24,8 +24,6 @@ const crownImage = computed(() => {
   return null
 })
 
-
-
 onMounted(async () => {
   if (isOwner.value) {
     await nextTick()
@@ -53,7 +51,9 @@ onMounted(async () => {
       :duration="100"
       :class="[
         'relative z-10 flex items-center gap-4 py-3 px-4 rounded-lg transition duration-200',
-        isOwner ? 'border-2 border-yellow-400 shadow-yellow-500/50 shadow-lg' : 'bg-gray-900 hover:bg-gray-800'
+        isOwner
+          ? 'border-2 border-yellow-400 shadow-yellow-500/50 shadow-lg'
+          : 'bg-gray-900 hover:bg-gray-800'
       ]"
     >
       <!-- Crown -->
@@ -64,14 +64,26 @@ onMounted(async () => {
           alt="Crown"
           class="w-16 h-16 rounded-lg object-cover"
         />
-        <div v-else class="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center">
-          <span class="text-gray-400 text-sm font-bold">#{{ track.position }}</span>
+        <div
+          v-else
+          class="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center"
+        >
+          <span class="text-gray-400 text-sm font-bold"
+            >#{{ track.position }}</span
+          >
         </div>
         <span class="text-xs text-gray-400 mt-1">Score: {{ track.score }}</span>
+        <span class="text-xs text-gray-400 mt-1"
+          >Louz: {{ track.specialScore }}</span
+        >
       </div>
 
       <!-- Cover -->
-      <img :src="track.cover" alt="Cover" class="w-16 h-16 rounded-md object-cover" />
+      <img
+        :src="track.cover"
+        alt="Cover"
+        class="w-16 h-16 rounded-md object-cover"
+      />
 
       <!-- Infos -->
       <div class="flex-1">
@@ -84,9 +96,26 @@ onMounted(async () => {
 
       <!-- Actions -->
       <div class="flex items-center gap-3">
-        <UButton icon="i-tabler-play" variant="ghost" size="sm" class="text-white hover:text-green-400" @click="emit('play', track)" />
-        <UButton icon="i-tabler-heart" variant="ghost" size="sm" class="text-white hover:text-red-500" @click="emit('favorite', track)" />
-        <UButton icon="i-tabler-dots" variant="ghost" size="sm" class="text-white hover:text-gray-300" />
+        <UButton
+          icon="i-tabler-play"
+          variant="ghost"
+          size="sm"
+          class="text-white hover:text-green-400"
+          @click="emit('play', track)"
+        />
+        <UButton
+          icon="i-tabler-heart"
+          variant="ghost"
+          size="sm"
+          class="text-white hover:text-red-500"
+          @click="emit('favorite', track)"
+        />
+        <UButton
+          icon="i-tabler-dots"
+          variant="ghost"
+          size="sm"
+          class="text-white hover:text-gray-300"
+        />
       </div>
     </div>
   </div>
