@@ -2,11 +2,12 @@
 import { Subscription, Transmit } from '@adonisjs/transmit-client'
 import type {
   Track,
-  PlaylistTrack,
   playlistInfo,
   TracksVersus,
   BroadcastTrack,
-  AddTrackResponse
+  AddTrackResponse,
+  ScoreAndLikes,
+  LikeTrackResponse
 } from '~/types/playlist.type'
 
 const isLoading = ref(true)
@@ -20,10 +21,11 @@ const foundTracks = ref<Track[]>(null)
 const toast = useSpecialToast()
 const playlistTracks = ref<BroadcastTrack[]>([])
 const currentTracksVersus = ref<TracksVersus>(null)
-const subscriptionInstance = ref<Subscription | null>(null)
+const playlistUpdatedInstance = ref<Subscription | null>(null)
+const likedTracksInstance = ref<Subscription | null>(null)
+const scoreAndLikes = ref<ScoreAndLikes>()
 
-const { runSearchTrack, runGetPlaylistTracks, runRefreshVersus } =
-  usePlaylistRepository()
+const { runSearchTrack, runGetPlaylistTracks } = usePlaylistRepository()
 const { handleError } = useSpecialError()
 
 const proceedResult = (value: BroadcastTrack | null) => {
@@ -48,8 +50,9 @@ const changePlaylist = async (playlistId: string) => {
     currentPlayListInfo.value = response.playlistInfo
     playlistTracks.value = response.playlistsTracks
     currentTracksVersus.value = response.currentTracksVersus
+    scoreAndLikes.value = response.scoreAndLikes
 
-    await setTransmitSubscription(playlistId)
+    await setTransmitSubscription(playlistId, response.currentTracksVersus)
   }
 
   isLoading.value = false
@@ -75,29 +78,51 @@ async function closeEventStream(subscription: Subscription) {
   await subscription.delete()
 }
 
-async function setTransmitSubscription(playlistId: string) {
+async function setTransmitSubscription(
+  playlistId: string,
+  tracksVersus: TracksVersus
+) {
   const transmit = new Transmit({
     baseUrl: `${config.public.siteUrl}/api/v1`
   })
 
-  const subscription = transmit.subscription(`playlist/updated/${playlistId}`)
-
-  subscriptionInstance.value = subscription
-
-  await subscription.create()
-
-  subscription.onMessage(
-    async (data: AddTrackResponse ) => {
-      console.log('subscription.onMessage', data)
-      playlistTracks.value = data.playlistTracksUpdated
-      currentTracksVersus.value = data.cleanVersus
-    }
+  const playlistUpdated = transmit.subscription(
+    `playlist/updated/${playlistId}`
   )
+
+  playlistUpdatedInstance.value = playlistUpdated
+
+  await playlistUpdated.create()
+
+  playlistUpdated.onMessage(async (data: AddTrackResponse) => {
+    playlistTracks.value = data.playlistTracksUpdated
+    currentTracksVersus.value = data.nextTracksVersus
+  })
+
+  if (tracksVersus) {
+    console.log('if tracksVersus', tracksVersus)
+    const likeUpdated = transmit.subscription(
+      `playlist/like/${tracksVersus.id}`
+    )
+    likedTracksInstance.value = likeUpdated
+    await likeUpdated.create()
+
+    likeUpdated.onMessage(async (data: LikeTrackResponse) => {
+      console.log('likeUpdated.onMessage', data.scoreAndLikes)
+      scoreAndLikes.value = data.scoreAndLikes
+    })
+  }
 }
 
 onUnmounted(async () => {
-  if (subscriptionInstance.value) {
-    await closeEventStream(subscriptionInstance.value as any)
+  if (playlistUpdatedInstance.value) {
+    console.log('closeEventStream 1', playlistUpdatedInstance.value)
+    await closeEventStream(playlistUpdatedInstance.value as any)
+  }
+
+  if (likedTracksInstance.value) {
+    console.log('closeEventStream 2', likedTracksInstance.value)
+    await closeEventStream(likedTracksInstance.value as any)
   }
 })
 </script>
@@ -159,22 +184,25 @@ onUnmounted(async () => {
               :track="track"
             />
           </div>
-          <div></div>
+          <div>
+            <h2>Battle</h2>
+            <div v-if="currentTracksVersus">
+              <TracksVersusSection
+                :currentTracksVersus="currentTracksVersus"
+                :scoreAndLikes="scoreAndLikes"
+              />
+            </div>
+            <div v-else>
+              <div class="text-center text-white text-sm py-6">
+                🎵 En attente de nouveaux morceaux pour lancer un battle...
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div v-else>Aucune Playlist selectionnée</div>
     </section>
-    <section>
-      <h2>Battle</h2>
-      <div v-if="currentTracksVersus">
-        <TracksVersusSection :currentTracksVersus="currentTracksVersus" />
-      </div>
-      <div v-else>
-        <div class="text-center text-white text-sm py-6">
-          🎵 En attente de nouveaux morceaux pour lancer un battle...
-        </div>
-      </div>
-    </section>
+    <section></section>
     <TrackValidationModal
       :isOpen="isTracksValidationModalOpen"
       :foundTracks="foundTracks || []"

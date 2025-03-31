@@ -1,37 +1,38 @@
 <script lang="ts" setup>
-import { type TracksVersus } from '~/types/playlist.type'
+import { type TracksVersus, type ScoreAndLikes } from '~/types/playlist.type'
 import { DateTime } from 'luxon'
 
 const props = defineProps({
   currentTracksVersus: {
     type: Object as PropType<TracksVersus>,
     required: true
+  },
+  scoreAndLikes: {
+    type: Object as PropType<ScoreAndLikes>,
+    required: true
   }
 })
-console.log('🔥', props.currentTracksVersus)
 const countdown = ref('00:00:00')
 const hasEnded = ref(false)
-const scoreFirstTrack = ref(props.currentTracksVersus.firstTrackScore)
-const scoreSecondTrack = ref(props.currentTracksVersus.secondTrackScore)
-const { runAddTrack } = usePlaylistRepository()
+const scoreFirstTrack = ref(props.scoreAndLikes.firstTrackScore)
+const isUseSpecialLikeModalOpen = ref(false)
+const scoreSecondTrack = ref(props.scoreAndLikes.secondTrackScore)
+const { runAddTrack, runLikeTrack } = usePlaylistRepository()
 const emit = defineEmits(['updateTracks'])
-
-
 
 // Animation state
 const animateFirst = ref(false)
 const animateSecond = ref(false)
 
-const handleVoteFirst = () => {
-  animateFirst.value = true
-  scoreFirstTrack.value++
-  setTimeout(() => (animateFirst.value = false), 200)
+const proceedResult = () => {
+  isUseSpecialLikeModalOpen.value = false
 }
 
-const handleVoteSecond = () => {
-  animateSecond.value = true
-  scoreSecondTrack.value++
-  setTimeout(() => (animateSecond.value = false), 200)
+const handleSpecialLike = (track: number) => {
+  animateFirst.value = true
+  setTimeout(() => (animateFirst.value = false), 200)
+
+  isUseSpecialLikeModalOpen.value = true
 }
 
 const onCountdownFinished = async () => {
@@ -46,10 +47,17 @@ const onCountdownFinished = async () => {
       ? { spotifyTrackId: props.currentTracksVersus.firstTrack.spotifyTrackId }
       : scoreSecondTrack.value > scoreFirstTrack.value
       ? { spotifyTrackId: props.currentTracksVersus.firstTrack.spotifyTrackId }
-      : { spotifyTrackId: null} 
+      : { spotifyTrackId: null }
 
   await runAddTrack(props.currentTracksVersus.id, winnerTrack.spotifyTrackId)
-  
+}
+
+const likeTrack = async (track: number) => {
+  console.log('❤️')
+  console.log('trackId', track)
+  const response = await runLikeTrack(props.currentTracksVersus.id, track)
+
+  console.log('response', response)
 }
 
 const updateCountdown = () => {
@@ -89,7 +97,6 @@ const progressSecond = computed(() => {
   return total === 0 ? '50%' : `${(scoreSecondTrack.value / total) * 100}%`
 })
 
-
 onMounted(() => {
   updateCountdown()
   interval = window.setInterval(updateCountdown, 1000)
@@ -101,7 +108,7 @@ onUnmounted(() => {
 
 watch(
   () => props.currentTracksVersus,
-  (newVersus) => {
+  newVersus => {
     if (!newVersus?.firstTrack || !newVersus?.secondTrack) return
 
     scoreFirstTrack.value = newVersus.firstTrackScore
@@ -114,13 +121,23 @@ watch(
   { immediate: true }
 )
 
+watch(
+  () => props.scoreAndLikes,
+  newScoreAndLikes => {
+    scoreFirstTrack.value = newScoreAndLikes.firstTrackScore
+    scoreSecondTrack.value = newScoreAndLikes.secondTrackScore
+  }
+)
 </script>
 
 <template>
   <div
     class="left-4 right-4 bg-gray-900 bg-opacity-90 p-3 shadow-lg border-t border-gray-800 rounded-lg"
   >
-    <div v-if="currentTracksVersus?.firstTrack && currentTracksVersus?.secondTrack" class="flex items-center justify-between gap-4">
+    <div
+      v-if="currentTracksVersus?.firstTrack && currentTracksVersus?.secondTrack"
+      class="flex items-center justify-between gap-4"
+    >
       <!-- Premier Track -->
       <div class="flex-1 text-center">
         <img
@@ -140,18 +157,31 @@ watch(
 
         <!-- Vote button -->
         <div class="flex flex-row justify-center items-center gap-2 mt-2">
+          <UPopover>
+            <UButton
+              label="Utiliser des louz"
+              color="primary"
+              variant="solid"
+              icon="i-tabler-music-up"
+            />
+            <template #content>
+              <div class="p-4 w-48 text-white">
+                Tu peux utiliser 1 Louz ici !
+              </div>
+            </template>
+          </UPopover>
+
           <UButton
-            @click="handleVoteFirst"
-            :class="[
-              'p-1 rounded-full transition duration-200',
-              animateFirst ? 'scale-105' : 'scale-100'
-            ]"
-            icon="i-tabler-music-up"
+            class="p-1 rounded-full"
+            icon="i-tabler-music-heart"
+            @click="() => likeTrack(1)"
           >
-            Utiliser des louz
-          </UButton>
-          <UButton class="p-1 rounded-full" icon="i-tabler-music-heart">
-            Liker la musique
+            {{ props.scoreAndLikes.nbLikesFirstTrack }} likes /
+            {{
+              props.scoreAndLikes.firstTrackAlreadyLiked
+                ? 'Déjà liké'
+                : 'Liker la musique'
+            }}
           </UButton>
         </div>
       </div>
@@ -182,7 +212,7 @@ watch(
 
         <div class="flex flex-row justify-center items-center gap-2 mt-2">
           <UButton
-            @click="handleVoteSecond"
+            @click="() => handleSpecialLike(2)"
             :class="[
               'p-1 rounded-full transition duration-200',
               animateSecond ? 'scale-105' : 'scale-100'
@@ -191,8 +221,17 @@ watch(
           >
             Utiliser des louz
           </UButton>
-          <UButton class="p-1 rounded-full" icon="i-tabler-music-heart">
-            Liker la musique
+          <UButton
+            class="p-1 rounded-full"
+            icon="i-tabler-music-heart"
+            @click="() => likeTrack(2)"
+          >
+            {{ props.scoreAndLikes.nbLikesSecondTrack }} likes /
+            {{
+              props.scoreAndLikes.secondTrackAlreadyLiked
+                ? 'Déjà liké'
+                : 'Liker la musique'
+            }}
           </UButton>
         </div>
       </div>
@@ -211,12 +250,15 @@ watch(
       <div
         class="bg-blue-500 transition-all duration-300"
         :style="{ width: progressFirst }"
-      ></div>
+      />
       <div
         class="bg-red-500 transition-all duration-300"
         :style="{ width: progressSecond }"
-      ></div>
+      />
     </div>
   </div>
+  <SpecialLikeModal
+    :is-open="isUseSpecialLikeModalOpen"
+    @proceed-result="proceedResult"
+  />
 </template>
-

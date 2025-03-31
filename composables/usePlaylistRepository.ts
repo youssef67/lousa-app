@@ -1,4 +1,4 @@
-import type { PlaylistTrack, Track, VersusTrack } from '~/types/playlist.type'
+import type { Track } from '~/types/playlist.type'
 
 export const usePlaylistRepository = () => {
   const {
@@ -6,7 +6,7 @@ export const usePlaylistRepository = () => {
     addTrack,
     addPendingTrack,
     getPlaylistTracks,
-    refreshVersus
+    likeTrack
   } = usePlaylistApi()
   const logger = useSpecialLogger()
 
@@ -45,9 +45,9 @@ export const usePlaylistRepository = () => {
     }
   }
 
-  const runRefreshVersus = async (playlistId: string) => {
+  const runLikeTrack = async (tracksVersusId: string, track: number) => {
     try {
-      const response = await refreshVersus(playlistId)
+      const response = await likeTrack(tracksVersusId, track)
       return response
     } catch (error) {
       logger.e('Error logging out', error)
@@ -59,6 +59,6 @@ export const usePlaylistRepository = () => {
     runAddTrack,
     runGetPlaylistTracks,
     runAddPendingTrack,
-    runRefreshVersus
+    runLikeTrack
   }
 }

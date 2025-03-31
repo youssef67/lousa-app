@@ -2,7 +2,7 @@ import type {
   SearchTracksResponse,
   GetPlaylistTracksResponse,
   AddPendingTracksResponse,
-  RefreshVersusResponse
+  LikeTracksResponse
 } from '~/types/playlist.type'
 import type  { Track } from '~/types/playlist.type'
 
@@ -80,18 +80,18 @@ export const usePlaylistApi = () => {
     }
   }
 
-  const refreshVersus = async (
-    playlistId: string
-  ): Promise<RefreshVersusResponse> => {
+  const likeTrack = async (
+    tracksVersusId: string,
+    track: number
+  ): Promise<LikeTracksResponse> => {
     try {
-      const url = `/api/v1/playlist/refresh/versus?playlistId=${playlistId}`
-
-      const response = await fetch(url, {
-        method: FetchMethod.GET,
+      const response = await fetch('/api/v1/playlist/track/like', {
+        method: FetchMethod.POST,
+        body: { tracksVersusId, track },
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
-      return response as RefreshVersusResponse
+      return response as LikeTracksResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -103,6 +103,6 @@ export const usePlaylistApi = () => {
     addTrack,
     addPendingTrack,
     getPlaylistTracks,
-    refreshVersus
+    likeTrack
   }
 }

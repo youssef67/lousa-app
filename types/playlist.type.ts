@@ -16,10 +16,15 @@ export interface AddPendingTracksResponse {
   result: true
 }
 
+export interface LikeTracksResponse {
+  result: true
+}
+
 export interface GetPlaylistTracksResponse {
   playlistsTracks: BroadcastTrack[]
   playlistInfo: playlistInfo
   currentTracksVersus: TracksVersus
+  scoreAndLikes: ScoreAndLikes
 }
 
 export interface PlaylistStreamer {
@@ -32,6 +37,15 @@ export interface PlaylistViewer {
   id: string
   playlistName: string
   isFavorite: boolean
+}
+
+export interface ScoreAndLikes {
+  firstTrackScore: number
+  firstTrackAlreadyLiked: boolean
+  secondTrackScore: number
+  secondTrackAlreadyLiked: boolean
+  nbLikesFirstTrack: number
+  nbLikesSecondTrack: number
 }
 
 export interface playlistInfo {
@@ -77,7 +91,12 @@ export interface PlaylistTrack {
 
 export interface AddTrackResponse {
   playlistTracksUpdated: BroadcastTrack[]
-  cleanVersus: TracksVersus
+  nextTracksVersus: TracksVersus
+  scoreAndLikes: ScoreAndLikes
+}
+
+export interface LikeTrackResponse {
+  scoreAndLikes: ScoreAndLikes
 }
 
 export interface BroadcastTrack {
@@ -115,6 +134,8 @@ export interface VersusTrack {
   album: string
   cover: string
   url: string
+  nbLikes: number
+  isLikedByUser: boolean
   user: {
     id: string
     userName: string | null
