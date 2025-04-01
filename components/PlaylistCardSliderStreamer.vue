@@ -1,17 +1,16 @@
 <script lang="ts" setup>
-import type { PlaylistStreamer } from '~/types/playlist.type'
+import type { PlaylistCardInfo } from '~/types/playlist.type'
 
 const props = defineProps({
   playlist: {
-    type: Object as PropType<PlaylistStreamer>,
+    type: Object as PropType<PlaylistCardInfo>,
     required: true
   },
-  closeSlider: Function,
+  closeSlider: Function
 })
 
 const { runDeletePlaylist } = useStreamerRepository()
-const { runSetAndGetPLaylistSelected } =
-  useStreamerRepository()
+const { runSetAndGetPLaylistSelected } = useStreamerRepository()
 const streamerStore = useStreamerStore()
 const toast = useSpecialToast()
 
@@ -25,11 +24,12 @@ const deletePlaylist = async () => {
 }
 
 const selectPlaylist = async () => {
-
-
-  if (streamerStore.playlistSelected === null || streamerStore.playlistSelected.id !== props.playlist.id) {
+  if (
+    streamerStore.playlistSelected === null ||
+    streamerStore.playlistSelected.id !== props.playlist.id
+  ) {
     const playlist = await runSetAndGetPLaylistSelected(props.playlist.id)
-    
+
     if (playlist) {
       streamerStore.playlistSelected = playlist.playlistSelected
     }

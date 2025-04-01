@@ -10,8 +10,6 @@ const props = defineProps({
   }
 })
 
-console.log('SpecialLikeModal', props)
-
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 const sessionStore = useSessionStore()
 

@@ -12,22 +12,22 @@ const props = defineProps({
 const emit = defineEmits(['selectPlaylist', 'deleteFavorites'])
 // const { runSetAndGetPLaylistSelected } = useViewerRepository()
 
+console.log('item', props.item)
 const selectPlaylist = async () => {
   // const response = await runSetAndGetPLaylistSelected(props.item.id)
 
-  // console.log(response)
+  // console.log('runSetAndGetPLaylistSelected ', response)
   // if (response) {
-    // emit('selectPlaylist', response.playlistSelectedData)
+  //   emit('selectPlaylist', response.playlistSelectedData)
   // }
   emit('selectPlaylist', props.item.id)
-
 }
 
 const deleteFavorites = async () => {
   emit('deleteFavorites', props.item)
 }
-
 </script>
+
 <template>
   <div
     class="flex flex-col mx-4 py-2 border rounded-md px-2 max-w-sm items-center"
@@ -36,7 +36,7 @@ const deleteFavorites = async () => {
     <h3>{{ item.spaceStreamerName }}</h3>
     <UAvatar :src="item.spaceStreamerImg" alt="Avatar" />
     <p>Nombre de musique : {{ item.nbTracks }}</p>
-    <p>Nombre de followers: 0</p>
+    <p>Nombre de followers: {{ item.nbFollowers }}</p>
 
     <div class="flex flex-col gap-2 mt-2 w-full">
       <UButton

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { PlaylistStreamer } from '~/types/playlist.type'
+import type { PlaylistCardInfo } from '~/types/playlist.type'
 
 const sessionStore = useSessionStore()
 const streamerStore = useStreamerStore()
@@ -8,13 +8,13 @@ const { runGetStreamerProfile } = useStreamerRepository()
 const isLoading = ref(true)
 const isSlideOverOpen = ref(false)
 const isCreatePlaylistModalOpen = ref(false)
-const currentPlayList = ref<PlaylistStreamer | null>(null)
+const currentPlayList = ref<PlaylistCardInfo | null>(null)
 
 const toggleSlider = () => {
   isSlideOverOpen.value = !isSlideOverOpen.value
 }
 
-const proceedResult = (playlist: PlaylistStreamer) => {
+const proceedResult = (playlist: PlaylistCardInfo) => {
   streamerStore.addPlaylistsToList(playlist)
   isCreatePlaylistModalOpen.value = false
 }
@@ -35,7 +35,6 @@ watch(
   () => streamerStore.playlistSelected,
   async playlist => {
     if (playlist) {
-      console.log('playlist selected', playlist)
       currentPlayList.value = streamerStore.playlistSelected
     }
   }

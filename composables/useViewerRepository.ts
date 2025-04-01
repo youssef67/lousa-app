@@ -1,5 +1,3 @@
-import type { Track } from '~/types/playlist.type'
-
 export const useViewerRepository = () => {
   const {
     addFavoritePlaylist,
@@ -12,7 +10,6 @@ export const useViewerRepository = () => {
     getStreamerProfile
   } = useViewerApi()
   const logger = useSpecialLogger()
-  // const { getData, saveData, deleteData } = useSpecialStorage()
 
   const runAddFavoritePlaylist = async (playlistId: string) => {
     try {
@@ -49,10 +46,6 @@ export const useViewerRepository = () => {
       logger.e('Error logging out', error)
     }
   }
-
-
-
-  
 
   const runCompleteProfile = async (userName: string) => {
     try {

@@ -9,7 +9,6 @@ import type {
   GetStreamerProfileResponse
 
 } from '~/types/viewer.type'
-import type  { Track } from '~/types/playlist.type'
 
 export const useViewerApi = () => {
   const { proceedApiError } = useSpecialError()

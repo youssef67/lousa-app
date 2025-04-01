@@ -47,8 +47,6 @@ const changePlaylist = async (playlistId: string) => {
 
   const response = await runGetPlaylistTracks(playlistId)
 
-  console.log('changePlaylist', response)
-
   if (response) {
     currentPlayListInfo.value = response.playlistInfo
     playlistTracks.value = response.playlistsTracks
@@ -100,7 +98,6 @@ async function setTransmitSubscription(
   await playlistUpdated.create()
 
   playlistUpdated.onMessage(async (data: AddTrackResponse) => {
-    console.log('playlistUpdated', data)
     playlistTracks.value = data.playlistTracksUpdated
     currentTracksVersus.value = data.nextTracksVersus
     scoreAndLikes.value = data.scoreAndLikes
@@ -125,12 +122,10 @@ async function setTransmitSubscription(
 
 onUnmounted(async () => {
   if (playlistUpdatedInstance) {
-    console.log('closeEventStream 1', playlistUpdatedInstance)
     await closeEventStream(playlistUpdatedInstance)
   }
 
   if (likedTracksInstance) {
-    console.log('closeEventStream 2', likedTracksInstance)
     await closeEventStream(likedTracksInstance)
   }
 })

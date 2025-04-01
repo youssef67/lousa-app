@@ -48,7 +48,6 @@ export const usePlaylistApi = () => {
     track: Track
   ): Promise<AddPendingTracksResponse> => {
     try {
-      console.log('playlistId ', playlistId)
       const response = await fetch('/api/v1/playlist/pending/track/add', {
         method: FetchMethod.POST,
         body: { playlistId, track },

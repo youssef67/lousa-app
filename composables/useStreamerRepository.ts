@@ -13,7 +13,6 @@ export const useStreamerRepository = () => {
   const logger = useSpecialLogger()
   const { newError } = useSpecialError()
 
-
   const runGetStreamerProfile = async () => {
     try {
       const response = await getStreamerProfile()

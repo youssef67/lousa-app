@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
-import type { PlaylistStreamer } from '~/types/playlist.type'
+import type { PlaylistCardInfo } from '~/types/playlist.type'
 
 const props = defineProps({
   isOpen: {
@@ -8,7 +8,7 @@ const props = defineProps({
     required: true
   },
   playlists: {
-    type: Object as PropType<PlaylistStreamer[]>,
+    type: Object as PropType<PlaylistCardInfo[]>,
     required: true
   },
   openedByStreamer: {
@@ -40,7 +40,7 @@ const filteredPlaylists = computed(() => {
   )
 })
 
-const proceedResult = (playlist: PlaylistStreamer) => {
+const proceedResult = (playlist: PlaylistCardInfo) => {
   streamerStore.addPlaylistsToList(playlist)
   isCreatePlaylistModalOpen.value = false
 }

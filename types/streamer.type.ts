@@ -1,10 +1,10 @@
-import { type PlaylistStreamer } from './playlist.type.js'
-import { type TwitchUserSession } from './twitch.type.js'
+import type { PlaylistCardInfo } from './playlist.type.js'
+import type { TwitchUserSession } from './twitch.type.js'
 
 export interface GetStreamerProfileResponse {
   spaceStreamerProfile: SpaceStreamerProfile
-  playlists: PlaylistStreamer[]
-  playlistSelected: PlaylistStreamer
+  playlists: PlaylistCardInfo[]
+  playlistSelected: PlaylistCardInfo
 }
 
 export interface GetCheckIfStreamerResponse {
@@ -24,7 +24,7 @@ export interface SpaceStreamerProfile {
 }
 
 export interface SetAndGetPlaylistSelectedResponse {
-  playlistSelected: PlaylistStreamer
+  playlistSelected: PlaylistCardInfo
 }
 
 export interface AddStreamerResponse {
@@ -34,4 +34,3 @@ export interface AddStreamerResponse {
 export interface UpdateStreamersListResponse {
   dateLastUpdate: string
 }
-

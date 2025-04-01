@@ -1,10 +1,13 @@
-import { type SpaceStreamerProfile, type GetStreamerProfileResponse } from '~~/types/streamer.type.js'
-import { type PlaylistStreamer } from '~~/types/playlist.type.js'
+import type {
+  SpaceStreamerProfile,
+  GetStreamerProfileResponse
+} from '~~/types/streamer.type.js'
+import type { PlaylistCardInfo } from '~~/types/playlist.type.js'
 
 export const useStreamerStore = defineStore('streamer', () => {
   const spaceStreamerProfile = ref<SpaceStreamerProfile>()
-  const playlistSelected = ref<PlaylistStreamer | null>(null)
-  const streamerPlaylists = ref<PlaylistStreamer[]>([])
+  const playlistSelected = ref<PlaylistCardInfo | null>(null)
+  const streamerPlaylists = ref<PlaylistCardInfo[]>([])
 
   const updateSpaceStreamerProfile = async (data: SpaceStreamerProfile) => {
     if (!spaceStreamerProfile.value) {
@@ -14,17 +17,17 @@ export const useStreamerStore = defineStore('streamer', () => {
     spaceStreamerProfile.value = data
   }
 
-  const updateStreamerPlaylists = async (playlists: PlaylistStreamer[]) => {
+  const updateStreamerPlaylists = async (playlists: PlaylistCardInfo[]) => {
     streamerPlaylists.value = playlists
   }
 
-  const updateSpaceStreamer = async (data: GetStreamerProfileResponse) => { 
+  const updateSpaceStreamer = async (data: GetStreamerProfileResponse) => {
     await updateSpaceStreamerProfile(data.spaceStreamerProfile)
     await updateStreamerPlaylists(data.playlists)
     playlistSelected.value = data.playlistSelected
   }
 
-  const addPlaylistsToList = (playlist: PlaylistStreamer) => {
+  const addPlaylistsToList = (playlist: PlaylistCardInfo) => {
     if (playlist !== undefined) {
       streamerPlaylists.value.push(playlist)
     }

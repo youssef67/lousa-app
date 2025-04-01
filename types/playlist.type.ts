@@ -33,10 +33,11 @@ export interface GetPlaylistTracksResponse {
   user: UserSession
 }
 
-export interface PlaylistStreamer {
+export interface PlaylistCardInfo {
   id: string
   playlistName: string
   nbTracks: number
+  nbFollowers?: number
 }
 
 export interface PlaylistViewer {
@@ -65,7 +66,7 @@ export interface playlistInfo {
 }
 
 export interface CreatePlaylistResponse {
-  playlist: PlaylistStreamer
+  playlist: PlaylistCardInfo
 }
 
 export interface DeletePlaylistResponse {

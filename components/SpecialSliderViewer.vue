@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import type { PlaylistFavorite, SpaceStreamerFavorite } from '~/types/viewer.type'
+import type {
+  PlaylistFavorite,
+  SpaceStreamerFavorite
+} from '~/types/viewer.type'
 
 defineProps({
   isOpen: {
@@ -37,14 +40,16 @@ const deletePlaylistFromFavorites = (playlistToDelete: PlaylistFavorite) => {
     toast.showError('Erreur lors de la suppression de la playlist')
     return
   }
-  
+
   favoritesPlaylists.value = favoritesPlaylists.value.filter(
     playlist => playlist.id !== playlistToDelete.id
   )
   toast.showSuccess('Playlist retirée des favoris')
 }
 
-const deleteStreamerFromFavorites = (spaceStreamerToDelete: SpaceStreamerFavorite) => {
+const deleteStreamerFromFavorites = (
+  spaceStreamerToDelete: SpaceStreamerFavorite
+) => {
   favoritesSpaceStreamers.value = favoritesSpaceStreamers.value.filter(
     streamer => streamer.id !== spaceStreamerToDelete.id
   )
@@ -53,12 +58,16 @@ const deleteStreamerFromFavorites = (spaceStreamerToDelete: SpaceStreamerFavorit
 
 const filteredData = computed(() => {
   if (!dataName.value) {
-    return displayPlaylist.value ? favoritesPlaylists.value : favoritesSpaceStreamers.value
+    return displayPlaylist.value
+      ? favoritesPlaylists.value
+      : favoritesSpaceStreamers.value
   }
-  
+
   return displayPlaylist.value
     ? favoritesPlaylists.value.filter(playlist =>
-        playlist.playlistName.toLowerCase().includes(dataName.value.toLowerCase())
+        playlist.playlistName
+          .toLowerCase()
+          .includes(dataName.value.toLowerCase())
       )
     : favoritesSpaceStreamers.value.filter(streamer =>
         streamer.spaceName.toLowerCase().includes(dataName.value.toLowerCase())
@@ -71,7 +80,11 @@ const toggleDataType = () => {
 }
 
 onMounted(async () => {
+  console.log('mounted')
   const response = await runGetFavorites()
+  console.log(response)
+
+  console.log('runGetFavorites ', response.playlistsFavorites)
 
   if (response) {
     favoritesPlaylists.value = response.playlistsFavorites
@@ -110,7 +123,9 @@ onMounted(async () => {
         v-model="dataName"
         input-text
         type="text"
-        :placeholder="displayPlaylist ? 'Rechercher une playlist' : 'Rechercher un streamer'"
+        :placeholder="
+          displayPlaylist ? 'Rechercher une playlist' : 'Rechercher un streamer'
+        "
         required
         size="sm"
         icon="i-tabler-search"
@@ -120,7 +135,11 @@ onMounted(async () => {
 
       <div class="flex-1 overflow-y-auto">
         <UButton
-          :label="displayPlaylist ? 'Voir les streamers favoris' : 'Voir les playlists favorites'"
+          :label="
+            displayPlaylist
+              ? 'Voir les streamers favoris'
+              : 'Voir les playlists favorites'
+          "
           variant="solid"
           size="xl"
           color="secondary"

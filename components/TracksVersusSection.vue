@@ -59,7 +59,6 @@ const handleSpecialLike = (value: number) => {
 const onCountdownFinished = async () => {
   if (hasEnded.value) return // ← stop si déjà fini
   hasEnded.value = true
-  console.log('🎉 Le duel est terminé !')
   clearInterval(interval)
 
   await runAddTrack(props.currentTracksVersus.id)

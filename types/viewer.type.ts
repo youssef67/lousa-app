@@ -2,8 +2,6 @@ import type { UserSession } from './session.type'
 import type { SpaceStreamerProfile } from './streamer.type'
 import type { PlaylistViewer } from './playlist.type'
 
-// RESPONSES TYPES
-
 export interface AddFavoritePlaylistResponse {
   result: boolean
 }
@@ -43,7 +41,6 @@ export interface GetStreamerProfileResponse {
   isFavoriteStreamer: boolean
 }
 
-
 export interface SpaceStreamerFavorite {
   id: string
   spaceName: string
@@ -58,13 +55,5 @@ export interface PlaylistFavorite {
   spaceStreamerImg: string
   nbTracks: number
   isSelected: boolean
+  nbFollowers: number
 }
-
-
-
-
-
-
-
-
-

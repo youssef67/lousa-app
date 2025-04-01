@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import type { PlaylistTrack, BroadcastTrack } from '~/types/playlist.type'
+import type { BroadcastTrack } from '~/types/playlist.type'
 import goldCrown from '~/assets/images/gold-crown.webp'
 import silverCrown from '~/assets/images/silver-crown.webp'
 import bronzeCrown from '~/assets/images/bronze-crown.webp'
-import { onMounted, ref, computed, nextTick } from 'vue'
 
 const props = defineProps<{
   track: BroadcastTrack
 }>()
 
-const emit = defineEmits(['play', 'favorite'])
 const delay = ref(props.track.position * 100)
 
 const sessionStore = useSessionStore()
@@ -23,6 +21,10 @@ const crownImage = computed(() => {
   if (props.track.position === 3) return bronzeCrown
   return null
 })
+
+const playTrack = () => {
+  window.open(props.track.url, '_blank')
+}
 
 onMounted(async () => {
   if (isOwner.value) {
@@ -101,20 +103,7 @@ onMounted(async () => {
           variant="ghost"
           size="sm"
           class="text-white hover:text-green-400"
-          @click="emit('play', track)"
-        />
-        <UButton
-          icon="i-tabler-heart"
-          variant="ghost"
-          size="sm"
-          class="text-white hover:text-red-500"
-          @click="emit('favorite', track)"
-        />
-        <UButton
-          icon="i-tabler-dots"
-          variant="ghost"
-          size="sm"
-          class="text-white hover:text-gray-300"
+          @click="playTrack"
         />
       </div>
     </div>

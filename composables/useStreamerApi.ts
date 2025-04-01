@@ -46,6 +46,7 @@ export const useStreamerApi = () => {
       await proceedApiError(error)
     }
   }
+
   const checkIfStreamer = async (): Promise<GetCheckIfStreamerResponse> => {
     try {
       const response = await fetch('/api/v1/streamer/profile/validation', {
