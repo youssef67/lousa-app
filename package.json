@@ -36,6 +36,13 @@
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.1",
-    "@types/cookie-signature": "^1.1.2"
+    "@types/cookie-signature": "^1.1.2",
+    "@types/luxon": "^3.6.2",
+    "@typescript-eslint/eslint-plugin": "^8.29.0",
+    "@typescript-eslint/parser": "^8.29.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "prettier": "^3.5.3"
   }
 }

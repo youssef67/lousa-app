@@ -3,14 +3,20 @@ import type { PlaylistViewer } from '~/types/playlist.type'
 import type { SpaceStreamerProfile } from '~/types/streamer.type'
 
 const route = useRoute()
-const spaceStreamerId = computed(() => route.query.streamer as string | undefined)
+const spaceStreamerId = computed(
+  () => route.query.streamer as string | undefined
+)
 
 const spaceStreamerProfile = ref<SpaceStreamerProfile | null>(null)
 const playlists = ref<PlaylistViewer[]>([])
 const isLoading = ref(true)
 const isFavoriteStreamer = ref(false)
 
-const { runGetStreamerProfile, runAddFavoriteStreamer, runDeleteFavoriteStreamer } = useViewerRepository()
+const {
+  runGetStreamerProfile,
+  runAddFavoriteStreamer,
+  runDeleteFavoriteStreamer
+} = useViewerRepository()
 const toast = useSpecialToast()
 
 const toggleFavoriteStreamer = async () => {
@@ -34,7 +40,7 @@ const toggleFavoriteStreamer = async () => {
 // Surveille les changements de `spaceStreamerId` pour éviter un appel API avec `undefined`
 watchEffect(async () => {
   if (!spaceStreamerId.value) return
-  
+
   isLoading.value = true
 
   try {
@@ -44,10 +50,10 @@ watchEffect(async () => {
       playlists.value = response.playlists || []
       isFavoriteStreamer.value = !!response.isFavoriteStreamer
     } else {
-      console.error("Aucune donnée reçue pour ce streamer.")
+      console.error('Aucune donnée reçue pour ce streamer.')
     }
   } catch (err) {
-    console.error("Erreur lors de la récupération du profil:", err)
+    console.error('Erreur lors de la récupération du profil:', err)
   } finally {
     isLoading.value = false
   }
@@ -70,12 +76,20 @@ watchEffect(async () => {
 
       <section>
         <UButton
-          :label="isFavoriteStreamer ? 'Retirer ce streamer de mes favoris' : 'Ajouter ce streamer à mes favoris'"
+          :label="
+            isFavoriteStreamer
+              ? 'Retirer ce streamer de mes favoris'
+              : 'Ajouter ce streamer à mes favoris'
+          "
           type="submit"
           variant="solid"
           size="xl"
           color="secondary"
-          :icon="isFavoriteStreamer ? 'i-heroicons-heart-20-solid' : 'i-heroicons-heart'"
+          :icon="
+            isFavoriteStreamer
+              ? 'i-heroicons-heart-20-solid'
+              : 'i-heroicons-heart'
+          "
           @click="toggleFavoriteStreamer"
         />
       </section>

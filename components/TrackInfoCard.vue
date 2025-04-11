@@ -12,11 +12,13 @@ const emit = defineEmits(['trackValidation'])
 async function chooseTrack() {
   emit('trackValidation', props.track)
 }
+
 </script>
 
 <template>
   <div class="flex flex-row">
-    <h1>{{ props.track.trackName }}</h1>
+    <h1>{{ props.track.trackName }} / </h1>
+    <p>{{ props.track.artistName }}</p>
     <UButton
       label="Choisir ce son"
       variant="solid"

@@ -54,6 +54,12 @@ export const useSessionStore = defineStore('session', () => {
     await updateSession(session.value)
   }
 
+  const updateSessionVirtualCurrency = async (amount: number) => {
+    session.value.user.amountVirtualCurrency = amount
+    await updateSession(session.value)
+
+  }
+
   const updateSessionAdmin = async (AdminUpdated: AdminSession) => {
     session.value.admin = AdminUpdated
     await updateSession(session.value)
@@ -120,6 +126,7 @@ export const useSessionStore = defineStore('session', () => {
     updateSessionTwitchUser,
     updateSessionAdmin,
     isAdmin,
-    isTwitchStreamerAuthenticated
+    isTwitchStreamerAuthenticated,
+    updateSessionVirtualCurrency
   }
 })

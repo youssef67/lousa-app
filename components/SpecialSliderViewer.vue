@@ -80,11 +80,7 @@ const toggleDataType = () => {
 }
 
 onMounted(async () => {
-  console.log('mounted')
   const response = await runGetFavorites()
-  console.log(response)
-
-  console.log('runGetFavorites ', response.playlistsFavorites)
 
   if (response) {
     favoritesPlaylists.value = response.playlistsFavorites

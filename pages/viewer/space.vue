@@ -6,8 +6,8 @@ import type {
   TracksVersus,
   BroadcastTrack,
   AddTrackResponse,
-  ScoreAndLikes,
-  LikeTrackResponse
+  LikeTrackResponse,
+  UpdateTracksVersusResponse,
 } from '~/types/playlist.type'
 
 const isLoading = ref(true)
@@ -21,14 +21,18 @@ const foundTracks = ref<Track[]>(null)
 const toast = useSpecialToast()
 const playlistTracks = ref<BroadcastTrack[]>([])
 const currentTracksVersus = ref<TracksVersus>(null)
-const scoreAndLikes = ref<ScoreAndLikes>()
 const sessionStore = useSessionStore()
-const { showSuccess } = useSpecialToast()
+const { showSuccess, showError } = useSpecialToast()
+const isBattleLoading = ref(false)
+const isUpdatingBattle = ref(false)
+
+
 
 let playlistUpdatedInstance: Subscription | null = null
 let likedTracksInstance: Subscription | null = null
+let tracksVersusUpdatedInstance: Subscription | null = null
 
-const { runSearchTrack, runGetPlaylistTracks } = usePlaylistRepository()
+const { runSearchTrack, runGetPlaylistTracks, runGetTracksVersus, runAddTrack } = usePlaylistRepository()
 const { handleError } = useSpecialError()
 
 const proceedResult = (value: BroadcastTrack | null) => {
@@ -45,26 +49,23 @@ const toggleSlider = () => {
 const changePlaylist = async (playlistId: string) => {
   isLoading.value = true
 
-  const response = await runGetPlaylistTracks(playlistId)
+  await setTransmitSubscription(playlistId)
 
-  if (response) {
-    currentPlayListInfo.value = response.playlistInfo
-    playlistTracks.value = response.playlistsTracks
-    currentTracksVersus.value = response.currentTracksVersus
-    scoreAndLikes.value = response.scoreAndLikes
+  const playlist = await runGetPlaylistTracks(playlistId)
+  currentPlayListInfo.value = playlist.playlistInfo
+  playlistTracks.value = playlist.playlistsTracks
 
-    sessionStore.updateSessionUser(response.user)
+  const tracksVersus = await runGetTracksVersus(playlistId)
 
-    await setTransmitSubscription(playlistId, response.currentTracksVersus)
-  }
+  currentTracksVersus.value = tracksVersus.currentTracksVersus
 
   isLoading.value = false
 }
 
-async function searchTrack() {
+async function searchTrack(value: string) {
   try {
     const playlistId = currentPlayListInfo.value.id
-    const response = await runSearchTrack(playlistId, trackName.value)
+    const response = await runSearchTrack(playlistId, value ?? trackName.value)
 
     if (response.foundTracks.length > 0) {
       foundTracks.value = response.foundTracks
@@ -77,47 +78,89 @@ async function searchTrack() {
   }
 }
 
+
+const proceedUpdateAll = async () => {
+    isBattleLoading.value = true
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    const response = await runAddTrack(currentTracksVersus.value.id)
+
+    if (response) {
+      currentTracksVersus.value = response.currentTracksVersus
+      playlistTracks.value = response.playlistsTracks
+      showSuccess('La mise à jour de la playlist a été effectuée avec succès !')
+    } else {
+      showError('Une erreur est survenue lors de la mise à jour de la playlist')
+    }
+
+    isBattleLoading.value = false
+  
+}
+
+const handleUpdateAll = async () => {
+  if (isUpdatingBattle.value) return // ⛔️ évite les appels multiples
+  isUpdatingBattle.value = true
+
+  await proceedUpdateAll()
+
+  isUpdatingBattle.value = false
+}
+
 async function closeEventStream(subscription: Subscription) {
   await subscription.delete()
 }
 
-async function setTransmitSubscription(
-  playlistId: string,
-  tracksVersus: TracksVersus
-) {
+async function setTransmitSubscription(playlistId: string) {
   const transmit = new Transmit({
-    baseUrl: `${config.public.siteUrl}/api/v1`
+    baseUrl: `${config.public.siteUrl}/api/v1`,
   })
 
-  const playlistUpdated = transmit.subscription(
-    `playlist/updated/${playlistId}`
-  )
+  console.log('playlistId', playlistId)
+  const playlistUpdated = transmit.subscription(`playlist/updated/${playlistId}`)
+  const likeUpdated = transmit.subscription(`playlist/like/${playlistId}`)
+  const tracksVersusUpdated = transmit.subscription(`playlist/tracksVersus/${playlistId}`)
 
   playlistUpdatedInstance = playlistUpdated
+  likedTracksInstance = likeUpdated
+  tracksVersusUpdatedInstance = tracksVersusUpdated
 
   await playlistUpdated.create()
+  await likeUpdated.create()
+  await tracksVersusUpdated.create()
 
   playlistUpdated.onMessage(async (data: AddTrackResponse) => {
-    playlistTracks.value = data.playlistTracksUpdated
-    currentTracksVersus.value = data.nextTracksVersus
-    scoreAndLikes.value = data.scoreAndLikes
+    isTracksValidationModalOpen.value = false
+    console.log('playlistUpdated', data)
+    if (data.playlistTracksUpdated) {
+      showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
+      playlistTracks.value = data.playlistTracksUpdated
+    } else {
+      showError('Une erreur est survenue lors de la mise à jour de la playlist')
+    }
   })
 
-  if (tracksVersus) {
-    const likeUpdated = transmit.subscription(
-      `playlist/like/${tracksVersus.id}`
-    )
-    likedTracksInstance = likeUpdated
-    await likeUpdated.create()
+  likeUpdated.onMessage(async (data: LikeTrackResponse) => {
+    currentTracksVersus.value = data.currentTracksVersus
+    console.log('currentTracksVersus', data.currentTracksVersus)
+    if (data.currentTracksVersus.firstTrack.user.id === sessionStore.session?.user.id) {
+      showSuccess('Merci pour votre vote et votre soutien à votre streamer !')
+      sessionStore.updateSessionVirtualCurrency(
+        data.currentTracksVersus.firstTrack.user.amountVirtualCurrency
+      )
+    }
 
-    likeUpdated.onMessage(async (data: LikeTrackResponse) => {
-      scoreAndLikes.value = data.scoreAndLikes
-      if (data.user && data.user.id === sessionStore.session.user.id) {
-        sessionStore.updateSessionUser(data.user)
-        showSuccess('Merci pour votre vote et votre soutien à votre streamer !')
-      }
-    })
-  }
+    if (data.currentTracksVersus.secondTrack.user.id === sessionStore.session?.user.id) {
+      showSuccess('Merci pour votre vote et votre soutien à votre streamer !')
+      sessionStore.updateSessionVirtualCurrency(
+        data.currentTracksVersus.firstTrack.user.amountVirtualCurrency
+      )
+    }
+  })
+
+  tracksVersusUpdated.onMessage(async (data: UpdateTracksVersusResponse) => {
+    showSuccess('La claaaasse!')
+    console.log('tracksVersusUpdated', data)
+    currentTracksVersus.value = data.currentTracksVersus
+  })
 }
 
 onUnmounted(async () => {
@@ -127,6 +170,10 @@ onUnmounted(async () => {
 
   if (likedTracksInstance) {
     await closeEventStream(likedTracksInstance)
+  }
+
+  if (tracksVersusUpdatedInstance) {
+    await closeEventStream(tracksVersusUpdatedInstance)
   }
 })
 </script>
@@ -170,42 +217,55 @@ onUnmounted(async () => {
         size="xl"
         color="secondary"
         class="flex"
-        @click="searchTrack()"
+        @click="searchTrack(null)"
       />
     </section>
 
     <section>
-      <div v-if="currentPlayListInfo" class="flex flex-col">
-        <div v-if="!isLoading">
-          {{ currentPlayListInfo.playlistName }}
-          <div
-            v-if="playlistTracks.length > 0"
-            class="divide-y divide-gray-700"
-          >
-            <PlaylistTrackRow
-              v-for="track in playlistTracks"
-              :key="track.trackId"
-              :track="track"
-            />
-          </div>
-          <div>
-            <h2>Battle</h2>
-            <div v-if="currentTracksVersus">
-              <TracksVersusSection
-                :currentTracksVersus="currentTracksVersus"
-                :scoreAndLikes="scoreAndLikes"
-              />
-            </div>
-            <div v-else>
-              <div class="text-center text-white text-sm py-6">
-                🎵 En attente de nouveaux morceaux pour lancer un battle...
-              </div>
-            </div>
+  <div v-if="isBattleLoading" class="flex justify-center items-center py-12">
+    <UIcon name="i-tabler-loader-2" class="animate-spin text-white text-4xl" />
+    <span class="ml-4 text-white text-lg font-semibold">Mise à jour de la playlist en cours...</span>
+  </div>
+
+  <div v-else-if="currentPlayListInfo" class="flex flex-col">
+    <div v-if="!isLoading">
+      <div class="text-white text-xl font-bold mb-4">
+        {{ currentPlayListInfo.playlistName }}
+      </div>
+      <div class="mb-8">
+        <h2 class="text-white text-lg font-semibold mb-4">Battle</h2>
+
+        <div v-if="currentTracksVersus">
+          <TracksVersusSection
+            :currentTracksVersus="currentTracksVersus"
+            :handleSearchTrack="searchTrack"
+            @updateAll="handleUpdateAll"
+          />
+        </div>
+        <div v-else>
+          <div class="text-center text-white text-sm py-6">
+            🎵 En attente de nouveaux morceaux pour lancer un battle...
           </div>
         </div>
       </div>
-      <div v-else>Aucune Playlist selectionnée</div>
-    </section>
+      <div v-if="playlistTracks.length > 0" class="divide-y divide-gray-700">
+        <PlaylistTrackRow
+          v-for="track in playlistTracks"
+          :key="track.trackId"
+          :track="track"
+        />
+      </div>
+
+     
+    </div>
+  </div>
+
+  <div v-else>
+    <div class="text-center text-white text-sm py-6">
+      Aucune playlist sélectionnée
+    </div>
+  </div>
+</section>
     <TrackValidationModal
       :isOpen="isTracksValidationModalOpen"
       :foundTracks="foundTracks || []"

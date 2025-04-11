@@ -4,7 +4,9 @@ import type {
   AddPendingTracksResponse,
   LikeTracksResponse,
   Track,
-  SpecialLikeTracksResponse
+  SpecialLikeTracksResponse,
+  GetTracksVersusResponse,
+  AddTracksResponse
 } from '~/types/playlist.type'
 
 export const usePlaylistApi = () => {
@@ -30,14 +32,17 @@ export const usePlaylistApi = () => {
     }
   }
 
-  const addTrack = async (versusId: string): Promise<void> => {
+  const addTrack = async (versusId: string): Promise<AddTracksResponse> => {
     try {
-      await fetch('/api/v1/playlist/track/add', {
-        method: FetchMethod.POST,
-        body: { versusId },
+      const url = `/api/v1/playlist/track/add?tracksVersusId=${versusId}`
+
+      const res = await fetch(url, {
+        method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'
       })
+
+      return res as AddTracksResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -72,6 +77,23 @@ export const usePlaylistApi = () => {
         cache: 'no-cache'
       })
       return response as GetPlaylistTracksResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const getTracksVersus = async (
+    playlistId: string
+  ): Promise<GetTracksVersusResponse> => {
+    try {
+      const url = `/api/v1/playlist/tracksVersus?playlistId=${playlistId}`
+
+      const response = await fetch(url, {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as GetTracksVersusResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -119,6 +141,7 @@ export const usePlaylistApi = () => {
     addPendingTrack,
     getPlaylistTracks,
     likeTrack,
-    specialLikeTrack
+    specialLikeTrack,
+    getTracksVersus
   }
 }

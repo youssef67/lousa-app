@@ -4,9 +4,9 @@ export interface SearchTracksResponse {
   foundTracks: Track[]
 }
 
-export interface AddTracksResponse {
-  playlistTracksUpdated: PlaylistTrack[]
-}
+// export interface AddTracksResponse {
+//   playlistTracksUpdated: PlaylistTrack[]
+// }
 
 export interface RefreshVersusResponse {
   result: boolean
@@ -14,6 +14,11 @@ export interface RefreshVersusResponse {
 
 export interface AddPendingTracksResponse {
   result: true
+}
+
+export interface AddTracksResponse {
+  playlistsTracks: BroadcastTrack[]
+  currentTracksVersus: TracksVersus
 }
 
 export interface LikeTracksResponse {
@@ -29,8 +34,10 @@ export interface GetPlaylistTracksResponse {
   playlistsTracks: BroadcastTrack[]
   playlistInfo: playlistInfo
   currentTracksVersus: TracksVersus
-  scoreAndLikes: ScoreAndLikes
-  user: UserSession
+}
+
+export interface GetTracksVersusResponse { 
+  currentTracksVersus: TracksVersus
 }
 
 export interface PlaylistCardInfo {
@@ -47,14 +54,10 @@ export interface PlaylistViewer {
 }
 
 export interface ScoreAndLikes {
-  firstTrackScore: number
-  firstTrackAlreadyLiked?: boolean
-  specialLikeFirstTrack: number
-  secondTrackScore: number
-  secondTrackAlreadyLiked?: boolean
-  specialLikeSecondTrack: number
-  nbLikesFirstTrack: number
-  nbLikesSecondTrack: number
+  trackScore: number
+  alreadyLiked?: boolean
+  specialLike: number
+  nbLikes: number
 }
 
 export interface playlistInfo {
@@ -99,14 +102,15 @@ export interface PlaylistTrack {
 }
 
 export interface AddTrackResponse {
-  playlistTracksUpdated: BroadcastTrack[]
-  nextTracksVersus: TracksVersus
-  scoreAndLikes: ScoreAndLikes
+  playlistTracksUpdated?: BroadcastTrack[]
 }
 
 export interface LikeTrackResponse {
-  scoreAndLikes: ScoreAndLikes
-  user?: UserSession
+  currentTracksVersus: TracksVersus
+}
+
+export interface UpdateTracksVersusResponse {
+  currentTracksVersus: TracksVersus
 }
 
 export interface BroadcastTrack {
@@ -129,12 +133,10 @@ export interface BroadcastTrack {
 }
 
 export interface TracksVersus {
-  id: string
-  closingDate: string
-  firstTrackScore: number
-  secondTrackScore: number
-  firstTrack: VersusTrack
-  secondTrack: VersusTrack
+  id: string | null
+  closingDate: string | null
+  firstTrack: VersusTrack | null
+  secondTrack: VersusTrack | null
 }
 
 export interface VersusTrack {
@@ -145,10 +147,10 @@ export interface VersusTrack {
   album: string
   cover: string
   url: string
-  nbLikes: number
-  isLikedByUser: boolean
+  scoreAndLikes: ScoreAndLikes | null
   user: {
     id: string
     userName: string | null
+    amountVirtualCurrency: number
   }
 }

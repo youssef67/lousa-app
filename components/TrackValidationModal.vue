@@ -17,20 +17,11 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 const { runAddPendingTrack } = usePlaylistRepository()
-const toast = useSpecialToast()
 
 const pendingTrackValidation = async (trackChosen: Track) => {
-  const response = await runAddPendingTrack(
-    props.playlistId,
-    trackChosen
-  )
+  await runAddPendingTrack(props.playlistId, trackChosen)
 
-  if (response) {
-    updateIsOpen(false)
-    toast.showSuccess("Son en liste d'attente")
-  } else {
-    toast.showError("Erreur lors de l'ajout de la chanson en liste d'attente")
-  }
+  updateIsOpen(false)
 }
 
 const updateIsOpen = (value: boolean) => {
@@ -56,7 +47,11 @@ const updateIsOpen = (value: boolean) => {
         />
       </div>
 
-      <div v-for="item in props.foundTracks" :key="item.trackId" class="mt-2 mx-2">
+      <div
+        v-for="item in props.foundTracks"
+        :key="item.trackId"
+        class="mt-2 mx-2"
+      >
         <TrackInfoCard
           :track="item"
           @track-validation="pendingTrackValidation"
