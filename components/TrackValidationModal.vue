@@ -16,11 +16,15 @@ const props = defineProps({
   }
 })
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
+const toast = useSpecialToast()
 const { runAddPendingTrack } = usePlaylistRepository()
 
 const pendingTrackValidation = async (trackChosen: Track) => {
-  await runAddPendingTrack(props.playlistId, trackChosen)
+  const response = await runAddPendingTrack(props.playlistId, trackChosen)
 
+  if (response) {
+    toast.showSuccess('La piste a été ajoutée à la liste d\'attente')
+  }
   updateIsOpen(false)
 }
 

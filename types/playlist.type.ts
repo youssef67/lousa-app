@@ -13,7 +13,7 @@ export interface RefreshVersusResponse {
 }
 
 export interface AddPendingTracksResponse {
-  result: true
+  result: boolean
 }
 
 export interface AddTracksResponse {
@@ -22,12 +22,11 @@ export interface AddTracksResponse {
 }
 
 export interface LikeTracksResponse {
-  result: true
+  result: boolean
 }
 
 export interface SpecialLikeTracksResponse {
   user: UserSession
-  scoreAndLikes: ScoreAndLikes
 }
 
 export interface GetPlaylistTracksResponse {
@@ -54,10 +53,9 @@ export interface PlaylistViewer {
 }
 
 export interface ScoreAndLikes {
-  trackScore: number
-  alreadyLiked?: boolean
-  specialLike: number
-  nbLikes: number
+  trackScore: number | null
+  specialLike: number | null
+  listOfUserIdWhoLiked: string[]
 }
 
 export interface playlistInfo {
@@ -137,6 +135,7 @@ export interface TracksVersus {
   closingDate: string | null
   firstTrack: VersusTrack | null
   secondTrack: VersusTrack | null
+  isComplete: boolean
 }
 
 export interface VersusTrack {

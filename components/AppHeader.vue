@@ -71,14 +71,18 @@ const onMenuOptionClick = async () => {
           @click="isSlideOverOpen = false"
         />
       </div>
-      <div class="flex p-4 flex-1 flex-col space-y-4">
-        <UButton label="Mon histoire" variant="ghost" color="black" class="flex pt-6" />
+      <div class="flex p-4 flex-1 flex-col">
         <UButton
           :label="authenticationStore.accountButtonLabel()"
           icon="i-tabler-user"
           color="secondary"
           @click="onMenuOptionClick"
         />
+        <div class="flex flex-col mt-6">
+          <UButton label="Mon histoire" variant="ghost" color="black" />
+          <UButton label="Comment ça marche ?" variant="ghost" color="black" />
+        </div>
+       
         <UButton
           v-if="isAdmin"
           label="Admin"

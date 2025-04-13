@@ -11,11 +11,17 @@ const props = defineProps({
     required: false,
     default: null
   },
+  isComplete: {
+    type: Boolean,
+    required: false,
+  },
 })
 
 const track = ref<VersusTrack>(props.track)
+const isComplete = ref<boolean>(props.isComplete)
 const animate = ref(false)
 const emit = defineEmits(['proceedSpecialLike', 'proceedLike'])
+
 
 
 const sessionStore = useSessionStore()
@@ -30,12 +36,36 @@ const likeTrack = async (trackId: string, targetTrack: number) => {
   emit('proceedLike', trackId, targetTrack)
 }
 
+const alreadyLiked = computed(() => {
+  const userId = sessionStore.session?.user?.id
+
+  if (track.value) {
+    return track.value?.scoreAndLikes?.listOfUserIdWhoLiked?.includes(userId)
+  }
+})
+
+const nbLikes = computed(() => {
+  if (track.value) {
+    return track.value?.scoreAndLikes?.listOfUserIdWhoLiked?.length
+  } else {
+    return 0
+  }
+})
+
 watch(
   () => props.track,
   newTrack => {
     if (newTrack) {
       track.value = newTrack
     }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => props.isComplete,
+  newIsComplete => {
+    isComplete.value = newIsComplete
   },
   { immediate: true }
 )
@@ -61,7 +91,7 @@ watch(
     </div>
 
     <!-- Vote button -->
-    <div class="flex flex-row justify-center items-center gap-2 mt-2">
+    <div v-if="isComplete" class="flex flex-row justify-center items-center gap-2 mt-2">
       <div v-if="sessionStore.session.user.id === track.user.id">
         <UButton
           :class="['p-1 rounded-full transition duration-200', animate ? 'scale-105' : 'scale-100']"
@@ -88,8 +118,8 @@ watch(
         icon="i-tabler-music-heart"
         @click="likeTrack(track.trackId, props.indexTrack)"
       >
-        {{ track.scoreAndLikes.nbLikes }} likes /
-        {{ track.scoreAndLikes.alreadyLiked ? 'Déjà liké' : 'Liker la musique' }}
+        {{ nbLikes }} likes /
+        {{ alreadyLiked ? 'Déjà liké' : 'Liker la musique' }}
       </UButton>
     </div>
   </div>

@@ -36,9 +36,7 @@ const updateCountdown = () => {
     hasEnded.value = true
     clearInterval(interval)
 
-    console.log('🎯 End countdown reçu dans CountDown')
     emit('endCountDown')
-    // await runAddTrack(props.tracksVersusId)
   }
 
   if (isOver) {
@@ -59,15 +57,8 @@ watch(
   () => props.closingDate,
   newClosingDate => {
 
-    console.log('🎯 TracksVersusId changé dans CountDown')
-    console.log(newClosingDate)
-
     closingDate.value = newClosingDate
-
-    // if (!newVersus?.firstTrack || !newVersus?.secondTrack) return
-
-    // scoreFirstTrack.value = newVersus.firstTrackScore
-    // scoreSecondTrack.value = newVersus.secondTrackScore
+    
     hasEnded.value = false
     clearInterval(interval)
     updateCountdown()

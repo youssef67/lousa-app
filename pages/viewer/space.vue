@@ -57,6 +57,7 @@ const changePlaylist = async (playlistId: string) => {
 
   const tracksVersus = await runGetTracksVersus(playlistId)
 
+  console.log('tracksVersus', tracksVersus)
   currentTracksVersus.value = tracksVersus.currentTracksVersus
 
   isLoading.value = false
@@ -114,7 +115,6 @@ async function setTransmitSubscription(playlistId: string) {
     baseUrl: `${config.public.siteUrl}/api/v1`,
   })
 
-  console.log('playlistId', playlistId)
   const playlistUpdated = transmit.subscription(`playlist/updated/${playlistId}`)
   const likeUpdated = transmit.subscription(`playlist/like/${playlistId}`)
   const tracksVersusUpdated = transmit.subscription(`playlist/tracksVersus/${playlistId}`)
@@ -129,7 +129,6 @@ async function setTransmitSubscription(playlistId: string) {
 
   playlistUpdated.onMessage(async (data: AddTrackResponse) => {
     isTracksValidationModalOpen.value = false
-    console.log('playlistUpdated', data)
     if (data.playlistTracksUpdated) {
       showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
       playlistTracks.value = data.playlistTracksUpdated
@@ -140,25 +139,11 @@ async function setTransmitSubscription(playlistId: string) {
 
   likeUpdated.onMessage(async (data: LikeTrackResponse) => {
     currentTracksVersus.value = data.currentTracksVersus
-    console.log('currentTracksVersus', data.currentTracksVersus)
-    if (data.currentTracksVersus.firstTrack.user.id === sessionStore.session?.user.id) {
-      showSuccess('Merci pour votre vote et votre soutien à votre streamer !')
-      sessionStore.updateSessionVirtualCurrency(
-        data.currentTracksVersus.firstTrack.user.amountVirtualCurrency
-      )
-    }
-
-    if (data.currentTracksVersus.secondTrack.user.id === sessionStore.session?.user.id) {
-      showSuccess('Merci pour votre vote et votre soutien à votre streamer !')
-      sessionStore.updateSessionVirtualCurrency(
-        data.currentTracksVersus.firstTrack.user.amountVirtualCurrency
-      )
-    }
   })
 
   tracksVersusUpdated.onMessage(async (data: UpdateTracksVersusResponse) => {
     showSuccess('La claaaasse!')
-    console.log('tracksVersusUpdated', data)
+    console.log('iscomplete', data.currentTracksVersus.isComplete)
     currentTracksVersus.value = data.currentTracksVersus
   })
 }

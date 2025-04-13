@@ -29,7 +29,7 @@ export const useAuthenticationStore = defineStore('authentication', () => {
 
   const accountButtonLabel = () => {
     if (sessionStore.isSessionAuthenticated()) {
-      return "Mon compte"
+      return "Mon profil"
     } else {
       return "Se connecter"
     }
