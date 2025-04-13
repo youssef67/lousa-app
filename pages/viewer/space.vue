@@ -15,24 +15,22 @@ const config = useRuntimeConfig()
 const isSlideOverOpen = ref(false)
 const currentPlayListInfo = ref<playlistInfo | null>(null)
 const trackName = ref('Avant tu riais')
-const { pushStreamers } = useSpecialRouter()
+const { pushStreamers, pushStats } = useSpecialRouter()
 const isTracksValidationModalOpen = ref(false)
 const foundTracks = ref<Track[]>(null)
 const toast = useSpecialToast()
 const playlistTracks = ref<BroadcastTrack[]>([])
 const currentTracksVersus = ref<TracksVersus>(null)
-const sessionStore = useSessionStore()
 const { showSuccess, showError } = useSpecialToast()
 const isBattleLoading = ref(false)
 const isUpdatingBattle = ref(false)
-
-
 
 let playlistUpdatedInstance: Subscription | null = null
 let likedTracksInstance: Subscription | null = null
 let tracksVersusUpdatedInstance: Subscription | null = null
 
-const { runSearchTrack, runGetPlaylistTracks, runGetTracksVersus, runAddTrack } = usePlaylistRepository()
+const { runSearchTrack, runGetPlaylistTracks, runGetTracksVersus, runAddTrack } =
+  usePlaylistRepository()
 const { handleError } = useSpecialError()
 
 const proceedResult = (value: BroadcastTrack | null) => {
@@ -57,7 +55,7 @@ const changePlaylist = async (playlistId: string) => {
 
   const tracksVersus = await runGetTracksVersus(playlistId)
 
-  console.log('tracksVersus', tracksVersus)
+  console.log('playlistId', playlistId)
   currentTracksVersus.value = tracksVersus.currentTracksVersus
 
   isLoading.value = false
@@ -79,22 +77,20 @@ async function searchTrack(value: string) {
   }
 }
 
-
 const proceedUpdateAll = async () => {
-    isBattleLoading.value = true
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    const response = await runAddTrack(currentTracksVersus.value.id)
+  isBattleLoading.value = true
+  await new Promise(resolve => setTimeout(resolve, 1500))
+  const response = await runAddTrack(currentTracksVersus.value.id)
 
-    if (response) {
-      currentTracksVersus.value = response.currentTracksVersus
-      playlistTracks.value = response.playlistsTracks
-      showSuccess('La mise à jour de la playlist a été effectuée avec succès !')
-    } else {
-      showError('Une erreur est survenue lors de la mise à jour de la playlist')
-    }
+  if (response) {
+    currentTracksVersus.value = response.currentTracksVersus
+    playlistTracks.value = response.playlistsTracks
+    showSuccess('La mise à jour de la playlist a été effectuée avec succès !')
+  } else {
+    showError('Une erreur est survenue lors de la mise à jour de la playlist')
+  }
 
-    isBattleLoading.value = false
-  
+  isBattleLoading.value = false
 }
 
 const handleUpdateAll = async () => {
@@ -166,7 +162,7 @@ onUnmounted(async () => {
 <template>
   <UContainer class="flex flex-col space-y-10">
     <!-- <h1>Espace viewer {{ sessionStore.session?.user.email }}</h1> -->
-    <section class="flex gap-2">
+    <section class="flex flex-wrap gap-4 md:flex-nowrap md:gap-2 w-full">
       <UButton
         label="Liste des streamers"
         type="submit"
@@ -174,7 +170,18 @@ onUnmounted(async () => {
         variant="solid"
         size="xl"
         color="secondary"
+        class="w-full md:w-auto"
         @click="pushStreamers()"
+      />
+      <UButton
+        label="Mes stats"
+        type="submit"
+        icon="i-tabler-presentation-analytics-filled"
+        variant="solid"
+        size="xl"
+        color="secondary"
+        class="w-full md:w-auto"
+        @click="pushStats()"
       />
       <UButton
         label="Mes favoris"
@@ -183,74 +190,73 @@ onUnmounted(async () => {
         variant="solid"
         size="xl"
         color="secondary"
+        class="w-full md:w-auto"
         @click="toggleSlider"
       />
-      <UInput
-        ref="inputText"
-        v-model="trackName"
-        input-text
-        type="text"
-        :placeholder="'Saisissez le nom de musique'"
-        required
-        size="xl"
-        icon="i-tabler-music-heart"
-        autocomplete="off"
-      />
-      <UButton
-        label="Rechercher"
-        variant="solid"
-        size="xl"
-        color="secondary"
-        class="flex"
-        @click="searchTrack(null)"
-      />
+
+      <div class="flex w-full gap-2 md:flex-1">
+        <UInput
+          ref="inputText"
+          v-model="trackName"
+          input-text
+          type="text"
+          :placeholder="'Saisissez le nom de musique'"
+          required
+          size="xl"
+          icon="i-tabler-music-heart"
+          autocomplete="off"
+          class="flex-1 min-w-[150px]"
+        />
+        <UButton
+          icon="i-tabler-music-search"
+          variant="solid"
+          size="xl"
+          color="secondary"
+          class="w-auto"
+          @click="searchTrack(null)"
+        />
+      </div>
     </section>
 
     <section>
-  <div v-if="isBattleLoading" class="flex justify-center items-center py-12">
-    <UIcon name="i-tabler-loader-2" class="animate-spin text-white text-4xl" />
-    <span class="ml-4 text-white text-lg font-semibold">Mise à jour de la playlist en cours...</span>
-  </div>
-
-  <div v-else-if="currentPlayListInfo" class="flex flex-col">
-    <div v-if="!isLoading">
-      <div class="text-white text-xl font-bold mb-4">
-        {{ currentPlayListInfo.playlistName }}
+      <div v-if="isBattleLoading" class="flex justify-center items-center py-12">
+        <UIcon name="i-tabler-loader-2" class="animate-spin text-white text-4xl" />
+        <span class="ml-4 text-white text-lg font-semibold"
+          >Mise à jour de la playlist en cours...</span
+        >
       </div>
-      <div class="mb-8">
-        <h2 class="text-white text-lg font-semibold mb-4">Battle</h2>
 
-        <div v-if="currentTracksVersus">
-          <TracksVersusSection
-            :currentTracksVersus="currentTracksVersus"
-            :handleSearchTrack="searchTrack"
-            @updateAll="handleUpdateAll"
-          />
-        </div>
-        <div v-else>
-          <div class="text-center text-white text-sm py-6">
-            🎵 En attente de nouveaux morceaux pour lancer un battle...
+      <div v-else-if="currentPlayListInfo" class="flex flex-col">
+        <div v-if="!isLoading">
+          <div class="mb-8 text-center">
+            <h2 class="text-white text-lg font-semibold mb-4">Duel en cours</h2>
+
+            <div v-if="currentTracksVersus">
+              <TracksVersusSection
+                :currentTracksVersus="currentTracksVersus"
+                :handleSearchTrack="searchTrack"
+                @updateAll="handleUpdateAll"
+              />
+            </div>
+            <div v-else>
+              <div class="text-center text-white text-sm py-6">
+                🎵 En attente de nouveaux morceaux pour lancer un battle...
+              </div>
+            </div>
+          </div>
+          <div class="text-white text-xl font-bold mb-4 text-center">
+            {{ currentPlayListInfo.playlistName }}
+          </div>
+          <div v-if="playlistTracks.length > 0" class="divide-y divide-gray-700">
+            <PlaylistTrackRow v-for="track in playlistTracks" :key="track.trackId" :track="track" />
           </div>
         </div>
       </div>
-      <div v-if="playlistTracks.length > 0" class="divide-y divide-gray-700">
-        <PlaylistTrackRow
-          v-for="track in playlistTracks"
-          :key="track.trackId"
-          :track="track"
-        />
+
+      <div v-else>
+        <div class="text-center text-white text-sm py-6">Aucune playlist sélectionnée</div>
       </div>
-
-     
-    </div>
-  </div>
-
-  <div v-else>
-    <div class="text-center text-white text-sm py-6">
-      Aucune playlist sélectionnée
-    </div>
-  </div>
-</section>
+    </section>
     <TrackValidationModal
       :isOpen="isTracksValidationModalOpen"
       :foundTracks="foundTracks || []"

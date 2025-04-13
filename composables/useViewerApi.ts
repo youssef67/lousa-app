@@ -6,8 +6,8 @@ import type {
   CompleteProfileResponse,
   CheckUserNameAvailabilityResponse,
   GetFavoritesResponse,
-  GetStreamerProfileResponse
-
+  GetStreamerProfileResponse,
+  StatsResponse
 } from '~/types/viewer.type'
 
 export const useViewerApi = () => {
@@ -139,6 +139,19 @@ export const useViewerApi = () => {
     }
   }
 
+  const getStats = async (): Promise<StatsResponse> => {
+    try {
+      const response = await fetch('/api/v1/viewer/stats', {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache'
+      })
+      return response as StatsResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
   return {
     addFavoritePlaylist,
     deleteFavoritePlaylist,
@@ -147,6 +160,7 @@ export const useViewerApi = () => {
     completeProfile,
     checkUserNameAvailability,
     getFavorites,
-    getStreamerProfile
+    getStreamerProfile,
+    getStats
   }
 }

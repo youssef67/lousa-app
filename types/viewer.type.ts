@@ -41,6 +41,20 @@ export interface GetStreamerProfileResponse {
   isFavoriteStreamer: boolean
 }
 
+export interface StatsResponse {
+  tracksVersus: {
+    completed: number
+    votingInProgress: number
+    onHold: number
+    won: number
+  }
+  tracks: {
+    top: number
+    ranked: number
+  }
+}
+
+
 export interface SpaceStreamerFavorite {
   id: string
   spaceName: string

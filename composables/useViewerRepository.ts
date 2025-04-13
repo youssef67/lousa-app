@@ -7,7 +7,8 @@ export const useViewerRepository = () => {
     completeProfile,
     checkUserNameAvailability,
     getFavorites,
-    getStreamerProfile
+    getStreamerProfile,
+    getStats
   } = useViewerApi()
   const logger = useSpecialLogger()
 
@@ -83,6 +84,15 @@ export const useViewerRepository = () => {
     }
   }
 
+  const runGetStats = async () => {
+    try {
+      const response = await getStats()
+      return response
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
   return {
     runAddFavoritePlaylist,
     runDeleteFavoritePlaylist,
@@ -91,6 +101,7 @@ export const useViewerRepository = () => {
     runCompleteProfile,
     runCheckUserNameAvailability,
     runGetFavorites,
-    runGetStreamerProfile
+    runGetStreamerProfile,
+    runGetStats
   }
 }

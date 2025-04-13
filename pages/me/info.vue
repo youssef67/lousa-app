@@ -29,8 +29,7 @@ type Schema = z.output<typeof schema>
 const isEdited = computed(() => {
   return (
     states.value.firstName !== currentUser.value?.firstName ||
-    states.value.lastName !== currentUser.value?.lastName ||
-    new Date(states.value.dateOfBirth).toISOString() !== new Date(currentUser.value.dateOfBirth).toISOString()
+    states.value.lastName !== currentUser.value?.lastName
   )
 })
 
@@ -50,9 +49,6 @@ onMounted(() => {
   if (currentUser.value) {
     states.value.firstName = currentUser.value.firstName
     states.value.lastName = currentUser.value.lastName
-    states.value.dateOfBirth = currentUser.value.dateOfBirth
-      ? new Date(currentUser.value.dateOfBirth).toISOString()
-      : null
   }
 })
 </script>
