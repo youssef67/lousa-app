@@ -4,7 +4,7 @@ import { computed, ref } from 'vue'
 const isSlideOverOpen = ref(false)
 const authenticationStore = useAuthenticationStore()
 const sessionStore = useSessionStore()
-const { pushAdmin } = useSpecialRouter()
+const { pushAdmin, pushBuyLouz } = useSpecialRouter()
 
 // Vérification si l'utilisateur est admin (réactif)
 const isAdmin = computed(() => sessionStore.isAdmin())
@@ -36,7 +36,12 @@ const onMenuOptionClick = async () => {
           label="Admin"
           icon="i-tabler-user"
           color="secondary"
-          @click="pushAdmin"
+          @click="pushAdmin()"
+        />
+        <UButton
+          label="Acheter des Louz"
+          color="secondary"
+          @click="pushBuyLouz()"
         />
         <UButton
           :label="authenticationStore.accountButtonLabel()"

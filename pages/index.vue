@@ -23,6 +23,7 @@ const goToSpaceViewer = () => {
     pushSpaceViewer()
   }
 }
+
 const goToStreamerSpace = () => {
   pushSpaceStreamer()
 }

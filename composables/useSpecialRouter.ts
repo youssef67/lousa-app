@@ -45,6 +45,7 @@ export const useSpecialRouter = () => {
   const pushSetting = (push: boolean = true): string => push2('/me/settings', push)
   const pushPlaylist = (push: boolean = true): string => push2('/playlist', push)
   const pushStreamers = (push: boolean = true): string => push2('/streamersList', push)
+  const pushBuyLouz = (push: boolean = true): string => push2('/buy', push)
   const pushAdmin = (push: boolean = true): string => push2('/admin/dashboard', push)
   const pushAuthorization = (push: boolean = true): string => push2('/authorization', push)
   const pushCreateSpaceStreamer = (push: boolean = true): string => push2('/streamer/create', push)
@@ -74,6 +75,7 @@ export const useSpecialRouter = () => {
     pushSpaceViewer,
     pushCreateSpaceStreamer,
     pushSpaceStreamerForViewer,
-    pushStats
+    pushStats,
+    pushBuyLouz
   }
 }
