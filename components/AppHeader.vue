@@ -13,6 +13,12 @@ const onMenuOptionClick = async () => {
   isSlideOverOpen.value = false
   authenticationStore.proceedLoginClick()
 }
+
+const victoryPoints = computed(() => {
+
+    return sessionStore?.session?.user?.victoryPoints.toString() + ' points'
+
+})
 </script>
 
 <template>
@@ -30,7 +36,7 @@ const onMenuOptionClick = async () => {
     </template>
 
     <template #right>
-      <div class="hidden lg:flex space-x-4">
+      <div class="flex flex-wrap items-center space-x-2 lg:space-x-4">
         <UButton
           v-if="isAdmin"
           label="Admin"
@@ -38,18 +44,21 @@ const onMenuOptionClick = async () => {
           color="secondary"
           @click="pushAdmin()"
         />
+
+        <div class="flex space-x-2">
+          <UButton v-if="sessionStore.isSessionAuthenticated()" :label="victoryPoints" variant="ghost" color="black" />
+          <UButton label="Acheter des Louz" color="secondary" @click="pushBuyLouz()" />
+        </div>
+
         <UButton
-          label="Acheter des Louz"
-          color="secondary"
-          @click="pushBuyLouz()"
-        />
-        <UButton
+          class="hidden lg:flex"
           :label="authenticationStore.accountButtonLabel()"
           icon="i-tabler-user"
           color="secondary"
           @click="onMenuOptionClick"
         />
       </div>
+
       <ColorModeButton class="text-white" />
     </template>
 
@@ -87,7 +96,7 @@ const onMenuOptionClick = async () => {
           <UButton label="Mon histoire" variant="ghost" color="black" />
           <UButton label="Comment ça marche ?" variant="ghost" color="black" />
         </div>
-       
+
         <UButton
           v-if="isAdmin"
           label="Admin"

@@ -14,6 +14,7 @@ const { $transmit } = useNuxtApp()
 const isLoading = ref(true)
 // const config = useRuntimeConfig()
 const isSlideOverOpen = ref(false)
+const sessionStore = useSessionStore()
 const currentPlayListInfo = ref<playlistInfo | null>(null)
 const trackName = ref('Avant tu riais')
 const { pushStreamers, pushStats } = useSpecialRouter()
@@ -89,9 +90,11 @@ const proceedUpdateAll = async () => {
   await new Promise(resolve => setTimeout(resolve, 1500))
   const response = await runAddTrack(currentTracksVersus.value.id)
 
+  console.log('response runAddTrack', response)
   if (response) {
     currentTracksVersus.value = response.currentTracksVersus
     playlistTracks.value = response.playlistsTracks
+    sessionStore.updateSessionUser(response.currentUser)
     showSuccess('La mise à jour de la playlist a été effectuée avec succès !')
   } else {
     showError('Une erreur est survenue lors de la mise à jour de la playlist')
@@ -161,8 +164,6 @@ async function setTransmitSubscription(playlistId: string) {
     })
 
     tracksVersusUpdated.onMessage(async (data: UpdateTracksVersusResponse) => {
-      showSuccess('La claaaasse!')
-      console.log('iscomplete', data.currentTracksVersus.isComplete)
       currentTracksVersus.value = data.currentTracksVersus
     })
   } catch (error) {

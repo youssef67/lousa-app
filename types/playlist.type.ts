@@ -1,4 +1,5 @@
 import type { UserSession } from './session.type.js'
+import { PendingAddResult } from '~/utils/playlist/PlaylistResult.ts.js'
 
 export interface SearchTracksResponse {
   foundTracks: Track[]
@@ -13,12 +14,13 @@ export interface RefreshVersusResponse {
 }
 
 export interface AddPendingTracksResponse {
-  result: boolean
+  result: PendingAddResult
 }
 
 export interface AddTracksResponse {
   playlistsTracks: BroadcastTrack[]
   currentTracksVersus: TracksVersus
+  currentUser: UserSession
 }
 
 export interface LikeTracksResponse {

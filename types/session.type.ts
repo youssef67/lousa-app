@@ -36,6 +36,7 @@ export interface UserSession {
   email: string
   role: UserRole
   amountVirtualCurrency: number
+  victoryPoints: number
   twitchUser?: TwitchUserSession
   spotifyUser?: SpotifyUserSession
 }
