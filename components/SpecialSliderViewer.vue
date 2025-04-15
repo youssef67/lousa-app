@@ -87,11 +87,11 @@ onMounted(async () => {
     favoritesSpaceStreamers.value = response.spaceStreamersFavorites
   }
 
-  for (const playlist of favoritesPlaylists.value) {
-    if (playlist.isSelected) {
-      emit('changePlaylist', playlist.id)
-    }
-  }
+  // for (const playlist of favoritesPlaylists.value) {
+  //   if (playlist.isSelected) {
+  //     emit('changePlaylist', playlist.id)
+  //   }
+  // }
 })
 </script>
 

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 const sessionStore = useSessionStore()
+const { pushSpaceViewer } = useSpecialRouter()
 const route = useRoute()
 
 // Optionnel : cacher le bouton sur certaines pages
 const shouldShowButton = computed(() => {
-  return !['/connexion', '/admin'].includes(route.path)
+  return !['/landing', '/', '/viewer/space'].includes(route.path)
 })
 </script>
 
@@ -24,9 +25,9 @@ const shouldShowButton = computed(() => {
         size="lg"
         class="shadow-xl px-5 py-3 rounded-full"
         icon="i-tabler-rocket"
-        to="/battles"
+        @click="pushSpaceViewer()"
       >
-        Découvrir les Battles
+        Retour à l'espace viewer
       </UButton>
     </div>
   </div>

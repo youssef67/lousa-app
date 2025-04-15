@@ -39,6 +39,10 @@ export interface GetTracksVersusResponse {
   currentTracksVersus: TracksVersus
 }
 
+export interface GetPlaylistSelectedResponse { 
+  playlistId: string | null
+}
+
 export interface PlaylistCardInfo {
   id: string
   playlistName: string

@@ -10,8 +10,9 @@ import type {
   UpdateTracksVersusResponse,
 } from '~/types/playlist.type'
 
+const { $transmit } = useNuxtApp()
 const isLoading = ref(true)
-const config = useRuntimeConfig()
+// const config = useRuntimeConfig()
 const isSlideOverOpen = ref(false)
 const currentPlayListInfo = ref<playlistInfo | null>(null)
 const trackName = ref('Avant tu riais')
@@ -25,12 +26,18 @@ const { showSuccess, showError } = useSpecialToast()
 const isBattleLoading = ref(false)
 const isUpdatingBattle = ref(false)
 
+
 let playlistUpdatedInstance: Subscription | null = null
 let likedTracksInstance: Subscription | null = null
 let tracksVersusUpdatedInstance: Subscription | null = null
 
-const { runSearchTrack, runGetPlaylistTracks, runGetTracksVersus, runAddTrack } =
-  usePlaylistRepository()
+const {
+  runSearchTrack,
+  runGetPlaylistTracks,
+  runGetTracksVersus,
+  runAddTrack,
+  runGetPlaylistSelected,
+} = usePlaylistRepository()
 const { handleError } = useSpecialError()
 
 const proceedResult = (value: BroadcastTrack | null) => {
@@ -46,6 +53,7 @@ const toggleSlider = () => {
 
 const changePlaylist = async (playlistId: string) => {
   isLoading.value = true
+  await closeAllEventStreams()
 
   await setTransmitSubscription(playlistId)
 
@@ -55,7 +63,6 @@ const changePlaylist = async (playlistId: string) => {
 
   const tracksVersus = await runGetTracksVersus(playlistId)
 
-  console.log('playlistId', playlistId)
   currentTracksVersus.value = tracksVersus.currentTracksVersus
 
   isLoading.value = false
@@ -106,45 +113,7 @@ async function closeEventStream(subscription: Subscription) {
   await subscription.delete()
 }
 
-async function setTransmitSubscription(playlistId: string) {
-  const transmit = new Transmit({
-    baseUrl: `${config.public.siteUrl}/api/v1`,
-  })
-
-  const playlistUpdated = transmit.subscription(`playlist/updated/${playlistId}`)
-  const likeUpdated = transmit.subscription(`playlist/like/${playlistId}`)
-  const tracksVersusUpdated = transmit.subscription(`playlist/tracksVersus/${playlistId}`)
-
-  playlistUpdatedInstance = playlistUpdated
-  likedTracksInstance = likeUpdated
-  tracksVersusUpdatedInstance = tracksVersusUpdated
-
-  await playlistUpdated.create()
-  await likeUpdated.create()
-  await tracksVersusUpdated.create()
-
-  playlistUpdated.onMessage(async (data: AddTrackResponse) => {
-    isTracksValidationModalOpen.value = false
-    if (data.playlistTracksUpdated) {
-      showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
-      playlistTracks.value = data.playlistTracksUpdated
-    } else {
-      showError('Une erreur est survenue lors de la mise à jour de la playlist')
-    }
-  })
-
-  likeUpdated.onMessage(async (data: LikeTrackResponse) => {
-    currentTracksVersus.value = data.currentTracksVersus
-  })
-
-  tracksVersusUpdated.onMessage(async (data: UpdateTracksVersusResponse) => {
-    showSuccess('La claaaasse!')
-    console.log('iscomplete', data.currentTracksVersus.isComplete)
-    currentTracksVersus.value = data.currentTracksVersus
-  })
-}
-
-onUnmounted(async () => {
+async function closeAllEventStreams() {
   if (playlistUpdatedInstance) {
     await closeEventStream(playlistUpdatedInstance)
   }
@@ -156,6 +125,68 @@ onUnmounted(async () => {
   if (tracksVersusUpdatedInstance) {
     await closeEventStream(tracksVersusUpdatedInstance)
   }
+}
+
+async function setTransmitSubscription(playlistId: string) {
+  try {
+    // const transmit = new Transmit({
+    //   baseUrl: `${config.public.siteUrl}/api/v1`,
+    // })
+
+    const playlistUpdated = $transmit.subscription(`playlist/updated/${playlistId}`)
+    const likeUpdated = $transmit.subscription(`playlist/like/${playlistId}`)
+    const tracksVersusUpdated = $transmit.subscription(`playlist/tracksVersus/${playlistId}`)
+
+    playlistUpdatedInstance = playlistUpdated
+    likedTracksInstance = likeUpdated
+    tracksVersusUpdatedInstance = tracksVersusUpdated
+
+    await playlistUpdated.create()
+    await likeUpdated.create()
+    await tracksVersusUpdated.create()
+
+    playlistUpdated.onMessage(async (data: AddTrackResponse) => {
+      isTracksValidationModalOpen.value = false
+      if (data.playlistTracksUpdated) {
+        showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
+        playlistTracks.value = data.playlistTracksUpdated
+      } else {
+        showError('Une erreur est survenue lors de la mise à jour de la playlist')
+      }
+    })
+
+    likeUpdated.onMessage(async (data: LikeTrackResponse) => {
+      console.log('likeUpdated', data)
+      currentTracksVersus.value = data.currentTracksVersus
+    })
+
+    tracksVersusUpdated.onMessage(async (data: UpdateTracksVersusResponse) => {
+      showSuccess('La claaaasse!')
+      console.log('iscomplete', data.currentTracksVersus.isComplete)
+      currentTracksVersus.value = data.currentTracksVersus
+    })
+  } catch (error) {
+    console.error('Erreur dans setTransmitSubscription:', error)
+  }
+}
+
+onMounted(async () => {
+  console.log('🔁 Transmit check', Transmit)
+
+  try {
+    console.log('onMounted')
+    const response = await runGetPlaylistSelected()
+   
+    if (response) {
+      await changePlaylist(response.playlistId)
+    }
+  } catch (error) {
+    console.error('Erreur dans onMounted:', error)
+  }
+})
+
+onUnmounted(async () => {
+  await closeAllEventStreams()
 })
 </script>
 

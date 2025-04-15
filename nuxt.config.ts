@@ -70,6 +70,9 @@ export default defineNuxtConfig({
   build: {
     transpile: ['@vuepic/vue-datepicker']
   },
+  plugins: [
+    '~/plugins/transmit.client.ts'
+  ],
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true }
 })

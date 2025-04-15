@@ -23,8 +23,6 @@ onMounted(async () => {
   if (stats) {
     userStats.value = stats
   }
-
-  console.log('stats', stats)
 })
 </script>
 

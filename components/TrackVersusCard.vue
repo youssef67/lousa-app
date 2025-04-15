@@ -26,10 +26,10 @@ const emit = defineEmits(['proceedSpecialLike', 'proceedLike'])
 
 const sessionStore = useSessionStore()
 
-const SetSpecialLike = (track: number) => {
+const SetSpecialLike = () => {
   animate.value = true
   setTimeout(() => (animate.value = false), 200)
-  emit('proceedSpecialLike', track)
+  emit('proceedSpecialLike', props.indexTrack)
 }
 
 const likeTrack = async (trackId: string, targetTrack: number) => {
@@ -97,7 +97,7 @@ watch(
           :class="['p-1 rounded-full transition duration-200', animate ? 'scale-105' : 'scale-100']"
           icon="i-tabler-music-up"
           :label="`Utiliser des louz - ${track.scoreAndLikes.specialLike}`"
-          @click="SetSpecialLike(1)"
+          @click="SetSpecialLike()"
         />
       </div>
       <div v-else>

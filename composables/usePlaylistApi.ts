@@ -6,7 +6,8 @@ import type {
   Track,
   SpecialLikeTracksResponse,
   GetTracksVersusResponse,
-  AddTracksResponse
+  AddTracksResponse,
+  GetPlaylistSelectedResponse,
 } from '~/types/playlist.type'
 
 export const usePlaylistApi = () => {
@@ -24,7 +25,7 @@ export const usePlaylistApi = () => {
       const response = await fetch(url, {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
+        cache: 'no-cache',
       })
       return response as SearchTracksResponse
     } catch (error) {
@@ -39,7 +40,7 @@ export const usePlaylistApi = () => {
       const res = await fetch(url, {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
+        cache: 'no-cache',
       })
 
       return res as AddTracksResponse
@@ -57,7 +58,7 @@ export const usePlaylistApi = () => {
         method: FetchMethod.POST,
         body: { playlistId, track },
         headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
+        cache: 'no-cache',
       })
       return response as AddPendingTracksResponse
     } catch (error) {
@@ -65,16 +66,14 @@ export const usePlaylistApi = () => {
     }
   }
 
-  const getPlaylistTracks = async (
-    playlistId: string
-  ): Promise<GetPlaylistTracksResponse> => {
+  const getPlaylistTracks = async (playlistId: string): Promise<GetPlaylistTracksResponse> => {
     try {
       const url = `/api/v1/playlist?playlistId=${playlistId}`
 
       const response = await fetch(url, {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
+        cache: 'no-cache',
       })
       return response as GetPlaylistTracksResponse
     } catch (error) {
@@ -82,16 +81,14 @@ export const usePlaylistApi = () => {
     }
   }
 
-  const getTracksVersus = async (
-    playlistId: string
-  ): Promise<GetTracksVersusResponse> => {
+  const getTracksVersus = async (playlistId: string): Promise<GetTracksVersusResponse> => {
     try {
       const url = `/api/v1/playlist/tracksVersus?playlistId=${playlistId}`
 
       const response = await fetch(url, {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
+        cache: 'no-cache',
       })
       return response as GetTracksVersusResponse
     } catch (error) {
@@ -109,7 +106,7 @@ export const usePlaylistApi = () => {
         method: FetchMethod.POST,
         body: { tracksVersusId, trackId, targetTrack },
         headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
+        cache: 'no-cache',
       })
       return response as LikeTracksResponse
     } catch (error) {
@@ -127,9 +124,22 @@ export const usePlaylistApi = () => {
         method: FetchMethod.POST,
         body: { tracksVersusId, targetTrack, amount },
         headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache'
+        cache: 'no-cache',
       })
       return response as SpecialLikeTracksResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const getPlaylistSelected = async (): Promise<GetPlaylistSelectedResponse> => {
+    try {
+      const response = await fetch('/api/v1/playlist/selected', {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache',
+      })
+      return response as GetPlaylistSelectedResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -142,6 +152,7 @@ export const usePlaylistApi = () => {
     getPlaylistTracks,
     likeTrack,
     specialLikeTrack,
-    getTracksVersus
+    getTracksVersus,
+    getPlaylistSelected,
   }
 }

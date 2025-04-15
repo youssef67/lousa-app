@@ -8,7 +8,8 @@ export const usePlaylistRepository = () => {
     getPlaylistTracks,
     likeTrack,
     specialLikeTrack,
-    getTracksVersus
+    getTracksVersus,
+    getPlaylistSelected
   } = usePlaylistApi()
   const logger = useSpecialLogger()
 
@@ -76,10 +77,11 @@ export const usePlaylistRepository = () => {
     }
   }
 
-  const addTrackToTracksVersus = async (tracksVersusId: string, targetTrack: number, amount: number) => {
+  const runGetPlaylistSelected = async () => {
     try {
-      const response = await specialLikeTrack(tracksVersusId, targetTrack, amount)
-      return response
+      const res = await getPlaylistSelected()
+
+      return res
     } catch (error) {
       logger.e('Error logging out', error)
     }
@@ -92,6 +94,7 @@ export const usePlaylistRepository = () => {
     runAddPendingTrack,
     runLikeTrack,
     runSpecialLikeTrack,
-    runGetTracksVersus
+    runGetTracksVersus,
+    runGetPlaylistSelected
   }
 }

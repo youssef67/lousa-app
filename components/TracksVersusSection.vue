@@ -31,6 +31,7 @@ const proceedResult = async (amount: number) => {
       amount
     )
 
+    console.log('response', response)
     if (response) {
       sessionStore.updateSessionVirtualCurrency(response.user.amountVirtualCurrency)
     }
@@ -39,8 +40,8 @@ const proceedResult = async (amount: number) => {
   targetTrack.value = 0
 }
 
-const proceedSpecialLike = async (track: number) => {
-  targetTrack.value = track
+const proceedSpecialLike = async (index: number) => {
+  targetTrack.value = index
   isOpenSpecialLikeModal.value = true
 }
 
@@ -106,7 +107,7 @@ watch(
     </div>
 
     <!-- Progress Bar -->
-    <ProgressBar :currentTracksVersus="currentTracksVersus" class="mt-6" />
+    <!-- <ProgressBar :currentTracksVersus="currentTracksVersus" class="mt-6" /> -->
 
     <!-- Modal -->
     <SpecialLikeModal
