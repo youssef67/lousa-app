@@ -51,6 +51,14 @@ export const useSpecialRouter = () => {
   const pushCreateSpaceStreamer = (push: boolean = true): string => push2('/streamer/create', push)
   const pushSpaceViewer = (push: boolean = true): string => push2('/viewer/space', push)
   const pushSpaceStreamer = (push: boolean = true): string => push2('/streamer/space', push)
+  const pushTermsSales = (push: boolean = true): string => push2('/sales-conditions', push)
+  const pushTermsUse = (push: boolean = true): string => push2('/terms', push)
+  const pushPrivatePolicy = (push: boolean = true): string => push2('/privacy-policy', push)
+  const pushAboutUs = (push: boolean = true): string => push2('/about-us', push)
+  const pushLegal = (push: boolean = true): string => push2('/legal', push)
+
+
+
 
 
   // Redirection vers `/space/:username`
@@ -76,6 +84,11 @@ export const useSpecialRouter = () => {
     pushCreateSpaceStreamer,
     pushSpaceStreamerForViewer,
     pushStats,
-    pushBuyLouz
+    pushBuyLouz,
+    pushTermsSales,
+    pushTermsUse,
+    pushPrivatePolicy,
+    pushAboutUs,
+    pushLegal
   }
 }

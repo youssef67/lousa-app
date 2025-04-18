@@ -3,7 +3,6 @@ const sessionStore = useSessionStore()
 const { pushSpaceViewer } = useSpecialRouter()
 const route = useRoute()
 
-// Optionnel : cacher le bouton sur certaines pages
 const shouldShowButton = computed(() => {
   return !['/landing', '/', '/viewer/space'].includes(route.path)
 })
@@ -30,6 +29,7 @@ const shouldShowButton = computed(() => {
         Retour à l'espace viewer
       </UButton>
     </div>
+    <AppFooter />
   </div>
 </template>
 
