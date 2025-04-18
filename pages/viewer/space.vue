@@ -27,7 +27,6 @@ const { showSuccess, showError } = useSpecialToast()
 const isBattleLoading = ref(false)
 const isUpdatingBattle = ref(false)
 
-
 let playlistUpdatedInstance: Subscription | null = null
 let likedTracksInstance: Subscription | null = null
 let tracksVersusUpdatedInstance: Subscription | null = null
@@ -177,7 +176,7 @@ onMounted(async () => {
   try {
     console.log('onMounted')
     const response = await runGetPlaylistSelected()
-   
+
     if (response) {
       await changePlaylist(response.playlistId)
     }
@@ -213,7 +212,7 @@ onUnmounted(async () => {
         size="xl"
         color="secondary"
         class="w-full md:w-auto"
-        @click="pushStats()"
+        @click="pushStats(sessionStore.session?.user.id, true)"
       />
       <UButton
         label="Mes favoris"
@@ -258,8 +257,21 @@ onUnmounted(async () => {
         >
       </div>
 
-      <div v-else-if="currentPlayListInfo" class="flex flex-col">
-        <div v-if="!isLoading">
+      <div v-else-if="currentPlayListInfo" class="flex flex-col items-center text-center mb-3">
+        <!-- Nom du streamer -->
+        <h1 class="text-xl md:text-2xl font-bold text-white mb-2">
+          {{ currentPlayListInfo.spaceStreamerName }}
+        </h1>
+
+        <!-- Petite image du streamer -->
+        <img
+          :src="currentPlayListInfo.spaceStreamerImg"
+          class="w-24 h-24 object-cover rounded-full shadow-md mb-4"
+          alt="Image du streamer"
+        />
+
+        <!-- Contenu principal -->
+        <div v-if="!isLoading" class="w-full max-w-4xl">
           <div class="mb-8 text-center">
             <h2 class="text-white text-lg font-semibold mb-4">Duel en cours</h2>
 
@@ -276,9 +288,11 @@ onUnmounted(async () => {
               </div>
             </div>
           </div>
+
           <div class="text-white text-xl font-bold mb-4 text-center">
             {{ currentPlayListInfo.playlistName }}
           </div>
+
           <div v-if="playlistTracks.length > 0" class="divide-y divide-gray-700">
             <PlaylistTrackRow v-for="track in playlistTracks" :key="track.trackId" :track="track" />
           </div>

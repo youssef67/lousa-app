@@ -40,7 +40,6 @@ export const useSpecialRouter = () => {
   const pushDashboard = (push: boolean = true): string => push2('/dashboard', push)
   const pushMyAccount = (push: boolean = true): string => push2('/me', push)
   const pushEditProfile = (push: boolean = true): string => push2('/me/info', push)
-  const pushStats = (push: boolean = true): string => push2('/me/stats', push)
   const pushManageStreamer = (push: boolean = true): string => push2('/me/streamer', push)
   const pushSetting = (push: boolean = true): string => push2('/me/settings', push)
   const pushPlaylist = (push: boolean = true): string => push2('/playlist', push)
@@ -63,6 +62,8 @@ export const useSpecialRouter = () => {
 
   // Redirection vers `/space/:username`
   const pushSpaceStreamerForViewer = (streamer: string, push: boolean = true): string => push2('/viewer/streamer/space', push, { streamer })
+  const pushStats = (userId: string, push: boolean = true): string => push2('/me/stats', push, { userId })
+
 
   // const pushSpaceViewer = (id: string, push: boolean = true): string => push2('/viewer/:id', push, undefined, { id })
 

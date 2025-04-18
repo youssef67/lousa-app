@@ -31,9 +31,9 @@ const proceedResult = async (amount: number) => {
       amount
     )
 
-    console.log('response', response)
     if (response) {
       sessionStore.updateSessionVirtualCurrency(response.user.amountVirtualCurrency)
+      showSuccess('Merci pour votre vote et votre soutien à votre streamer !')
     }
   }
 

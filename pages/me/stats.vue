@@ -1,8 +1,13 @@
 <script lang="ts" setup>
 import type { StatsResponse } from '~/types/viewer.type'
 
+const route = useRoute()
+const userId = computed(
+  () => route.query.userId as string | undefined
+)
 
 const userStats = ref<StatsResponse>({
+  userName: '',
   tracksVersus: {
     completed: 0,
     votingInProgress: 0,
@@ -15,10 +20,11 @@ const userStats = ref<StatsResponse>({
   },
 })
 const { runGetStats } = useViewerRepository()
+const sessionStore = useSessionStore()
 
 
 onMounted(async () => {
-  const stats = await runGetStats()
+  const stats = await runGetStats(userId.value)
 
   if (stats) {
     userStats.value = stats
@@ -28,7 +34,8 @@ onMounted(async () => {
 
 <template>
   <UContainer>
-    <div class="text-4xl font-medium w-full mb-10">Mes Statistiques</div>
+    <div v-if="sessionStore.session.user.id === userId" class="text-4xl font-medium w-full mb-10">Mes Statistiques</div>
+    <div v-else class="text-4xl font-medium w-full mb-10">Statistiques de {{ userStats.userName }}</div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       

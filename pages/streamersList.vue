@@ -5,11 +5,13 @@ import { useDebounceFn } from '@vueuse/core'
 const { runGetStreamersList } = useSessionRepository()
 const streamersList = ref<SpaceStreamerProfile[]>([]) // Liste paginée pour affichage
 const allStreamersList = ref<SpaceStreamerProfile[]>([]) // Contient tous les streamers chargés
+const allStreamersActiveList = ref<SpaceStreamerProfile[]>([]) // Liste des streamers actifs
 const filteredStreamers = ref<SpaceStreamerProfile[]>([]) // Résultat de la recherche
 const paginatedStreamers = ref<SpaceStreamerProfile[]>([]) // Liste finale après recherche + pagination
 const currentPage = ref(1)
 const totalPages = ref(1)
 const searchQuery = ref('')
+const showOnlyActive = ref(false)
 const perPage = 15
 const isFetchingAll = ref(false) // Pour éviter de recharger inutilement
 
@@ -31,8 +33,14 @@ const fetchAllStreamers = async () => {
 
   allStreamersList.value = allStreamers
   filteredStreamers.value = allStreamers
+  allStreamersActiveList.value = allStreamers.filter(
+    streamer => streamer.twitchUserId !== null
+  )
+
+  console.log('allStreamersActiveList', allStreamersActiveList.value)
   updatePaginatedStreamers()
 }
+
 
 // Fonction pour charger les streamers d'une page spécifique (pagination normale)
 const fetchStreamers = async (page: number) => {
@@ -56,26 +64,44 @@ const updatePaginatedStreamers = () => {
 
 // **Ajout du debounce pour la recherche**
 const debouncedSearch = useDebounceFn(() => {
-  currentPage.value = 1 // Reset à la première page lors d'une recherche
+  currentPage.value = 1
 
-  if (!searchQuery.value) {
-    filteredStreamers.value = allStreamersList.value
-  } else {
-    filteredStreamers.value = allStreamersList.value.filter(streamer =>
+  // Source selon l'état du filtre
+  const baseList = showOnlyActive.value
+    ? allStreamersActiveList.value
+    : allStreamersList.value
+
+  let filtered = baseList
+
+  if (searchQuery.value) {
+    filtered = filtered.filter(streamer =>
       streamer.twitchUserLogin
         .toLowerCase()
         .includes(searchQuery.value.toLowerCase())
     )
   }
 
-  totalPages.value = Math.ceil(filteredStreamers.value.length / perPage)
+  filteredStreamers.value = filtered
+  totalPages.value = Math.ceil(filtered.length / perPage)
   updatePaginatedStreamers()
-}, 300) // 300ms de délai avant d'exécuter la recherche
+}, 300)
 
 // Surveille searchQuery mais applique le debounce
 watch(searchQuery, () => {
   debouncedSearch()
 })
+
+const selectActiveStreamers = () => {
+  showOnlyActive.value = true
+  searchQuery.value = '' // (optionnel) reset recherche
+  debouncedSearch()
+}
+
+const showAllStreamers = () => {
+  showOnlyActive.value = false
+  searchQuery.value = '' // (optionnel) reset recherche
+  debouncedSearch()
+}
 
 // Surveille la page actuelle pour mettre à jour la liste affichée
 watch(currentPage, () => {
@@ -107,15 +133,29 @@ const prevPage = () => {
     <h1 class="text-2xl font-bold mb-4">Liste des streamers</h1>
 
     <!-- Champ de recherche avec debounce -->
-    <div class="mb-6 flex justify-center">
-      <UInput
-        v-model="searchQuery"
-        placeholder="Rechercher un streamer"
-        size="xl"
-        class="w-1/2"
-        icon="i-tabler-search"
-      />
-    </div>
+    <div class="mb-6 flex justify-center gap-4 items-center flex-wrap">
+  <UInput
+    v-model="searchQuery"
+    placeholder="Rechercher un streamer"
+    size="xl"
+    class="w-full md:w-1/2"
+    icon="i-tabler-search"
+  />
+  <UButton
+    label="Streamers Actifs"
+    icon="i-tabler-lock-open-2"
+    :variant="showOnlyActive ? 'solid' : 'outline'"
+    color="primary"
+    @click="selectActiveStreamers"
+  />
+  <UButton
+    label="Tous les streamers"
+    icon="i-tabler-users-group"
+    :variant="!showOnlyActive ? 'solid' : 'outline'"
+    color="gray"
+    @click="showAllStreamers"
+  />
+</div>
 
     <!-- Vérifie si la liste est vide -->
     <div v-if="paginatedStreamers.length === 0" class="text-gray-500">

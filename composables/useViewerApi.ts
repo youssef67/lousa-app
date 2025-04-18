@@ -139,9 +139,11 @@ export const useViewerApi = () => {
     }
   }
 
-  const getStats = async (): Promise<StatsResponse> => {
+  const getStats = async (userId: string): Promise<StatsResponse> => {
     try {
-      const response = await fetch('/api/v1/viewer/stats', {
+      const url = `/api/v1/viewer/stats?userId=${userId}`
+
+      const response = await fetch(url, {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache'

@@ -102,9 +102,9 @@ onMounted(async () => {
     side="left"
   >
     <div class="p-4 flex flex-col h-full">
-      <div class="flex justify-between items-center mb-4">
+      <!-- Header : Logo + Close -->
+      <div class="flex justify-between items-center mb-6">
         <UIcon name="my-icon:logo-name" size="40" mode="svg" />
-
         <UButton
           variant="ghost"
           icon="i-tabler-x"
@@ -114,37 +114,40 @@ onMounted(async () => {
         />
       </div>
 
-      <UInput
-        ref="inputText"
-        v-model="dataName"
-        input-text
-        type="text"
-        :placeholder="
-          displayPlaylist ? 'Rechercher une playlist' : 'Rechercher un streamer'
-        "
-        required
-        size="sm"
-        icon="i-tabler-search"
-        autocomplete="off"
-        class="flex mt-12"
-      />
+      <!-- Barre de recherche -->
+      <div class="mb-4">
+        <UInput
+          ref="inputText"
+          v-model="dataName"
+          type="text"
+          :placeholder="displayPlaylist ? 'Rechercher une playlist' : 'Rechercher un streamer'"
+          size="md"
+          icon="i-tabler-search"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
 
-      <div class="flex-1 overflow-y-auto">
+      <!-- Switch entre playlists et streamers -->
+      <div class="mb-6">
         <UButton
-          :label="
-            displayPlaylist
-              ? 'Voir les streamers favoris'
-              : 'Voir les playlists favorites'
-          "
-          variant="solid"
-          size="xl"
-          color="secondary"
-          class="mb-4"
+          :label="displayPlaylist ? 'Voir les streamers favoris' : 'Voir les playlists favorites'"
+          variant="outline"
+          size="sm"
+          color="red"
+          class="w-full justify-center text-center"
           @click="toggleDataType"
         />
+      </div>
 
+      <!-- Contenu scrollable -->
+      <div class="flex-1 overflow-y-auto space-y-6 mt-5 px-1">
         <template v-if="filteredData.length > 0">
-          <div v-for="item in filteredData" :key="item.id" class="mt-2 mx-2">
+          <div
+            v-for="item in filteredData"
+            :key="item.id"
+            class="transition-all duration-300 hover:scale-[1.02]"
+          >
             <FavoritePlaylistCardSlider
               v-if="displayPlaylist"
               :item="item as PlaylistFavorite"
@@ -160,21 +163,23 @@ onMounted(async () => {
           </div>
         </template>
 
-        <div v-else class="text-center mt-4 text-gray-500">
+        <!-- Aucune donnée -->
+        <div v-else class="text-center text-gray-500 mt-10 space-y-4">
           <p v-if="displayPlaylist">Aucune playlist en favoris</p>
           <p v-else>Aucun streamer en favoris</p>
           <UButton
-            label="Liste des streamers"
+            label="Voir tous les streamers"
             variant="solid"
-            size="xl"
+            size="md"
             color="secondary"
-            @click="pushStreamers()"
+            @click="pushStreamers"
           />
         </div>
       </div>
     </div>
   </USlideover>
 </template>
+
 
 <style scoped>
 .flex-1::-webkit-scrollbar {

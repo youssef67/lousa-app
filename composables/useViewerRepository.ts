@@ -84,9 +84,9 @@ export const useViewerRepository = () => {
     }
   }
 
-  const runGetStats = async () => {
+  const runGetStats = async (userId: string) => {
     try {
-      const response = await getStats()
+      const response = await getStats(userId)
       return response
     } catch (error) {
       logger.e('Error logging out', error)

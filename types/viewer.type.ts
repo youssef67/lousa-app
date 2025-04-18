@@ -42,6 +42,7 @@ export interface GetStreamerProfileResponse {
 }
 
 export interface StatsResponse {
+  userName: string
   tracksVersus: {
     completed: number
     votingInProgress: number

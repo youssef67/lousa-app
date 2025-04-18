@@ -11,6 +11,7 @@ const props = defineProps<{
 const delay = ref(props.track.position * 100)
 
 const sessionStore = useSessionStore()
+const { pushStats } = useSpecialRouter()
 const userId = ref(sessionStore.session.user.id)
 
 const isOwner = computed(() => props.track.user.id === userId.value)
@@ -26,6 +27,11 @@ const playTrack = () => {
   window.open(props.track.url, '_blank')
 }
 
+const goToUserProfile = (userId: string) => {
+  // Exemple : redirige vers un profil public
+  useRouter().push(`/user/${userId}`)
+}
+
 onMounted(async () => {
   if (isOwner.value) {
     await nextTick()
@@ -36,11 +42,7 @@ onMounted(async () => {
 <template>
   <div class="relative">
     <div v-if="isOwner" class="absolute inset-0 z-0">
-      <span
-        v-for="i in 20"
-        :key="i"
-        :class="`particle-${track.playlistTrackId}`"
-      ></span>
+      <span v-for="i in 20" :key="i" :class="`particle-${track.playlistTrackId}`"></span>
     </div>
 
     <!-- Track avec bordure personnalisée -->
@@ -55,7 +57,7 @@ onMounted(async () => {
         'relative z-10 flex items-center gap-4 py-3 px-4 rounded-lg transition duration-200',
         isOwner
           ? 'border-2 border-yellow-400 shadow-yellow-500/50 shadow-lg'
-          : 'bg-gray-900 hover:bg-gray-800'
+          : 'bg-gray-900 hover:bg-gray-800',
       ]"
     >
       <!-- Crown -->
@@ -66,33 +68,28 @@ onMounted(async () => {
           alt="Crown"
           class="w-16 h-16 rounded-lg object-cover"
         />
-        <div
-          v-else
-          class="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center"
-        >
-          <span class="text-gray-400 text-sm font-bold"
-            >#{{ track.position }}</span
-          >
+        <div v-else class="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center">
+          <span class="text-gray-400 text-sm font-bold">#{{ track.position }}</span>
         </div>
         <span class="text-xs text-gray-400 mt-1">Score: {{ track.score }}</span>
-        <span class="text-xs text-gray-400 mt-1"
-          >Louz: {{ track.specialScore }}</span
-        >
+        <span class="text-xs text-gray-400 mt-1">Louz: {{ track.specialScore }}</span>
       </div>
 
       <!-- Cover -->
-      <img
-        :src="track.cover"
-        alt="Cover"
-        class="w-16 h-16 rounded-md object-cover"
-      />
+      <img :src="track.cover" alt="Cover" class="w-16 h-16 rounded-md object-cover" />
 
       <!-- Infos -->
       <div class="flex-1">
         <h3 class="text-lg font-medium text-white">{{ track.trackName }}</h3>
         <p class="text-gray-400 text-sm">{{ track.artistName }}</p>
         <p class="text-gray-500 text-xs">
-          Ajouté par <span class="text-white">{{ track.user.userName }}</span>
+          Ajouté par
+          <span
+            class="text-white hover:underline hover:text-blue-400 cursor-pointer"
+            @click="pushStats(track.user.id, true)"
+          >
+            {{ track.user.userName }}
+          </span>
         </p>
       </div>
 
