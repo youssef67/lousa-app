@@ -25,9 +25,9 @@ const updateIsOpen = (value: boolean) => {
 async function onCreateClick() {
   loading.value = true
   try {
-    const newPlaylist = await runCreatePlaylist(playlistName.value)
+    const response = await runCreatePlaylist(playlistName.value)
     toast.showSuccess('Playlist créée avec succès')
-    emit('proceedResult', newPlaylist.playlist)
+    emit('proceedResult', response.playlistCreated)
   } catch (error) {
     handleError(error)
   } finally {

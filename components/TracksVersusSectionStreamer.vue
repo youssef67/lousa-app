@@ -6,13 +6,9 @@ const props = defineProps({
     type: Object as PropType<TracksVersus>,
     required: true,
   },
-  handleSearchTrack: {
-    type: Function as PropType<(trackName: string) => Promise<void>>,
-    required: true,
-  },
 })
 const isOpenSpecialLikeModal = ref(false)
-const { runLikeTrack, runSpecialLikeTrack } = usePlaylistRepository()
+const { runLikeTrack, runSpecialLikeTrack, runSetGoldenLike } = usePlaylistRepository()
 const sessionStore = useSessionStore()
 const targetTrack = ref(0)
 const firstTrack = ref<VersusTrack>(props.currentTracksVersus.firstTrack)
@@ -59,6 +55,12 @@ const proceedLike = async (trackId: string, targetTrack: number) => {
   }
 }
 
+const proceedGoldenLike = async (trackId: string, targetTrack: number) => {
+  const response = await runSetGoldenLike(props.currentTracksVersus.id, trackId, targetTrack)
+  console.log('golden like')
+  console.log('trackId', trackId)
+  console.log('targetTrack', targetTrack)
+}
 
 watch(
   () => props.currentTracksVersus,
@@ -82,8 +84,9 @@ watch(
         :indexTrack="1"
         :track="firstTrack"
         :isComplete="isComplete"
-        :isStreamer="false"
+        :isStreamer="true"
         @proceedSpecialLike="proceedSpecialLike"
+        @proceedGoldenLike="proceedGoldenLike"
         @proceedLike="proceedLike"
         class="w-full md:w-1/3"
       />
@@ -101,8 +104,9 @@ watch(
         :indexTrack="2"
         :track="secondTrack"
         :isComplete="isComplete"
-        :isStreamer="false"
+        :isStreamer="true"
         @proceedSpecialLike="proceedSpecialLike"
+        @proceedGoldenLike="proceedGoldenLike"
         @proceedLike="proceedLike"
         class="w-full md:w-1/3"
       />

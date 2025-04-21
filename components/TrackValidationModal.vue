@@ -16,45 +16,53 @@ const props = defineProps({
     required: true
   }
 })
+
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
+
 const toast = useSpecialToast()
 const { runAddPendingTrack } = usePlaylistRepository()
 
-const pendingTrackValidation = async (trackChosen: Track) => {
-  const response = await runAddPendingTrack(props.playlistId, trackChosen)
+const handleTrackValidation = async (track: Track) => {
+  const response = await runAddPendingTrack(props.playlistId, track)
 
-  if (response.result === PendingAddResult.VOTING) {
-    toast.showSuccess('Votre musique est soumise au vote du public')
-  } else if (response.result === PendingAddResult.ON_HOLD) {
-    toast.showError('Votre musique est en file d\'attente')
-  } else if (response.result === PendingAddResult.MISSING) {
-    toast.showSuccess('Votre musique est en attente d\'un adversaire')
-  } else if (response.result === PendingAddResult.LIMIT_REACH) {
-    toast.showError('Vous avez atteint le nombre maximum de musiques à soumettre')
+  console.log('response', response.result)
+  switch (response.result) {
+    case PendingAddResult.VOTING:
+      toast.showSuccess('Votre musique est soumise au vote du public')
+      break
+    case PendingAddResult.ON_HOLD:
+      toast.showSuccess('Votre musique est en file d\'attente')
+      break
+    case PendingAddResult.MISSING:
+      toast.showSuccess('Votre musique est en attente d\'un adversaire')
+      break
+    case PendingAddResult.LIMIT_REACH:
+      toast.showError('Vous avez atteint le nombre maximum de musiques à soumettre')
+      break
   }
-  updateIsOpen(false)
+
+  closeModal()
 }
 
-const updateIsOpen = (value: boolean) => {
-  emit('update:isOpen', value)
-  if (!value) {
-    emit('proceedResult', null)
-  }
+const closeModal = () => {
+  emit('update:isOpen', false)
+  emit('proceedResult', null)
 }
 </script>
 
 <template>
-  <UModal :model-value="isOpen" @update:model-value="updateIsOpen">
+  <UModal :model-value="isOpen" @update:model-value="closeModal">
     <div class="p-4">
       <div class="relative flex flex-grow">
         <p class="mx-auto font-bold text-3xl">Résultat de la recherche</p>
+
         <UButton
           variant="ghost"
           icon="i-tabler-x"
           color="black"
           size="xl"
           class="absolute top-0 right-0"
-          @click="updateIsOpen(false)"
+          @click="closeModal"
         />
       </div>
 
@@ -65,7 +73,7 @@ const updateIsOpen = (value: boolean) => {
       >
         <TrackInfoCard
           :track="item"
-          @track-validation="pendingTrackValidation"
+          @track-validation="handleTrackValidation"
         />
       </div>
     </div>

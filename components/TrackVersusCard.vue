@@ -15,13 +15,17 @@ const props = defineProps({
     type: Boolean,
     required: false,
   },
+  isStreamer: {
+    type: Boolean,
+    required: false,
+  },
 })
 
 const baseBtnClass = 'w-full md:w-[220px] p-2 rounded-full text-sm transition duration-200'
 const track = ref<VersusTrack>(props.track)
 const isComplete = ref<boolean>(props.isComplete)
 const animate = ref(false)
-const emit = defineEmits(['proceedSpecialLike', 'proceedLike'])
+const emit = defineEmits(['proceedSpecialLike', 'proceedLike', 'proceedGoldenLike'])
 
 const sessionStore = useSessionStore()
 
@@ -29,10 +33,15 @@ const playTrack = () => {
   window.open(props.track.url, '_blank')
 }
 
-const SetSpecialLike = () => {
+const setSpecialLike = () => {
   animate.value = true
   setTimeout(() => (animate.value = false), 200)
   emit('proceedSpecialLike', props.indexTrack)
+}
+
+const setGoldenLike = () => {
+  console.log('golden like')
+  emit('proceedGoldenLike', props.track.trackId, props.indexTrack)
 }
 
 const likeTrack = async (trackId: string, targetTrack: number) => {
@@ -85,25 +94,24 @@ watch(
     <p class="text-gray-400 text-xs">
       {{ track.artistName }}
     </p>
-    <div class="text-green-400 text-sm font-bold">{{ track.scoreAndLikes.trackScore }} pts</div>
-    <div class="text-green-400 text-sm font-bold">
-      {{ track.scoreAndLikes.listOfUserIdWhoLiked.length }} like
-    </div>
-    <div
-      class="text-green-400 text-sm font-bold"
-      v-if="sessionStore.session.user.id === track.user.id && track.scoreAndLikes.specialLike > 0"
-    >
-      {{ track.scoreAndLikes.specialLike }} louz dépensés
-    </div>
+
     <!-- Vote button -->
     <div v-if="isComplete" class="flex flex-col justify-center items-center gap-2 mt-2">
+      <div class="text-green-400 text-sm font-bold">{{ track.scoreAndLikes.trackScore }} pts</div>
+      <div class="text-green-400 text-sm font-bold">{{ nbLikes }} like</div>
+      <div
+        class="text-green-400 text-sm font-bold"
+        v-if="sessionStore.session.user.id === track.user.id && track.scoreAndLikes.specialLike > 0"
+      >
+        {{ track.scoreAndLikes.specialLike }} louz dépensés
+      </div>
       <div v-if="sessionStore.session.user.id === track.user.id">
         <div v-if="track.scoreAndLikes.specialLike === 0">
           <UButton
             :class="[baseBtnClass, animate ? 'scale-105' : 'scale-100']"
             icon="i-tabler-music-up"
             label="Utiliser des louz"
-            @click="SetSpecialLike()"
+            @click="setSpecialLike()"
           />
         </div>
         <div v-else>
@@ -126,6 +134,14 @@ watch(
       >
         {{ alreadyLiked ? 'Déjà liké' : 'Liker la musique' }}
       </UButton>
+      <UButton
+        v-if="props.isStreamer"
+        :class="baseBtnClass"
+        icon="i-tabler-heart-star"
+        size="sm"
+        label="Golden Like"
+        @click="setGoldenLike"
+      />
       <UButton
         :class="baseBtnClass"
         icon="i-tabler-play"

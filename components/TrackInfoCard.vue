@@ -7,27 +7,29 @@ const props = defineProps({
     required: true
   }
 })
-const emit = defineEmits(['trackValidation'])
 
-async function chooseTrack() {
-  emit('trackValidation', props.track)
+const emit = defineEmits(['track-validation'])
+
+const chooseTrack = () => {
+  emit('track-validation', props.track)
 }
-
 </script>
 
 <template>
-  <div class="flex flex-row">
-    <h1>{{ props.track.trackName }} / </h1>
-    <p>{{ props.track.artistName }}</p>
+  <div class="flex items-center justify-between p-3 border rounded-xl shadow-sm">
+    <div class="flex flex-col">
+      <h2 class="text-lg font-semibold">{{ track.trackName }}</h2>
+      <p class="text-sm text-gray-600">{{ track.artistName }}</p>
+    </div>
+
     <UButton
       label="Choisir ce son"
       variant="solid"
       size="sm"
       color="secondary"
-      class="flex"
-      @click="chooseTrack()"
+      @click="chooseTrack"
     />
   </div>
 </template>
 
-<style></style>
+<style scoped></style>

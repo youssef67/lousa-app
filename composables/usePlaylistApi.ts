@@ -8,6 +8,8 @@ import type {
   GetTracksVersusResponse,
   AddTracksResponse,
   GetPlaylistSelectedResponse,
+  GetPlaylistUpdatedForStreamerResponse,
+  SetGoldenLikeResponse
 } from '~/types/playlist.type'
 
 export const usePlaylistApi = () => {
@@ -145,6 +147,39 @@ export const usePlaylistApi = () => {
     }
   }
 
+  const getPlaylistUpdatedForStreamer = async (playlistId: string): Promise<GetPlaylistUpdatedForStreamerResponse> => {
+    try {
+      const url = `/api/v1/playlist/updated/streamer?playlistId=${playlistId}`
+
+      const response = await fetch(url, {
+        method: FetchMethod.GET,
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache',
+      })
+      return response as GetPlaylistUpdatedForStreamerResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
+  const setGoldenLike = async (
+    tracksVersusId: string,
+    trackId: string,
+    targetTrack: number
+  ): Promise<SetGoldenLikeResponse> => {
+    try {
+      const response = await fetch('/api/v1/playlist/golden-like', {
+        method: FetchMethod.POST,
+        body: { tracksVersusId, trackId, targetTrack },
+        headers: sessionStore.defaultHeaders(),
+        cache: 'no-cache',
+      })
+      return response as SetGoldenLikeResponse
+    } catch (error) {
+      await proceedApiError(error)
+    }
+  }
+
   return {
     searchTrack,
     addTrack,
@@ -154,5 +189,7 @@ export const usePlaylistApi = () => {
     specialLikeTrack,
     getTracksVersus,
     getPlaylistSelected,
+    getPlaylistUpdatedForStreamer,
+    setGoldenLike
   }
 }

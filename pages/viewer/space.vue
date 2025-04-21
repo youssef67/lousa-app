@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type Subscription, Transmit } from '@adonisjs/transmit-client'
+import { type Subscription } from '@adonisjs/transmit-client'
 import type {
   Track,
   playlistInfo,
@@ -89,7 +89,6 @@ const proceedUpdateAll = async () => {
   await new Promise(resolve => setTimeout(resolve, 1500))
   const response = await runAddTrack(currentTracksVersus.value.id)
 
-  console.log('response runAddTrack', response)
   if (response) {
     currentTracksVersus.value = response.currentTracksVersus
     playlistTracks.value = response.playlistsTracks
@@ -158,7 +157,6 @@ async function setTransmitSubscription(playlistId: string) {
     })
 
     likeUpdated.onMessage(async (data: LikeTrackResponse) => {
-      console.log('likeUpdated', data)
       currentTracksVersus.value = data.currentTracksVersus
     })
 
@@ -171,10 +169,8 @@ async function setTransmitSubscription(playlistId: string) {
 }
 
 onMounted(async () => {
-  console.log('🔁 Transmit check', Transmit)
 
   try {
-    console.log('onMounted')
     const response = await runGetPlaylistSelected()
 
     if (response) {
@@ -191,7 +187,7 @@ onUnmounted(async () => {
 </script>
 
 <template>
-  <UContainer class="flex flex-col space-y-10">
+  <UContainer class="flex flex-col max-w-full space-y-10">
     <!-- <h1>Espace viewer {{ sessionStore.session?.user.email }}</h1> -->
     <section class="flex flex-wrap gap-4 md:flex-nowrap md:gap-2 w-full">
       <UButton
@@ -271,7 +267,7 @@ onUnmounted(async () => {
         />
 
         <!-- Contenu principal -->
-        <div v-if="!isLoading" class="w-full max-w-4xl">
+        <div v-if="!isLoading" class="w-full max-w-6xl">
           <div class="mb-8 text-center">
             <h2 class="text-white text-lg font-semibold mb-4">Duel en cours</h2>
 

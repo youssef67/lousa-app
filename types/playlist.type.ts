@@ -1,5 +1,6 @@
 import type { UserSession } from './session.type.js'
 import { PendingAddResult } from '~/utils/playlist/PlaylistResult.ts.js'
+import type { StreamerPlaylist } from './streamer.type.js'
 
 export interface SearchTracksResponse {
   foundTracks: Track[]
@@ -23,7 +24,21 @@ export interface AddTracksResponse {
   currentUser: UserSession
 }
 
+export interface GetPlaylistUpdatedForStreamerResponse {
+  playlistsTracks: BroadcastTrack[]
+  currentTracksVersus: TracksVersus
+  playlists: StreamerPlaylist[]
+  playlistInfoOfPlaylistSelected: {
+    id: string
+    playlistName: string
+  }
+}
+
 export interface LikeTracksResponse {
+  result: boolean
+}
+
+export interface SetGoldenLikeResponse {
   result: boolean
 }
 
@@ -73,7 +88,7 @@ export interface playlistInfo {
 }
 
 export interface CreatePlaylistResponse {
-  playlist: PlaylistCardInfo
+  playlistCreated: StreamerPlaylist
 }
 
 export interface DeletePlaylistResponse {
@@ -106,7 +121,8 @@ export interface PlaylistTrack {
 }
 
 export interface AddTrackResponse {
-  playlistTracksUpdated?: BroadcastTrack[]
+  playlistTracksUpdated: BroadcastTrack[]
+  userWinner?: UserSession
 }
 
 export interface LikeTrackResponse {

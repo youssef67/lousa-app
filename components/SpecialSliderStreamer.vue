@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
-import type { PlaylistCardInfo } from '~/types/playlist.type'
+import type { StreamerPlaylist } from '~/types/streamer.type'
 
 const props = defineProps({
   isOpen: {
@@ -8,42 +8,70 @@ const props = defineProps({
     required: true
   },
   playlists: {
-    type: Object as PropType<PlaylistCardInfo[]>,
+    type: Object as PropType<StreamerPlaylist[]>,
     required: true
   },
-  openedByStreamer: {
-    type: Boolean,
-    required: false
-  }
 })
 
 const inputText = ref(null)
 const playlistName = ref('')
-const streamerStore = useStreamerStore()
+const playlistsOfStreamer = ref<StreamerPlaylist[]>(props.playlists)
 
-const isCreatePlaylistModalOpen = ref(false)
-const emit = defineEmits(['update:isOpen', 'proceedResult'])
+const emit = defineEmits(['update:isOpen', 'changePlaylist', 'deletePlaylist'])
 
 const closeSlider = () => {
   playlistName.value = ''
   emit('update:isOpen', false)
 }
 
+const selectPlaylist = (value: string) => {
+  emit('update:isOpen', false)
+  if (value) {
+    emit('changePlaylist', value)
+  }
+}
+
+const deletePlaylist = async (id: string) => {
+  emit('deletePlaylist', id)
+  // const playlistToDelete = playlistsOfStreamer.value.find(
+  //   playlist => playlist.id === id
+  // )
+
+  // const response = await runDeletePlaylist(playlistToDelete.id)
+
+  // if (response.result) {
+  //   playlistsOfStreamer.value = playlistsOfStreamer.value.filter(
+  //     playlist => playlist.id !== id
+  //   )
+  //   showSuccess('Playlist supprimée avec succès')
+  // } else {
+  //   showError('Erreur lors de la suppression de la playlist')
+  // }
+}
+
 const filteredPlaylists = computed(() => {
   if (!playlistName.value) {
-    return props.playlists
+    return playlistsOfStreamer.value
   }
-  return props.playlists.filter(playlist =>
+  return playlistsOfStreamer.value.filter(playlist =>
     playlist.playlistName
       .toLowerCase()
       .includes(playlistName.value.toLowerCase())
   )
 })
 
-const proceedResult = (playlist: PlaylistCardInfo) => {
-  streamerStore.addPlaylistsToList(playlist)
-  isCreatePlaylistModalOpen.value = false
-}
+// const proceedResult = (playlist: PlaylistCardInfo) => {
+//   streamerStore.updateStreamerPlaylists(playlistsOfStreamer.value)
+//   isCreatePlaylistModalOpen.value = false
+// }
+
+watch(
+  () => props.playlists,
+  newValue => {
+    playlistsOfStreamer.value = newValue
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -79,8 +107,7 @@ const proceedResult = (playlist: PlaylistCardInfo) => {
         :trailing="true"
       />
       <div class="flex-1 overflow-y-auto">
-        <UButton
-          v-if="props.openedByStreamer"
+        <!-- <UButton
           label="créer la playlist"
           type="submit"
           variant="solid"
@@ -92,7 +119,7 @@ const proceedResult = (playlist: PlaylistCardInfo) => {
               isCreatePlaylistModalOpen = true
             }
           "
-        />
+        /> -->
         <template v-if="filteredPlaylists.length > 0">
           <div
             v-for="playlist in filteredPlaylists"
@@ -101,7 +128,8 @@ const proceedResult = (playlist: PlaylistCardInfo) => {
           >
             <PlaylistCardSliderStreamer
               :playlist="playlist"
-              :closeSlider="closeSlider"
+              @select-playlist="selectPlaylist"
+              @delete-playlist="deletePlaylist"
             />
           </div>
         </template>
@@ -111,10 +139,6 @@ const proceedResult = (playlist: PlaylistCardInfo) => {
       </div>
     </div>
   </USlideover>
-  <CreatePlaylistModal
-    :is-open="isCreatePlaylistModalOpen"
-    @proceed-result="proceedResult"
-  />
 </template>
 
 <style scoped>

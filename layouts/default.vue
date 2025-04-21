@@ -4,7 +4,10 @@ const { pushSpaceViewer } = useSpecialRouter()
 const route = useRoute()
 
 const shouldShowButton = computed(() => {
-  return !['/landing', '/', '/viewer/space'].includes(route.path)
+  const excludedRoutes = ['/', '/landing', '/viewer/space']
+  const isExcluded = excludedRoutes.includes(route.path)
+  const isStreamerRoute = route.path.startsWith('/streamer/')
+  return !(isExcluded || isStreamerRoute)
 })
 </script>
 

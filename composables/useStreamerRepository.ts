@@ -8,7 +8,8 @@ export const useStreamerRepository = () => {
     createPlaylist,
     deletePlaylist,
     addStreamer,
-    updateStreamersList
+    updateStreamersList,
+    getSpaceStreamerInfo
   } = useStreamerApi()
   const logger = useSpecialLogger()
   const { newError } = useSpecialError()
@@ -56,9 +57,9 @@ export const useStreamerRepository = () => {
     }
   }
 
-  const runDeletePlaylist = async (playlistName: string) => {
+  const runDeletePlaylist = async (playlistId: string) => {
     try {
-      const response = await deletePlaylist(playlistName)
+      const response = await deletePlaylist(playlistId)
       return response
     } catch (error) {
       logger.e('Error logging out', error)
@@ -108,6 +109,16 @@ export const useStreamerRepository = () => {
     }
   }
 
+  const runGetSpaceStreamerInfo = async () => {
+    try {
+      const res = await getSpaceStreamerInfo()
+
+      return res
+    } catch (error) {
+      logger.e('Error logging out', error)
+    }
+  }
+
   return {
     runSetAndGetPLaylistSelected,
     runCheckIfStreamer,
@@ -116,6 +127,7 @@ export const useStreamerRepository = () => {
     runCreatePlaylist,
     runDeletePlaylist,
     runAddStreamer,
-    runUpdateStreamersList
+    runUpdateStreamersList,
+    runGetSpaceStreamerInfo
   }
 }

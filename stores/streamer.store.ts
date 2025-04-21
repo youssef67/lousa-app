@@ -1,13 +1,14 @@
 import type {
   SpaceStreamerProfile,
-  GetStreamerProfileResponse
+  GetStreamerProfileResponse,
+  StreamerPlaylist
 } from '~~/types/streamer.type.js'
 import type { PlaylistCardInfo } from '~~/types/playlist.type.js'
 
 export const useStreamerStore = defineStore('streamer', () => {
   const spaceStreamerProfile = ref<SpaceStreamerProfile>()
   const playlistSelected = ref<PlaylistCardInfo | null>(null)
-  const streamerPlaylists = ref<PlaylistCardInfo[]>([])
+  const streamerPlaylists = ref<StreamerPlaylist[]>([])
 
   const updateSpaceStreamerProfile = async (data: SpaceStreamerProfile) => {
     if (!spaceStreamerProfile.value) {
@@ -17,7 +18,7 @@ export const useStreamerStore = defineStore('streamer', () => {
     spaceStreamerProfile.value = data
   }
 
-  const updateStreamerPlaylists = async (playlists: PlaylistCardInfo[]) => {
+  const updateStreamerPlaylists = async (playlists: StreamerPlaylist[]) => {
     streamerPlaylists.value = playlists
   }
 
@@ -27,30 +28,12 @@ export const useStreamerStore = defineStore('streamer', () => {
     playlistSelected.value = data.playlistSelected
   }
 
-  const addPlaylistsToList = (playlist: PlaylistCardInfo) => {
-    if (playlist !== undefined) {
-      streamerPlaylists.value.push(playlist)
-    }
-  }
-
-  const deletePlaylistsToList = (playlistIdToDelete: string) => {
-    const indexPlaylistToDelete = streamerPlaylists.value.findIndex(
-      playlist => playlist.id === playlistIdToDelete
-    )
-
-    if (indexPlaylistToDelete === -1) return false
-
-    streamerPlaylists.value.splice(indexPlaylistToDelete, 1)
-    return false
-  }
-
   return {
     spaceStreamerProfile,
     playlistSelected,
     streamerPlaylists,
     updateSpaceStreamerProfile,
-    addPlaylistsToList,
-    deletePlaylistsToList,
-    updateSpaceStreamer
+    updateSpaceStreamer,
+    updateStreamerPlaylists
   }
 })
