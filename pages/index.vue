@@ -23,6 +23,10 @@ const goToStreamerSpace = () => {
   pushSpaceStreamer()
 }
 
+const proceedResult = () => {
+  pushSpaceViewer()
+}
+
 </script>
 
 <template>
@@ -91,6 +95,7 @@ const goToStreamerSpace = () => {
       <CompleteUserNameModal
         :is-open="isCompleteUserNameModalOpen"
         @update:isOpen="isCompleteUserNameModalOpen = $event"
+        @proceedResult="proceedResult"
       />
     </section>
   </UContainer>

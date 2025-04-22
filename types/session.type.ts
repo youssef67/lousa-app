@@ -20,6 +20,24 @@ export interface EditUserSessionResponse {
   user: UserSession
 }
 
+export interface GetStreamersListResponse {
+  data: {
+    data: SpaceStreamerProfile[]
+    meta: {
+      currentPage: number
+      firstPage: number
+      firstPageUrl: string
+      lastPage: number
+      lastPageUrl: string
+      nextPageUrl: string
+      perPage: number
+      previousPageUrl: string
+      total: number
+    }
+  }
+  streamersList: SpaceStreamerProfile[]
+}
+
 export interface Session {
   at: string
   di: string
@@ -80,20 +98,3 @@ export interface Auth {
   authId: string
 }
 
-export interface GetStreamersListResponse {
-  data: {
-    data: SpaceStreamerProfile[]
-    meta: {
-      currentPage: number
-      firstPage: number
-      firstPageUrl: string
-      lastPage: number
-      lastPageUrl: string
-      nextPageUrl: string
-      perPage: number
-      previousPageUrl: string
-      total: number
-    }
-  }
-  streamersList: SpaceStreamerProfile[]
-}

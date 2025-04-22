@@ -5,7 +5,6 @@ export const usePlaylistRepository = () => {
     searchTrack,
     getPlaylist,
     addPendingTrack,
-    // getPlaylistTracks,
     likeTrack,
     specialLikeTrack,
     getTracksVersus,
@@ -44,8 +43,6 @@ export const usePlaylistRepository = () => {
       logger.e('Error logging out', error)
     }
   }
-
-
 
   const runGetTracksVersus = async (playlistId: string) => {
     try {
@@ -107,7 +104,6 @@ export const usePlaylistRepository = () => {
   return {
     runSearchTrack,
     runGetPlaylist,
-    // runGetPlaylistTracks,
     runAddPendingTrack,
     runLikeTrack,
     runSpecialLikeTrack,

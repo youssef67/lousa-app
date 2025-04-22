@@ -8,33 +8,12 @@ export interface GetStreamerProfileResponse {
   playlistInfoOfPlaylistSelected: PlaylistInfo | null
 }
 
-export interface StreamerPlaylist {
-  id: string
-  playlistName: string
-  nbTracks: number
-  isSelected: boolean
-  nbFollowers: number
-}
-
-export interface PlaylistInfo {
-  id: string
-  playlistName: string
-}
-
 export interface GetCheckIfStreamerResponse {
   twitchUser: TwitchUserSession
 }
 
 export interface DeleteStreamerProfileResponse {
   result: boolean
-}
-
-export interface SpaceStreamerProfile {
-  id: string
-  spaceName: string
-  spaceStreamerImg: string
-  twitchUserId: string
-  twitchUserLogin: string
 }
 
 export interface SetAndGetPlaylistSelectedResponse {
@@ -52,3 +31,26 @@ export interface UpdateStreamersListResponse {
 export interface GetSpaceStreamerInfoResponse { 
   id: string
 }
+
+export interface StreamerPlaylist {
+  id: string
+  playlistName: string
+  nbTracks: number
+  isSelected: boolean
+  nbFollowers: number
+}
+
+export interface PlaylistInfo {
+  id: string
+  playlistName: string
+}
+
+export interface SpaceStreamerProfile {
+  id: string
+  spaceName: string
+  spaceStreamerImg: string
+  twitchUserId: string
+  twitchUserLogin: string
+}
+
+

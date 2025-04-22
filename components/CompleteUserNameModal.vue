@@ -12,7 +12,6 @@ defineProps({
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 
 const userName = ref('')
-const config = useRuntimeConfig()
 const { $transmit } = useNuxtApp()
 const { runLoginTwitch } = useAuthRepository()
 const isUserNameValid = ref(false) // Pour gérer l'activation du bouton
@@ -20,6 +19,8 @@ const isChecking = ref(false) // Indique si la vérification est en cours
 const isError = ref(false)
 const ErrorMessage = ref('')
 const { runCompleteProfile, runCheckUserNameAvailability } = useViewerRepository()
+const { pushSpaceViewer } = useSpecialRouter()
+
 
 const { handleError } = useSpecialError()
 const sessionStore = useSessionStore()

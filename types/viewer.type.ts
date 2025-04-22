@@ -55,7 +55,6 @@ export interface StatsResponse {
   }
 }
 
-
 export interface SpaceStreamerFavorite {
   id: string
   spaceName: string

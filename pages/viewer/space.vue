@@ -18,7 +18,7 @@ const currentPlayListInfo = ref<playlistInfo | null>(null)
 const trackName = ref('Avant tu riais')
 const { pushStreamers, pushStats } = useSpecialRouter()
 const isTracksValidationModalOpen = ref(false)
-const foundTracks = ref<Track[]>(null)
+const foundTracks = ref<Track[]>([])
 const toast = useSpecialToast()
 const playlistTracks = ref<BroadcastTrack[]>([])
 const currentTracksVersus = ref<TracksVersus>(null)
@@ -30,11 +30,7 @@ let playlistUpdatedInstance: Subscription | null = null
 let likedTracksInstance: Subscription | null = null
 let tracksVersusUpdatedInstance: Subscription | null = null
 
-const {
-  runSearchTrack,
-  runGetPlaylist,
-  runGetPlaylistSelected,
-} = usePlaylistRepository()
+const { runSearchTrack, runGetPlaylist, runGetPlaylistSelected } = usePlaylistRepository()
 const { handleError } = useSpecialError()
 
 const proceedResult = (value: BroadcastTrack | null) => {
@@ -65,7 +61,10 @@ const changePlaylist = async (playlistId: string) => {
 async function searchTrack(value: string) {
   try {
     const playlistId = currentPlayListInfo.value.id
-    const response = await runSearchTrack(playlistId, value ?? trackName.value)
+
+    const searchValue = value || trackName.value
+    if (!searchValue) return toast.showError('Veuillez saisir un nom de musique')
+    const response = await runSearchTrack(playlistId, searchValue)
 
     if (response.foundTracks.length > 0) {
       foundTracks.value = response.foundTracks
@@ -162,6 +161,8 @@ async function setTransmitSubscription(playlistId: string) {
 }
 
 onMounted(async () => {
+  isLoading.value = true
+
   try {
     const response = await runGetPlaylistSelected()
 
@@ -170,6 +171,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Erreur dans onMounted:', error)
+  } finally {
+    isLoading.value = false
   }
 })
 
@@ -293,7 +296,7 @@ onUnmounted(async () => {
     </section>
     <TrackValidationModal
       :isOpen="isTracksValidationModalOpen"
-      :foundTracks="foundTracks || []"
+      :foundTracks="foundTracks"
       :playlistId="currentPlayListInfo?.id ?? ''"
       @proceed-result="proceedResult"
     />

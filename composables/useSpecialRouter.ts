@@ -57,16 +57,8 @@ export const useSpecialRouter = () => {
   const pushLegal = (push: boolean = true): string => push2('/legal', push)
 
 
-
-
-
-  // Redirection vers `/space/:username`
   const pushSpaceStreamerForViewer = (streamer: string, push: boolean = true): string => push2('/viewer/streamer/space', push, { streamer })
   const pushStats = (userId: string, push: boolean = true): string => push2('/me/stats', push, { userId })
-
-
-  // const pushSpaceViewer = (id: string, push: boolean = true): string => push2('/viewer/:id', push, undefined, { id })
-
 
   return {
     push2,

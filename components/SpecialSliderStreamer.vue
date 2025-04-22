@@ -32,20 +32,6 @@ const selectPlaylist = (value: string) => {
 
 const deletePlaylist = async (id: string) => {
   emit('deletePlaylist', id)
-  // const playlistToDelete = playlistsOfStreamer.value.find(
-  //   playlist => playlist.id === id
-  // )
-
-  // const response = await runDeletePlaylist(playlistToDelete.id)
-
-  // if (response.result) {
-  //   playlistsOfStreamer.value = playlistsOfStreamer.value.filter(
-  //     playlist => playlist.id !== id
-  //   )
-  //   showSuccess('Playlist supprimée avec succès')
-  // } else {
-  //   showError('Erreur lors de la suppression de la playlist')
-  // }
 }
 
 const filteredPlaylists = computed(() => {
@@ -58,11 +44,6 @@ const filteredPlaylists = computed(() => {
       .includes(playlistName.value.toLowerCase())
   )
 })
-
-// const proceedResult = (playlist: PlaylistCardInfo) => {
-//   streamerStore.updateStreamerPlaylists(playlistsOfStreamer.value)
-//   isCreatePlaylistModalOpen.value = false
-// }
 
 watch(
   () => props.playlists,

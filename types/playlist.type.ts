@@ -6,14 +6,6 @@ export interface SearchTracksResponse {
   foundTracks: Track[]
 }
 
-// export interface AddTracksResponse {
-//   playlistTracksUpdated: PlaylistTrack[]
-// }
-
-export interface RefreshVersusResponse {
-  result: boolean
-}
-
 export interface AddPendingTracksResponse {
   result: PendingAddResult
 }
@@ -55,6 +47,27 @@ export interface GetPlaylistSelectedResponse {
   playlistId: string | null
 }
 
+export interface CreatePlaylistResponse {
+  playlistCreated: StreamerPlaylist
+}
+
+export interface DeletePlaylistResponse {
+  result: boolean
+}
+
+export interface AddTrackResponse {
+  playlistTracksUpdated: BroadcastTrack[]
+  userWinner?: UserSession
+}
+
+export interface LikeTrackResponse {
+  currentTracksVersus: TracksVersus
+}
+
+export interface UpdateTracksVersusResponse {
+  currentTracksVersus: TracksVersus
+}
+
 export interface PlaylistCardInfo {
   id: string
   playlistName: string
@@ -82,14 +95,6 @@ export interface playlistInfo {
   spaceStreamerImg: string
 }
 
-export interface CreatePlaylistResponse {
-  playlistCreated: StreamerPlaylist
-}
-
-export interface DeletePlaylistResponse {
-  result: boolean
-}
-
 export interface Track {
   trackId?: string
   spotifyTrackId?: string
@@ -113,19 +118,6 @@ export interface PlaylistTrack {
   votes: number
   score: number
   user: UserSession
-}
-
-export interface AddTrackResponse {
-  playlistTracksUpdated: BroadcastTrack[]
-  userWinner?: UserSession
-}
-
-export interface LikeTrackResponse {
-  currentTracksVersus: TracksVersus
-}
-
-export interface UpdateTracksVersusResponse {
-  currentTracksVersus: TracksVersus
 }
 
 export interface BroadcastTrack {
