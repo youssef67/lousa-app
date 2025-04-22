@@ -114,17 +114,6 @@ const changePlaylist = async (playlistId: string) => {
   } else {
     showError('Une erreur est survenue lors de la sélection de la playlist')
   }
-  // await closeAllEventStreams()
-
-  // await setTransmitSubscription(playlistId)
-
-  // const playlist = await runGetPlaylistTracks(playlistId)
-  // currentPlayListInfo.value = playlist.playlistInfo
-  // playlistTracks.value = playlist.playlistsTracks
-
-  // const tracksVersus = await runGetTracksVersus(playlistId)
-
-  // currentTracksVersus.value = tracksVersus.currentTracksVersus
 
   isLoading.value = false
 }
@@ -195,55 +184,55 @@ onUnmounted(async () => {
   await closeAllEventStreams()
 })
 
-// watch(
-//   () => streamerStore.playlistSelected,
-//   async playlist => {
-//     if (playlist) {
-//       currentPlayList.value = streamerStore.playlistSelected
-//     }
-//   }
-// )
 </script>
 
 <template>
   <UContainer>
     <AuthenticatedTwitchContainer>
       <AuthenticatedSpotifyContainer>
-        <div>
-          <h1 class="text-2xl font-bold mb-4">Espace de {{ sessionStore.session.user.email }}</h1>
-        </div>
-        <section>
-          <UButton
-            label="Mes playlists actives"
-            type="submit"
-            variant="solid"
-            size="xl"
-            color="secondary"
-            @click="toggleSlider"
-          />
-          <UButton
-            label="créer une playlist"
-            type="submit"
-            variant="solid"
-            size="xl"
-            color="secondary"
-            @click="isCreatePlaylistModalOpen = true"
-          />
-        </section>
-
-        <section>
-          <div v-if="isBattleLoading" class="flex justify-center items-center py-12">
-            <UIcon name="i-tabler-loader-2" class="animate-spin text-white text-4xl" />
-            <span class="ml-4 text-white text-lg font-semibold"
-              >Mise à jour de la playlist en cours...</span
-            >
+        <div class="space-y-10 py-6">
+          <!-- Header utilisateur -->
+          <div class="text-center">
+            <h1 class="text-3xl font-bold text-white">
+              Bienvenue, {{ sessionStore.session.user.email }}
+            </h1>
           </div>
 
-          <div v-else-if="currentPlayListInfo" class="flex flex-col items-center text-center mb-3">
-            <!-- Contenu principal -->
-            <div v-if="!isLoading" class="w-full max-w-6xl">
-              <div class="mb-8 text-center">
-                <h2 class="text-white text-lg font-semibold mb-4">Duel en cours</h2>
+          <!-- Actions principales -->
+          <section class="flex flex-wrap justify-center gap-4">
+            <UButton
+              label="Mes playlists actives"
+              type="button"
+              variant="solid"
+              size="xl"
+              color="secondary"
+              @click="toggleSlider"
+            />
+            <UButton
+              label="Créer une playlist"
+              type="button"
+              variant="solid"
+              size="xl"
+              color="secondary"
+              @click="isCreatePlaylistModalOpen = true"
+            />
+          </section>
+
+          <!-- Zone de battle / playlist -->
+          <section>
+            <!-- Loader -->
+            <div v-if="isBattleLoading" class="flex flex-col items-center py-12">
+              <UIcon name="i-tabler-loader-2" class="animate-spin text-white text-4xl" />
+              <span class="mt-4 text-white text-lg font-medium">
+                Mise à jour de la playlist en cours...
+              </span>
+            </div>
+
+            <!-- Playlist sélectionnée -->
+            <div v-else-if="currentPlayListInfo" class="w-full max-w-6xl mx-auto space-y-8">
+              <!-- Battle en cours -->
+              <div>
+                <h2 class="text-white text-xl font-semibold text-center mb-4">🎶 Duel en cours</h2>
 
                 <div v-if="currentTracksVersus">
                   <TracksVersusSectionStreamer
@@ -251,18 +240,18 @@ onUnmounted(async () => {
                     @updateAll="handleUpdateAll"
                   />
                 </div>
-                <div v-else>
-                  <div class="text-center text-white text-sm py-6">
-                    🎵 En attente de nouveaux morceaux pour lancer un battle...
-                  </div>
+                <div v-else class="text-center text-white py-6 text-sm">
+                  🎵 En attente de nouveaux morceaux pour lancer un battle...
                 </div>
               </div>
 
-              <div class="text-white text-xl font-bold mb-4 text-center">
+              <!-- Nom de la playlist -->
+              <div class="text-white text-2xl font-bold text-center">
                 {{ currentPlayListInfo.playlistName }}
               </div>
 
-              <div v-if="playlistTracks.length > 0" class="divide-y divide-gray-700">
+              <!-- Liste des tracks -->
+              <div v-if="playlistTracks.length > 0" class="divide-y divide-gray-700 rounded-md overflow-hidden">
                 <PlaylistTrackRow
                   v-for="track in playlistTracks"
                   :key="track.trackId"
@@ -270,24 +259,30 @@ onUnmounted(async () => {
                 />
               </div>
             </div>
-          </div>
 
-          <div v-else>
-            <div class="text-center text-white text-sm py-6">Aucune playlist sélectionnée</div>
-          </div>
-        </section>
+            <!-- Aucune playlist sélectionnée -->
+            <div v-else class="text-center text-white text-sm py-6">
+              Aucune playlist sélectionnée
+            </div>
+          </section>
 
-        <CreatePlaylistModal :is-open="isCreatePlaylistModalOpen" @proceed-result="proceedResult" />
-        <SpecialSliderStreamer
-          :isOpen="isSlideOverOpen"
-          :playlists="streamerPlaylists || []"
-          @update:isOpen="isSlideOverOpen = $event"
-          @change-playlist="changePlaylist"
-          @delete-playlist="deletePlaylist"
-        />
+          <!-- Modaux & sliders -->
+          <CreatePlaylistModal
+            :is-open="isCreatePlaylistModalOpen"
+            @proceed-result="proceedResult"
+          />
+          <SpecialSliderStreamer
+            :isOpen="isSlideOverOpen"
+            :playlists="streamerPlaylists || []"
+            @update:isOpen="isSlideOverOpen = $event"
+            @change-playlist="changePlaylist"
+            @delete-playlist="deletePlaylist"
+          />
+        </div>
       </AuthenticatedSpotifyContainer>
     </AuthenticatedTwitchContainer>
   </UContainer>
 </template>
+
 
 <style></style>
