@@ -12,9 +12,10 @@ const delay = ref(props.track.position * 100)
 
 const sessionStore = useSessionStore()
 const { pushStats } = useSpecialRouter()
+const currentTrack = ref<BroadcastTrack>(props.track)
 const userId = ref(sessionStore.session.user.id)
+const isOwner = ref(false)
 
-const isOwner = computed(() => props.track.user.id === userId.value)
 
 const crownImage = computed(() => {
   if (props.track.position === 1) return goldCrown
@@ -28,16 +29,25 @@ const playTrack = () => {
 }
 
 onMounted(async () => {
-  if (isOwner.value) {
-    await nextTick()
-  }
+  isOwner.value = props.track.user.id === userId.value
 })
+
+watch(
+  () => props.track,
+  (newTrack) => {
+    console.log('watch')
+    currentTrack.value = newTrack
+    isOwner.value = newTrack.user.id === userId.value
+  },
+  { immediate: true }
+)
+
 </script>
 
 <template>
   <div class="relative">
     <div v-if="isOwner" class="absolute inset-0 z-0">
-      <span v-for="i in 20" :key="i" :class="`particle-${track.playlistTrackId}`"></span>
+      <span v-for="i in 20" :key="i" :class="`particle-${currentTrack.playlistTrackId}`"></span>
     </div>
 
     <!-- Track avec bordure personnalisée -->
@@ -64,26 +74,26 @@ onMounted(async () => {
           class="w-16 h-16 rounded-lg object-cover"
         />
         <div v-else class="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center">
-          <span class="text-gray-400 text-sm font-bold">#{{ track.position }}</span>
+          <span class="text-gray-400 text-sm font-bold">#{{ currentTrack.position }}</span>
         </div>
-        <span class="text-xs text-gray-400 mt-1">Score: {{ track.score }}</span>
-        <span class="text-xs text-gray-400 mt-1">Louz: {{ track.specialScore }}</span>
+        <span class="text-xs text-gray-400 mt-1">Score: {{ currentTrack.score }}</span>
+        <span class="text-xs text-gray-400 mt-1">Louz: {{ currentTrack.specialScore }}</span>
       </div>
 
       <!-- Cover -->
-      <img :src="track.cover" alt="Cover" class="w-16 h-16 rounded-md object-cover" />
+      <img :src="currentTrack.cover" alt="Cover" class="w-16 h-16 rounded-md object-cover" />
 
       <!-- Infos -->
       <div class="flex-1">
-        <h3 class="text-lg font-medium text-white">{{ track.trackName }}</h3>
-        <p class="text-gray-400 text-sm">{{ track.artistName }}</p>
+        <h3 class="text-lg font-medium text-white">{{ currentTrack.trackName }}</h3>
+        <p class="text-gray-400 text-sm">{{ currentTrack.artistName }}</p>
         <p class="text-gray-500 text-xs">
           Ajouté par
           <span
             class="text-white hover:underline hover:text-blue-400 cursor-pointer"
-            @click="pushStats(track.user.id, true)"
+            @click="pushStats(currentTrack.user.id, true)"
           >
-            {{ track.user.userName }}
+            {{ currentTrack.user.userName }}
           </span>
         </p>
       </div>

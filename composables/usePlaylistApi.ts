@@ -1,12 +1,11 @@
 import type {
   SearchTracksResponse,
-  GetPlaylistTracksResponse,
   AddPendingTracksResponse,
   LikeTracksResponse,
   Track,
   SpecialLikeTracksResponse,
   GetTracksVersusResponse,
-  GetPlaylistUpdatedResponse,
+  GetPlaylistResponse,
   GetPlaylistSelectedResponse,
   GetPlaylistUpdatedForStreamerResponse,
   SetGoldenLikeResponse
@@ -35,9 +34,9 @@ export const usePlaylistApi = () => {
     }
   }
 
-  const getPlaylistUpdated = async (versusId: string): Promise<GetPlaylistUpdatedResponse> => {
+  const getPlaylist = async (playlistId: string): Promise<GetPlaylistResponse> => {
     try {
-      const url = `/api/v1/playlist/updated?tracksVersusId=${versusId}`
+      const url = `/api/v1/playlist?playlistId=${playlistId}`
 
       const res = await fetch(url, {
         method: FetchMethod.GET,
@@ -45,7 +44,7 @@ export const usePlaylistApi = () => {
         cache: 'no-cache',
       })
 
-      return res as GetPlaylistUpdatedResponse
+      return res as GetPlaylistResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -63,21 +62,6 @@ export const usePlaylistApi = () => {
         cache: 'no-cache',
       })
       return response as AddPendingTracksResponse
-    } catch (error) {
-      await proceedApiError(error)
-    }
-  }
-
-  const getPlaylistTracks = async (playlistId: string): Promise<GetPlaylistTracksResponse> => {
-    try {
-      const url = `/api/v1/playlist?playlistId=${playlistId}`
-
-      const response = await fetch(url, {
-        method: FetchMethod.GET,
-        headers: sessionStore.defaultHeaders(),
-        cache: 'no-cache',
-      })
-      return response as GetPlaylistTracksResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -182,9 +166,8 @@ export const usePlaylistApi = () => {
 
   return {
     searchTrack,
-    getPlaylistUpdated,
+    getPlaylist,
     addPendingTrack,
-    getPlaylistTracks,
     likeTrack,
     specialLikeTrack,
     getTracksVersus,

@@ -12,7 +12,6 @@ import type {
 
 const { $transmit } = useNuxtApp()
 const isLoading = ref(true)
-// const config = useRuntimeConfig()
 const isSlideOverOpen = ref(false)
 const sessionStore = useSessionStore()
 const currentPlayListInfo = ref<playlistInfo | null>(null)
@@ -33,9 +32,7 @@ let tracksVersusUpdatedInstance: Subscription | null = null
 
 const {
   runSearchTrack,
-  runGetPlaylistTracks,
-  runGetTracksVersus,
-  runGetPlaylistUpdated,
+  runGetPlaylist,
   runGetPlaylistSelected,
 } = usePlaylistRepository()
 const { handleError } = useSpecialError()
@@ -57,13 +54,10 @@ const changePlaylist = async (playlistId: string) => {
 
   await setTransmitSubscription(playlistId)
 
-  const playlist = await runGetPlaylistTracks(playlistId)
+  const playlist = await runGetPlaylist(playlistId)
   currentPlayListInfo.value = playlist.playlistInfo
   playlistTracks.value = playlist.playlistsTracks
-
-  const tracksVersus = await runGetTracksVersus(playlistId)
-
-  currentTracksVersus.value = tracksVersus.currentTracksVersus
+  currentTracksVersus.value = playlist.currentTracksVersus
 
   isLoading.value = false
 }
@@ -87,7 +81,7 @@ async function searchTrack(value: string) {
 const proceedUpdateAll = async () => {
   isBattleLoading.value = true
   await new Promise(resolve => setTimeout(resolve, 1500))
-  const response = await runGetPlaylistUpdated(currentTracksVersus.value.id)
+  const response = await runGetPlaylist(currentPlayListInfo.value.id)
 
   if (response) {
     currentTracksVersus.value = response.currentTracksVersus
@@ -101,13 +95,16 @@ const proceedUpdateAll = async () => {
   isBattleLoading.value = false
 }
 
+// Fonction de verrouillage
 const handleUpdateAll = async () => {
-  if (isUpdatingBattle.value) return // ⛔️ évite les appels multiples
+  if (isUpdatingBattle.value) return // évite les appels multiples
   isUpdatingBattle.value = true
 
-  await proceedUpdateAll()
-
-  isUpdatingBattle.value = false
+  try {
+    await proceedUpdateAll()
+  } finally {
+    isUpdatingBattle.value = false
+  }
 }
 
 async function closeEventStream(subscription: Subscription) {
@@ -130,10 +127,6 @@ async function closeAllEventStreams() {
 
 async function setTransmitSubscription(playlistId: string) {
   try {
-    // const transmit = new Transmit({
-    //   baseUrl: `${config.public.siteUrl}/api/v1`,
-    // })
-
     const playlistUpdated = $transmit.subscription(`playlist/updated/${playlistId}`)
     const likeUpdated = $transmit.subscription(`playlist/like/${playlistId}`)
     const tracksVersusUpdated = $transmit.subscription(`playlist/tracksVersus/${playlistId}`)
@@ -169,7 +162,6 @@ async function setTransmitSubscription(playlistId: string) {
 }
 
 onMounted(async () => {
-
   try {
     const response = await runGetPlaylistSelected()
 

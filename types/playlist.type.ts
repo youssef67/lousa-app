@@ -18,8 +18,9 @@ export interface AddPendingTracksResponse {
   result: PendingAddResult
 }
 
-export interface GetPlaylistUpdatedResponse {
+export interface GetPlaylistResponse {
   playlistsTracks: BroadcastTrack[]
+  playlistInfo: playlistInfo
   currentTracksVersus: TracksVersus
   currentUser: UserSession
 }
@@ -44,12 +45,6 @@ export interface SetGoldenLikeResponse {
 
 export interface SpecialLikeTracksResponse {
   user: UserSession
-}
-
-export interface GetPlaylistTracksResponse {
-  playlistsTracks: BroadcastTrack[]
-  playlistInfo: playlistInfo
-  currentTracksVersus: TracksVersus
 }
 
 export interface GetTracksVersusResponse { 

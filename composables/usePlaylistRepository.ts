@@ -3,9 +3,9 @@ import type { Track } from '~/types/playlist.type'
 export const usePlaylistRepository = () => {
   const {
     searchTrack,
-    getPlaylistUpdated,
+    getPlaylist,
     addPendingTrack,
-    getPlaylistTracks,
+    // getPlaylistTracks,
     likeTrack,
     specialLikeTrack,
     getTracksVersus,
@@ -24,9 +24,9 @@ export const usePlaylistRepository = () => {
     }
   }
 
-  const runGetPlaylistUpdated = async (versusId: string) => {
+  const runGetPlaylist = async (playlistId: string) => {
     try {
-      const res = await getPlaylistUpdated(versusId)
+      const res = await getPlaylist(playlistId)
 
       return res
     } catch (error) {
@@ -45,14 +45,7 @@ export const usePlaylistRepository = () => {
     }
   }
 
-  const runGetPlaylistTracks = async (playlistId: string) => {
-    try {
-      const response = await getPlaylistTracks(playlistId)
-      return response
-    } catch (error) {
-      logger.e('Error logging out', error)
-    }
-  }
+
 
   const runGetTracksVersus = async (playlistId: string) => {
     try {
@@ -113,8 +106,8 @@ export const usePlaylistRepository = () => {
 
   return {
     runSearchTrack,
-    runGetPlaylistUpdated,
-    runGetPlaylistTracks,
+    runGetPlaylist,
+    // runGetPlaylistTracks,
     runAddPendingTrack,
     runLikeTrack,
     runSpecialLikeTrack,
