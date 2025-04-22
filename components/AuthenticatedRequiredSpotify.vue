@@ -6,12 +6,11 @@ import {
   type SpotifyUserSession
 } from '~~/types/spotify.type'
 
-const { showSuccess, showError } = useSpecialToast()
+const { showSuccess } = useSpecialToast()
 const config = useRuntimeConfig()
 const sessionStore = useSessionStore()
 const { handleError } = useSpecialError()
 const { runLoginSpotifyStreamer } = useAuthRepository()
-const { pushMyAccount } = useSpecialRouter()
 
 async function onLoginClick() {
 

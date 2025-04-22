@@ -32,7 +32,7 @@ const updateCountdown = () => {
   const onCountdownFinished = async () => {
     if (!props.closingDate || !props.tracksVersusId) return
 
-    if (hasEnded.value) return // ← stop si déjà fini
+    if (hasEnded.value) return
     hasEnded.value = true
     clearInterval(interval)
 

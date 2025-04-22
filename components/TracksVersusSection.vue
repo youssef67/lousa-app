@@ -59,7 +59,6 @@ const proceedLike = async (trackId: string, targetTrack: number) => {
   }
 }
 
-
 watch(
   () => props.currentTracksVersus,
   newVersus => {
@@ -107,9 +106,6 @@ watch(
         class="w-full md:w-1/3"
       />
     </div>
-
-    <!-- Progress Bar -->
-    <!-- <ProgressBar :currentTracksVersus="currentTracksVersus" class="mt-6" /> -->
 
     <!-- Modal -->
     <SpecialLikeModal

@@ -25,7 +25,6 @@ const { runAddPendingTrack } = usePlaylistRepository()
 const handleTrackValidation = async (track: Track) => {
   const response = await runAddPendingTrack(props.playlistId, track)
 
-  console.log('response', response.result)
   switch (response.result) {
     case PendingAddResult.VOTING:
       toast.showSuccess('Votre musique est soumise au vote du public')

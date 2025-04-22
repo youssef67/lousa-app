@@ -18,7 +18,7 @@ export interface AddPendingTracksResponse {
   result: PendingAddResult
 }
 
-export interface AddTracksResponse {
+export interface GetPlaylistUpdatedResponse {
   playlistsTracks: BroadcastTrack[]
   currentTracksVersus: TracksVersus
   currentUser: UserSession

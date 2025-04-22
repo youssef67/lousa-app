@@ -27,11 +27,6 @@ const playTrack = () => {
   window.open(props.track.url, '_blank')
 }
 
-const goToUserProfile = (userId: string) => {
-  // Exemple : redirige vers un profil public
-  useRouter().push(`/user/${userId}`)
-}
-
 onMounted(async () => {
   if (isOwner.value) {
     await nextTick()

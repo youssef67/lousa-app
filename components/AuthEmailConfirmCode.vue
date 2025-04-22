@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { PropType } from 'vue'
 import { AuthType, ConfirmResult } from '~/utils/auth/AuthResult'
 
 const authenticationStore = useAuthenticationStore()

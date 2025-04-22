@@ -83,8 +83,6 @@ export const useAuthRepository = () => {
         throw newError('ERROR_INVALID_DATA', 'ARAS-2')
       }
 
-      // await runAuthenticationSpotify(response.urlAuthorize)
-
       const windowTwitchLogin = window.open(response.urlAuthorize, '_blank')
 
       return windowTwitchLogin

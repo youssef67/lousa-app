@@ -6,7 +6,7 @@ import type {
   Track,
   SpecialLikeTracksResponse,
   GetTracksVersusResponse,
-  AddTracksResponse,
+  GetPlaylistUpdatedResponse,
   GetPlaylistSelectedResponse,
   GetPlaylistUpdatedForStreamerResponse,
   SetGoldenLikeResponse
@@ -35,9 +35,9 @@ export const usePlaylistApi = () => {
     }
   }
 
-  const addTrack = async (versusId: string): Promise<AddTracksResponse> => {
+  const getPlaylistUpdated = async (versusId: string): Promise<GetPlaylistUpdatedResponse> => {
     try {
-      const url = `/api/v1/playlist/track/add?tracksVersusId=${versusId}`
+      const url = `/api/v1/playlist/updated?tracksVersusId=${versusId}`
 
       const res = await fetch(url, {
         method: FetchMethod.GET,
@@ -45,7 +45,7 @@ export const usePlaylistApi = () => {
         cache: 'no-cache',
       })
 
-      return res as AddTracksResponse
+      return res as GetPlaylistUpdatedResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -182,7 +182,7 @@ export const usePlaylistApi = () => {
 
   return {
     searchTrack,
-    addTrack,
+    getPlaylistUpdated,
     addPendingTrack,
     getPlaylistTracks,
     likeTrack,

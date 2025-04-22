@@ -40,7 +40,6 @@ const setSpecialLike = () => {
 }
 
 const setGoldenLike = () => {
-  console.log('golden like')
   emit('proceedGoldenLike', props.track.trackId, props.indexTrack)
 }
 

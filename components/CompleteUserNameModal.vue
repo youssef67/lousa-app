@@ -13,6 +13,7 @@ const emit = defineEmits(['update:isOpen', 'proceedResult'])
 
 const userName = ref('')
 const config = useRuntimeConfig()
+const { $transmit } = useNuxtApp()
 const { runLoginTwitch } = useAuthRepository()
 const isUserNameValid = ref(false) // Pour gérer l'activation du bouton
 const isChecking = ref(false) // Indique si la vérification est en cours
@@ -56,11 +57,7 @@ async function onCompleteClick() {
 }
 
 async function onTwitchLoginClick() {
-  const transmit = new Transmit({
-    baseUrl: `${config.public.siteUrl}/api/v1`
-  })
-
-  const subscription = transmit.subscription(
+  const subscription = $transmit.subscription(
     `authentication/twitch/${sessionStore.session.user.id}`
   )
 

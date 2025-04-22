@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { SignUpResult } from '~/utils/auth/AuthResult'
 
-const props = defineProps({
+defineProps({
   isOpen: {
     type: Boolean,
     required: true

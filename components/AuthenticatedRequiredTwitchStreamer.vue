@@ -5,6 +5,7 @@ const { showSuccess, showError } = useSpecialToast()
 const config = useRuntimeConfig()
 const sessionStore = useSessionStore()
 const { runLoginTwitch } = useAuthRepository()
+const { $transmit } = useNuxtApp()
 const { runCheckIfStreamer, runDeleteStreamerProfile } =
   useStreamerRepository()
 
@@ -15,13 +16,11 @@ async function closeEventStream(subscription: Subscription) {
 }
 
 async function onLoginClick() {
-  // Initialisation de la connexion
-  const transmit = new Transmit({
-    baseUrl: `${config.public.siteUrl}/api/v1`
-  })
+  // const transmit = new Transmit({
+  //   baseUrl: `${config.public.siteUrl}/api/v1`
+  // })
 
-  // Création de la souscription
-  const subscription = transmit.subscription(
+  const subscription = $transmit.subscription(
     `authentication/twitch/${sessionStore.session.user.id}`
   )
 
@@ -29,7 +28,6 @@ async function onLoginClick() {
 
   try {
     const newWindow = await runLoginTwitch()
-    // Mise en place de l'écoute des messages envoyés par le serveur au moment du callback
     subscription.onMessage(async () => {
       const response = await runCheckIfStreamer()
 
@@ -43,7 +41,6 @@ async function onLoginClick() {
         showError("Désolé, vous n'êtes pas autorisé à accéder à cet espace")
       }
 
-      // Fermeture de la page de connexion twitch et de la connextion serveur sent events
       newWindow?.close()
       await closeEventStream(subscription)
     })

@@ -3,7 +3,7 @@ import type { Track } from '~/types/playlist.type'
 export const usePlaylistRepository = () => {
   const {
     searchTrack,
-    addTrack,
+    getPlaylistUpdated,
     addPendingTrack,
     getPlaylistTracks,
     likeTrack,
@@ -24,9 +24,9 @@ export const usePlaylistRepository = () => {
     }
   }
 
-  const runAddTrack = async (versusId: string) => {
+  const runGetPlaylistUpdated = async (versusId: string) => {
     try {
-      const res = await addTrack(versusId)
+      const res = await getPlaylistUpdated(versusId)
 
       return res
     } catch (error) {
@@ -113,7 +113,7 @@ export const usePlaylistRepository = () => {
 
   return {
     runSearchTrack,
-    runAddTrack,
+    runGetPlaylistUpdated,
     runGetPlaylistTracks,
     runAddPendingTrack,
     runLikeTrack,

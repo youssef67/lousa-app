@@ -56,10 +56,7 @@ const proceedLike = async (trackId: string, targetTrack: number) => {
 }
 
 const proceedGoldenLike = async (trackId: string, targetTrack: number) => {
-  const response = await runSetGoldenLike(props.currentTracksVersus.id, trackId, targetTrack)
-  console.log('golden like')
-  console.log('trackId', trackId)
-  console.log('targetTrack', targetTrack)
+  await runSetGoldenLike(props.currentTracksVersus.id, trackId, targetTrack)
 }
 
 watch(

@@ -35,7 +35,7 @@ const {
   runSearchTrack,
   runGetPlaylistTracks,
   runGetTracksVersus,
-  runAddTrack,
+  runGetPlaylistUpdated,
   runGetPlaylistSelected,
 } = usePlaylistRepository()
 const { handleError } = useSpecialError()
@@ -87,7 +87,7 @@ async function searchTrack(value: string) {
 const proceedUpdateAll = async () => {
   isBattleLoading.value = true
   await new Promise(resolve => setTimeout(resolve, 1500))
-  const response = await runAddTrack(currentTracksVersus.value.id)
+  const response = await runGetPlaylistUpdated(currentTracksVersus.value.id)
 
   if (response) {
     currentTracksVersus.value = response.currentTracksVersus
