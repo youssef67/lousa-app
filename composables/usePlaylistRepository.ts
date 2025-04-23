@@ -9,7 +9,7 @@ export const usePlaylistRepository = () => {
     specialLikeTrack,
     getTracksVersus,
     getPlaylistSelected,
-    getPlaylistUpdatedForStreamer,
+    getPlaylistForStreamer,
     setGoldenLike
   } = usePlaylistApi()
   const logger = useSpecialLogger()
@@ -37,7 +37,6 @@ export const usePlaylistRepository = () => {
     try {
       const response = await addPendingTrack(playlistId, track)
 
-      console.log('response', response)
       return response
     } catch (error) {
       logger.e('Error logging out', error)
@@ -81,9 +80,9 @@ export const usePlaylistRepository = () => {
     }
   }
 
-  const runGetPlaylistUpdatedForStreamer = async (playlistId: string) => {
+  const runGetPlaylistForStreamer = async (playlistId: string) => {
     try {
-      const res = await getPlaylistUpdatedForStreamer(playlistId)
+      const res = await getPlaylistForStreamer(playlistId)
 
       return res
     } catch (error) {
@@ -109,7 +108,7 @@ export const usePlaylistRepository = () => {
     runSpecialLikeTrack,
     runGetTracksVersus,
     runGetPlaylistSelected,
-    runGetPlaylistUpdatedForStreamer,
+    runGetPlaylistForStreamer,
     runSetGoldenLike
   }
 }

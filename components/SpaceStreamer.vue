@@ -1,45 +1,76 @@
 <script lang="ts" setup>
-import type { AddTrackResponse, BroadcastTrack, LikeTrackResponse, PlaylistCardInfo, TracksVersus, UpdateTracksVersusResponse } from '~/types/playlist.type'
-import type { StreamerPlaylist, PlaylistInfo } from '~/types/streamer.type'
 import { type Subscription } from '@adonisjs/transmit-client'
+import type {
+  BroadcastTrack,
+  TracksVersus,
+} from '~/types/playlist.type'
+import type { StreamerPlaylist, PlaylistInfo } from '~/types/streamer.type'
 
-const { $transmit } = useNuxtApp()
 
 const sessionStore = useSessionStore()
+
 const { runGetStreamerProfile, runDeletePlaylist } = useStreamerRepository()
-const { runGetTracksVersus, runGetPlaylistUpdatedForStreamer } = usePlaylistRepository()
+const { runGetTracksVersus, runGetPlaylistForStreamer } = usePlaylistRepository()
+const { showSuccess, showError } = useSpecialToast()
+const { subscribeToPlaylist } = usePlaylistTransmit()
+const { updatePlaylist } = usePlaylistUpdater()
 
 const currentPlayListInfo = ref<PlaylistInfo | null>(null)
 const playlistTracks = ref<BroadcastTrack[]>([])
 const streamerPlaylists = ref<StreamerPlaylist[]>([])
+const currentTracksVersus = ref<TracksVersus>(null)
+
 const isLoading = ref(true)
 const isSlideOverOpen = ref(false)
 const isCreatePlaylistModalOpen = ref(false)
 const isBattleLoading = ref(false)
-const currentPlayList = ref<PlaylistCardInfo | null>(null)
-const currentTracksVersus = ref<TracksVersus>(null)
 const isUpdatingBattle = ref(false)
-const { showSuccess, showError } = useSpecialToast()
-
-const toggleSlider = () => {
-  isSlideOverOpen.value = !isSlideOverOpen.value
-}
 
 let playlistUpdatedInstance: Subscription | null = null
 let likedTracksInstance: Subscription | null = null
 let tracksVersusUpdatedInstance: Subscription | null = null
 
-const proceedUpdateAll = async () => {
-  isBattleLoading.value = true
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  const response = await runGetPlaylistUpdatedForStreamer(currentPlayList.value.id)
+const toggleSlider = () => {
+  isSlideOverOpen.value = !isSlideOverOpen.value
+}
+
+const changePlaylist = async (playlistId: string) => {
+  isLoading.value = true
+
+  const response = await runGetPlaylistForStreamer(playlistId)
 
   if (response) {
+    await closeAllEventStreams()
+
+    await setTransmitSubscription(playlistId)
+
     currentTracksVersus.value = response.currentTracksVersus
     playlistTracks.value = response.playlistsTracks
-    showSuccess('La mise à jour de la playlist a été effectuée avec succès !')
+    currentPlayListInfo.value = response.currentPlaylist
+    streamerPlaylists.value = response.otherPlaylists
+
+    showSuccess('Playlist séléctionnée avec succés !')
   } else {
-    showError('Une erreur est survenue lors de la mise à jour de la playlist')
+    showError('Une erreur est survenue lors de la sélection de la playlist')
+  }
+
+  isLoading.value = false
+}
+
+const proceedUpdateAll = async () => {
+  isBattleLoading.value = true
+
+  if (!currentPlayListInfo.value?.id) {
+  showError("Aucune playlist sélectionnée")
+  isBattleLoading.value = false
+  return
+}
+
+  const result = await updatePlaylist(currentPlayListInfo.value?.id, true)
+  if (result?.success) {
+    playlistTracks.value = result.tracks
+    currentTracksVersus.value = result.versus
+    showSuccess('Playlist mise à jour avec succès !')
   }
 
   isBattleLoading.value = false
@@ -60,16 +91,12 @@ const proceedResult = (playlist: StreamerPlaylist) => {
 }
 
 const deletePlaylist = async (id: string) => {
-  const playlistToDelete = streamerPlaylists.value.find(
-    playlist => playlist.id === id
-  )
+  const playlistToDelete = streamerPlaylists.value.find(playlist => playlist.id === id)
 
   const response = await runDeletePlaylist(playlistToDelete.id)
 
   if (response.result) {
-    streamerPlaylists.value = streamerPlaylists.value.filter(
-      playlist => playlist.id !== id
-    )
+    streamerPlaylists.value = streamerPlaylists.value.filter(playlist => playlist.id !== id)
     showSuccess('Playlist supprimée avec succès')
   } else {
     showError('Erreur lors de la suppression de la playlist')
@@ -94,62 +121,36 @@ async function closeAllEventStreams() {
   }
 }
 
-const changePlaylist = async (playlistId: string) => {
-  isLoading.value = true
 
-  const response = await runGetPlaylistUpdatedForStreamer(playlistId)
-
-  if (response) {
-    await closeAllEventStreams()
-
-    await setTransmitSubscription(playlistId)
-
-    currentTracksVersus.value = response.currentTracksVersus
-    playlistTracks.value = response.playlistsTracks
-    currentPlayListInfo.value = response.playlistInfoOfPlaylistSelected
-    streamerPlaylists.value = response.playlists
-
-
-    showSuccess('Playlist séléctionnée avec succés !')
-  } else {
-    showError('Une erreur est survenue lors de la sélection de la playlist')
-  }
-
-  isLoading.value = false
-}
 
 async function setTransmitSubscription(playlistId: string) {
   try {
-    const playlistUpdated = $transmit.subscription(`playlist/updated/${playlistId}`)
-    const likeUpdated = $transmit.subscription(`playlist/like/${playlistId}`)
-    const tracksVersusUpdated = $transmit.subscription(`playlist/tracksVersus/${playlistId}`)
-
-    playlistUpdatedInstance = playlistUpdated
-    likedTracksInstance = likeUpdated
-    tracksVersusUpdatedInstance = tracksVersusUpdated
-
-    await playlistUpdated.create()
-    await likeUpdated.create()
-    await tracksVersusUpdated.create()
-
-    playlistUpdated.onMessage(async (data: AddTrackResponse) => {
-      console.log('playlistUpdated', data)
-      console.log('sessionStore', sessionStore.session.user)
-      if (data.playlistTracksUpdated) {
-        showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
-        playlistTracks.value = data.playlistTracksUpdated
-      } else {
-        showError('Une erreur est survenue lors de la mise à jour de la playlist')
+    const subs = await subscribeToPlaylist(
+      playlistId,
+      data => {
+        if (data.playlistTracksUpdated) {
+          showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
+          playlistTracks.value = data.playlistTracksUpdated
+        } else {
+          showError('Une erreur est survenue lors de la mise à jour de la playlist')
+        }
+      },
+      data => {
+        currentTracksVersus.value = data.currentTracksVersus
+      },
+      data => {
+        currentTracksVersus.value = data.currentTracksVersus
       }
-    })
+    )
 
-    likeUpdated.onMessage(async (data: LikeTrackResponse) => {
-      console.log('likeUpdated', data)
-      currentTracksVersus.value = data.currentTracksVersus
-    })
+    playlistUpdatedInstance = subs.playlistUpdated
+    likedTracksInstance = subs.likeUpdated
+    tracksVersusUpdatedInstance = subs.tracksVersusUpdated
 
-    tracksVersusUpdated.onMessage(async (data: UpdateTracksVersusResponse) => {
-      currentTracksVersus.value = data.currentTracksVersus
+    console.log('streamer - Subscribed to playlist streams', {
+      playlistUpdatedInstance,
+      likedTracksInstance,
+      tracksVersusUpdatedInstance,
     })
   } catch (error) {
     console.error('Erreur dans setTransmitSubscription:', error)
@@ -172,7 +173,7 @@ onMounted(async () => {
 
     streamerPlaylists.value = spaceStreamer.playlists
 
-    setTransmitSubscription(spaceStreamer.playlistInfoOfPlaylistSelected.id)
+    await setTransmitSubscription(spaceStreamer.playlistInfoOfPlaylistSelected.id)
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
   } finally {
@@ -183,7 +184,6 @@ onMounted(async () => {
 onUnmounted(async () => {
   await closeAllEventStreams()
 })
-
 </script>
 
 <template>
@@ -251,7 +251,10 @@ onUnmounted(async () => {
               </div>
 
               <!-- Liste des tracks -->
-              <div v-if="playlistTracks.length > 0" class="divide-y divide-gray-700 rounded-md overflow-hidden">
+              <div
+                v-if="playlistTracks.length > 0"
+                class="divide-y divide-gray-700 rounded-md overflow-hidden"
+              >
                 <PlaylistTrackRow
                   v-for="track in playlistTracks"
                   :key="track.trackId"
@@ -283,6 +286,5 @@ onUnmounted(async () => {
     </AuthenticatedTwitchContainer>
   </UContainer>
 </template>
-
 
 <style></style>

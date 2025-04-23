@@ -1,44 +1,33 @@
 <script lang="ts" setup>
 import { type Subscription } from '@adonisjs/transmit-client'
-import type {
-  Track,
-  playlistInfo,
-  TracksVersus,
-  BroadcastTrack,
-  AddTrackResponse,
-  LikeTrackResponse,
-  UpdateTracksVersusResponse,
-} from '~/types/playlist.type'
+import type { Track, playlistInfo, TracksVersus, BroadcastTrack } from '~/types/playlist.type'
 
-const { $transmit } = useNuxtApp()
-const isLoading = ref(true)
-const isSlideOverOpen = ref(false)
 const sessionStore = useSessionStore()
-const currentPlayListInfo = ref<playlistInfo | null>(null)
-const trackName = ref('Avant tu riais')
+
 const { pushStreamers, pushStats } = useSpecialRouter()
-const isTracksValidationModalOpen = ref(false)
-const foundTracks = ref<Track[]>([])
+const { showSuccess, showError } = useSpecialToast()
+const { subscribeToPlaylist } = usePlaylistTransmit()
+const { updatePlaylist } = usePlaylistUpdater()
+const { runSearchTrack, runGetPlaylist, runGetPlaylistSelected } = usePlaylistRepository()
+const { handleError } = useSpecialError()
 const toast = useSpecialToast()
+
+const currentPlayListInfo = ref<playlistInfo | null>(null)
 const playlistTracks = ref<BroadcastTrack[]>([])
 const currentTracksVersus = ref<TracksVersus>(null)
-const { showSuccess, showError } = useSpecialToast()
+const foundTracks = ref<Track[]>([])
+const trackName = ref('')
+
+const isSlideOverOpen = ref(false)
+const isTracksValidationModalOpen = ref(false)
+const isLoading = ref(true)
 const isBattleLoading = ref(false)
 const isUpdatingBattle = ref(false)
+const isFirstLoaded = ref(true)
 
 let playlistUpdatedInstance: Subscription | null = null
 let likedTracksInstance: Subscription | null = null
 let tracksVersusUpdatedInstance: Subscription | null = null
-
-const { runSearchTrack, runGetPlaylist, runGetPlaylistSelected } = usePlaylistRepository()
-const { handleError } = useSpecialError()
-
-const proceedResult = (value: BroadcastTrack | null) => {
-  if (value) {
-    playlistTracks.value.push(value)
-  }
-  isTracksValidationModalOpen.value = false
-}
 
 const toggleSlider = () => {
   isSlideOverOpen.value = !isSlideOverOpen.value
@@ -46,49 +35,46 @@ const toggleSlider = () => {
 
 const changePlaylist = async (playlistId: string) => {
   isLoading.value = true
-  await closeAllEventStreams()
 
-  await setTransmitSubscription(playlistId)
+  const response = await runGetPlaylist(playlistId)
 
-  const playlist = await runGetPlaylist(playlistId)
-  currentPlayListInfo.value = playlist.playlistInfo
-  playlistTracks.value = playlist.playlistsTracks
-  currentTracksVersus.value = playlist.currentTracksVersus
+  if (response) {
+    await closeAllEventStreams()
+
+    await setTransmitSubscription(playlistId)
+
+    currentPlayListInfo.value = response.currentPlaylist
+    playlistTracks.value = response.playlistsTracks
+    currentTracksVersus.value = response.currentTracksVersus
+
+    if (!isFirstLoaded.value) {
+      showSuccess('Playlist séléctionnée avec succés !')
+    } else {
+      isFirstLoaded.value = false
+    }
+  } else {
+    showError('Une erreur est survenue lors de la sélection de la playlist')
+  }
 
   isLoading.value = false
 }
 
-async function searchTrack(value: string) {
-  try {
-    const playlistId = currentPlayListInfo.value.id
-
-    const searchValue = value || trackName.value
-    if (!searchValue) return toast.showError('Veuillez saisir un nom de musique')
-    const response = await runSearchTrack(playlistId, searchValue)
-
-    if (response.foundTracks.length > 0) {
-      foundTracks.value = response.foundTracks
-      isTracksValidationModalOpen.value = true
-    } else {
-      toast.showError('Aucun titre trouvé')
-    }
-  } catch (error) {
-    handleError(error)
-  }
-}
-
 const proceedUpdateAll = async () => {
   isBattleLoading.value = true
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  const response = await runGetPlaylist(currentPlayListInfo.value.id)
 
-  if (response) {
-    currentTracksVersus.value = response.currentTracksVersus
-    playlistTracks.value = response.playlistsTracks
-    sessionStore.updateSessionUser(response.currentUser)
-    showSuccess('La mise à jour de la playlist a été effectuée avec succès !')
-  } else {
-    showError('Une erreur est survenue lors de la mise à jour de la playlist')
+  if (!currentPlayListInfo.value?.id) {
+    showError('Aucune playlist sélectionnée')
+    isBattleLoading.value = false
+    return
+  }
+
+  const result = await updatePlaylist(currentPlayListInfo.value?.id, false)
+  if (result?.success) {
+    playlistTracks.value = result.tracks
+    currentTracksVersus.value = result.versus
+    sessionStore.updateSessionUser(result.currentUser)
+
+    showSuccess('Playlist mise à jour avec succès !')
   }
 
   isBattleLoading.value = false
@@ -103,6 +89,27 @@ const handleUpdateAll = async () => {
     await proceedUpdateAll()
   } finally {
     isUpdatingBattle.value = false
+  }
+}
+
+async function searchTrack(value?: string) {
+  try {
+    if (!currentPlayListInfo.value?.id) return showError('Aucune playlist sélectionnée')
+    const playlistId = currentPlayListInfo.value.id
+
+    const searchValue = value || trackName.value
+    if (!searchValue) return toast.showError('Veuillez saisir un nom de musique')
+
+    const response = await runSearchTrack(playlistId, searchValue)
+
+    if (response.foundTracks.length > 0) {
+      foundTracks.value = response.foundTracks
+      isTracksValidationModalOpen.value = true
+    } else {
+      toast.showError('Aucun titre trouvé')
+    }
+  } catch (error) {
+    handleError(error)
   }
 }
 
@@ -126,34 +133,33 @@ async function closeAllEventStreams() {
 
 async function setTransmitSubscription(playlistId: string) {
   try {
-    const playlistUpdated = $transmit.subscription(`playlist/updated/${playlistId}`)
-    const likeUpdated = $transmit.subscription(`playlist/like/${playlistId}`)
-    const tracksVersusUpdated = $transmit.subscription(`playlist/tracksVersus/${playlistId}`)
-
-    playlistUpdatedInstance = playlistUpdated
-    likedTracksInstance = likeUpdated
-    tracksVersusUpdatedInstance = tracksVersusUpdated
-
-    await playlistUpdated.create()
-    await likeUpdated.create()
-    await tracksVersusUpdated.create()
-
-    playlistUpdated.onMessage(async (data: AddTrackResponse) => {
-      isTracksValidationModalOpen.value = false
-      if (data.playlistTracksUpdated) {
-        showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
-        playlistTracks.value = data.playlistTracksUpdated
-      } else {
-        showError('Une erreur est survenue lors de la mise à jour de la playlist')
+    const subs = await subscribeToPlaylist(
+      playlistId,
+      data => {
+        isTracksValidationModalOpen.value = false
+        if (data.playlistTracksUpdated) {
+          showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
+          playlistTracks.value = data.playlistTracksUpdated
+        } else {
+          showError('Une erreur est survenue lors de la mise à jour de la playlist')
+        }
+      },
+      data => {
+        currentTracksVersus.value = data.currentTracksVersus
+      },
+      data => {
+        currentTracksVersus.value = data.currentTracksVersus
       }
-    })
+    )
 
-    likeUpdated.onMessage(async (data: LikeTrackResponse) => {
-      currentTracksVersus.value = data.currentTracksVersus
-    })
+    playlistUpdatedInstance = subs.playlistUpdated
+    likedTracksInstance = subs.likeUpdated
+    tracksVersusUpdatedInstance = subs.tracksVersusUpdated
 
-    tracksVersusUpdated.onMessage(async (data: UpdateTracksVersusResponse) => {
-      currentTracksVersus.value = data.currentTracksVersus
+    console.log('viewer - Subscribed to playlist streams', {
+      playlistUpdatedInstance,
+      likedTracksInstance,
+      tracksVersusUpdatedInstance,
     })
   } catch (error) {
     console.error('Erreur dans setTransmitSubscription:', error)
@@ -220,7 +226,6 @@ onUnmounted(async () => {
         <UInput
           ref="inputText"
           v-model="trackName"
-          input-text
           type="text"
           :placeholder="'Saisissez le nom de musique'"
           required
@@ -235,7 +240,7 @@ onUnmounted(async () => {
           size="xl"
           color="secondary"
           class="w-auto"
-          @click="searchTrack(null)"
+          @click="searchTrack()"
         />
       </div>
     </section>
@@ -298,7 +303,7 @@ onUnmounted(async () => {
       :isOpen="isTracksValidationModalOpen"
       :foundTracks="foundTracks"
       :playlistId="currentPlayListInfo?.id ?? ''"
-      @proceed-result="proceedResult"
+      @update:isOpen="isTracksValidationModalOpen = $event"
     />
     <SpecialSliderViewer
       :is-open="isSlideOverOpen"

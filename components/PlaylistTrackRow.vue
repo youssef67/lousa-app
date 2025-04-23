@@ -35,7 +35,6 @@ onMounted(async () => {
 watch(
   () => props.track,
   (newTrack) => {
-    console.log('watch')
     currentTrack.value = newTrack
     isOwner.value = newTrack.user.id === userId.value
   },

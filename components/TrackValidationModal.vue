@@ -17,7 +17,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:isOpen', 'proceedResult'])
+const emit = defineEmits(['update:isOpen'])
 
 const toast = useSpecialToast()
 const { runAddPendingTrack } = usePlaylistRepository()
@@ -45,7 +45,6 @@ const handleTrackValidation = async (track: Track) => {
 
 const closeModal = () => {
   emit('update:isOpen', false)
-  emit('proceedResult', null)
 }
 </script>
 

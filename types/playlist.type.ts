@@ -12,19 +12,10 @@ export interface AddPendingTracksResponse {
 
 export interface GetPlaylistResponse {
   playlistsTracks: BroadcastTrack[]
-  playlistInfo: playlistInfo
   currentTracksVersus: TracksVersus
-  currentUser: UserSession
-}
-
-export interface GetPlaylistUpdatedForStreamerResponse {
-  playlistsTracks: BroadcastTrack[]
-  currentTracksVersus: TracksVersus
-  playlists: StreamerPlaylist[]
-  playlistInfoOfPlaylistSelected: {
-    id: string
-    playlistName: string
-  }
+  otherPlaylists?: StreamerPlaylist[]
+  currentUser?: UserSession
+  currentPlaylist: playlistInfo
 }
 
 export interface LikeTracksResponse {

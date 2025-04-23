@@ -7,8 +7,7 @@ import type {
   GetTracksVersusResponse,
   GetPlaylistResponse,
   GetPlaylistSelectedResponse,
-  GetPlaylistUpdatedForStreamerResponse,
-  SetGoldenLikeResponse
+  SetGoldenLikeResponse,
 } from '~/types/playlist.type'
 
 export const usePlaylistApi = () => {
@@ -131,16 +130,18 @@ export const usePlaylistApi = () => {
     }
   }
 
-  const getPlaylistUpdatedForStreamer = async (playlistId: string): Promise<GetPlaylistUpdatedForStreamerResponse> => {
+  const getPlaylistForStreamer = async (
+    playlistId: string
+  ): Promise<GetPlaylistResponse> => {
     try {
-      const url = `/api/v1/playlist/updated/streamer?playlistId=${playlistId}`
+      const url = `/api/v1/playlist/streamer?playlistId=${playlistId}`
 
       const response = await fetch(url, {
         method: FetchMethod.GET,
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache',
       })
-      return response as GetPlaylistUpdatedForStreamerResponse
+      return response as GetPlaylistResponse
     } catch (error) {
       await proceedApiError(error)
     }
@@ -172,7 +173,7 @@ export const usePlaylistApi = () => {
     specialLikeTrack,
     getTracksVersus,
     getPlaylistSelected,
-    getPlaylistUpdatedForStreamer,
-    setGoldenLike
+    getPlaylistForStreamer,
+    setGoldenLike,
   }
 }

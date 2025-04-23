@@ -37,7 +37,6 @@ const fetchAllStreamers = async () => {
     streamer => streamer.twitchUserId !== null
   )
 
-  console.log('allStreamersActiveList', allStreamersActiveList.value)
   updatePaginatedStreamers()
 }
 
