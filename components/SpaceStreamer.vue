@@ -162,18 +162,18 @@ onMounted(async () => {
   try {
     const spaceStreamer = await runGetStreamerProfile()
 
-    if (spaceStreamer.playlistInfoOfPlaylistSelected) {
-      currentPlayListInfo.value = spaceStreamer.playlistInfoOfPlaylistSelected
+    if (spaceStreamer.currentPlaylist) {
+      currentPlayListInfo.value = spaceStreamer.currentPlaylist
       playlistTracks.value = spaceStreamer.playlistsTracks
 
-      const tracksVersus = await runGetTracksVersus(spaceStreamer.playlistInfoOfPlaylistSelected.id)
+      const tracksVersus = await runGetTracksVersus(spaceStreamer.currentPlaylist.id)
 
       currentTracksVersus.value = tracksVersus.currentTracksVersus
     }
 
-    streamerPlaylists.value = spaceStreamer.playlists
+    streamerPlaylists.value = spaceStreamer.otherPlaylists
 
-    await setTransmitSubscription(spaceStreamer.playlistInfoOfPlaylistSelected.id)
+    await setTransmitSubscription(spaceStreamer.currentPlaylist.id)
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
   } finally {

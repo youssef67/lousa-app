@@ -9,6 +9,7 @@ const { showSuccess, showError } = useSpecialToast()
 const { subscribeToPlaylist } = usePlaylistTransmit()
 const { updatePlaylist } = usePlaylistUpdater()
 const { runSearchTrack, runGetPlaylist, runGetPlaylistSelected } = usePlaylistRepository()
+const { refreshUserSession} = useSessionRepository()
 const { handleError } = useSpecialError()
 const toast = useSpecialToast()
 
@@ -52,8 +53,6 @@ const changePlaylist = async (playlistId: string) => {
     } else {
       isFirstLoaded.value = false
     }
-  } else {
-    showError('Une erreur est survenue lors de la sélection de la playlist')
   }
 
   isLoading.value = false
@@ -135,11 +134,17 @@ async function setTransmitSubscription(playlistId: string) {
   try {
     const subs = await subscribeToPlaylist(
       playlistId,
-      data => {
+      async data => {
         isTracksValidationModalOpen.value = false
         if (data.playlistTracksUpdated) {
           showSuccess('Une nouvelle musique a été ajoutée à la playlist !')
           playlistTracks.value = data.playlistTracksUpdated
+
+          const userId = sessionStore.session.user.id
+
+          if (userId === data.userWinner.id) {
+            await refreshUserSession()
+          }
         } else {
           showError('Une erreur est survenue lors de la mise à jour de la playlist')
         }

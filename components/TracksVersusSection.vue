@@ -61,7 +61,8 @@ const proceedLike = async (trackId: string, targetTrack: number) => {
 
 watch(
   () => props.currentTracksVersus,
-  newVersus => {
+  async newVersus => {
+
     firstTrack.value = { ...newVersus.firstTrack }
     secondTrack.value = { ...newVersus.secondTrack }
     isComplete.value = newVersus.isComplete

@@ -10,7 +10,6 @@ export function usePlaylistUpdater() {
     try {
       let response: GetPlaylistResponse
 
-      console.log('updater ', playlistId, isStreamer)
       if (isStreamer) {
         response = await runGetPlaylistForStreamer(playlistId)
       } else {

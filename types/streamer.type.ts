@@ -3,9 +3,9 @@ import type { TwitchUserSession } from './twitch.type.js'
 
 export interface GetStreamerProfileResponse {
   spaceStreamerProfile: SpaceStreamerProfile
-  playlists: StreamerPlaylist []
+  otherPlaylists: StreamerPlaylist []
   playlistsTracks: BroadcastTrack[] | null
-  playlistInfoOfPlaylistSelected: PlaylistInfo | null
+  currentPlaylist: PlaylistInfo | null
 }
 
 export interface GetCheckIfStreamerResponse {

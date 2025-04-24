@@ -3,7 +3,6 @@ import type { AddTrackResponse, LikeTrackResponse, UpdateTracksVersusResponse } 
 // composables/usePlaylistTransmit.ts
 export function usePlaylistTransmit() {
   const { $transmit } = useNuxtApp()
-  const { showSuccess, showError } = useSpecialToast()
 
   const subscribeToPlaylist = async (
     playlistId: string,
