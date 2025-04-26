@@ -95,9 +95,9 @@ export const useSessionStore = defineStore('session', () => {
     return !!session.value?.user.twitchUser
   }
 
-  const isTwitchStreamerAuthenticated = () => {
-    return !!session.value.user.twitchUser?.spaceStreamerId
-  }
+  // const isTwitchStreamerAuthenticated = () => {
+  //   return !!session.value && !!session.value.user.twitchUser
+  // }
 
   // SPOTIFY
   const updateSessionSpotifyUser = async (
@@ -126,7 +126,7 @@ export const useSessionStore = defineStore('session', () => {
     updateSessionTwitchUser,
     updateSessionAdmin,
     isAdmin,
-    isTwitchStreamerAuthenticated,
+    // isTwitchStreamerAuthenticated,
     updateSessionVirtualCurrency
   }
 })

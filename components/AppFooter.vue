@@ -1,45 +1,62 @@
 <script setup lang="ts">
-const { pushTermsSales, pushTermsUse, pushPrivatePolicy, pushAboutUs, pushLegal } =
-  useSpecialRouter()
+import type { NavigationMenuItem } from '@nuxt/ui'
+
+const items: NavigationMenuItem[] = [
+  {
+    label: 'Figma Kit',
+    to: 'https://www.figma.com/community/file/1288455405058138934',
+    target: '_blank'
+  },
+  {
+    label: 'Playground',
+    to: 'https://stackblitz.com/edit/nuxt-ui',
+    target: '_blank'
+  },
+  {
+    label: 'Roadmap',
+    to: '/roadmap'
+  },
+  {
+    label: 'Releases',
+    to: 'https://github.com/nuxt/ui/releases',
+    target: '_blank'
+  }
+]
 </script>
 
 <template>
-  <UFooter class="w-full py-8">
-    <template #center>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full px-6">
-        <div class="flex flex-col items-center md:items-start text-center md:text-left">
-          <h1 class="font-bold text-lg mb-2">À propos</h1>
-          <ul class="space-y-2">
-            <li>
-              <NuxtLink :to="pushLegal(false)">Mentions légales</NuxtLink>
-            </li>
-            <li>
-              <NuxtLink :to="pushAboutUs(false)">À propos de nous</NuxtLink>
-            </li>
-          </ul>
-        </div>
+  <UFooter>
+    <template #left>
+      <p class="text-muted text-sm">Copyright © {{ new Date().getFullYear() }}</p>
+    </template>
 
-        <div class="flex flex-col items-center md:items-start text-center md:text-left">
-          <h1 class="font-bold text-lg mb-2">Services</h1>
-          <ul class="space-y-2">
-            <li>
-              <NuxtLink to="/faq">FAQ</NuxtLink>
-            </li>
-            <li class="flex flex-wrap justify-center md:justify-start gap-1">
-              <NuxtLink :to="pushTermsSales(false)">CGV</NuxtLink> /
-              <NuxtLink :to="pushTermsUse(false)">CGU</NuxtLink>
-            </li>
-            <li>
-              <NuxtLink :to="pushPrivatePolicy(false)">Vie privée</NuxtLink>
-            </li>
-          </ul>
-        </div>
+    <UNavigationMenu :items="items" variant="link" />
 
-        <div class="flex flex-col items-center md:items-start text-center md:text-left">
-          <h1 class="font-bold text-lg mb-2">Contact</h1>
-          <p class="text-sm">you.moudni@gmail.com</p>
-        </div>
-      </div>
+    <template #right>
+      <UButton
+        icon="i-simple-icons-discord"
+        color="neutral"
+        variant="ghost"
+        to="https://chat.nuxt.dev"
+        target="_blank"
+        aria-label="Discord"
+      />
+      <UButton
+        icon="i-simple-icons-x"
+        color="neutral"
+        variant="ghost"
+        to="https://x.com/nuxt_js"
+        target="_blank"
+        aria-label="X"
+      />
+      <UButton
+        icon="i-simple-icons-github"
+        color="neutral"
+        variant="ghost"
+        to="https://github.com/nuxt/nuxt"
+        target="_blank"
+        aria-label="GitHub"
+      />
     </template>
   </UFooter>
 </template>

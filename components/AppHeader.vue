@@ -8,7 +8,7 @@ const { pushAdmin, pushBuyLouz } = useSpecialRouter()
 
 // Vérification si l'utilisateur est admin (réactif)
 const isAdmin = computed(() => sessionStore.isAdmin())
-// const isStreamer = computed(() => sessionStore.isTwitchStreamerAuthenticated())
+const isTwitchAuthenticated = computed(() => sessionStore.isTwitchUserAuthenticated())
 
 const onMenuOptionClick = async () => {
   isSlideOverOpen.value = false
@@ -16,11 +16,14 @@ const onMenuOptionClick = async () => {
 }
 
 const victoryPoints = computed(() => {
-
-    return sessionStore?.session?.user?.victoryPoints.toString() + ' points'
-
+  return sessionStore?.session?.user?.victoryPoints.toString() + ' points'
 })
 
+onMounted(() => {
+  sessionStore.restoreSession()
+  console.log('isTwitchAuthenticated', isTwitchAuthenticated.value)
+
+})
 </script>
 
 <template>
@@ -48,9 +51,13 @@ const victoryPoints = computed(() => {
         />
 
         <div class="flex space-x-2">
-          <UButton v-if="sessionStore.isSessionAuthenticated()" :label="victoryPoints" variant="ghost" color="black" />
-          <UButton label="Acheter des Louz" color="secondary" @click="pushBuyLouz()" />
-
+          <UButton
+            v-if="sessionStore.isSessionAuthenticated()"
+            :label="victoryPoints"
+            variant="ghost"
+            color="black"
+          />
+          <UButton label="La boutique" color="secondary" @click="pushBuyLouz()" />
         </div>
 
         <UButton

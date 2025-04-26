@@ -50,15 +50,12 @@ export const useSpecialRouter = () => {
   const pushCreateSpaceStreamer = (push: boolean = true): string => push2('/streamer/create', push)
   const pushSpaceViewer = (push: boolean = true): string => push2('/viewer/space', push)
   const pushSpaceStreamer = (push: boolean = true): string => push2('/streamer/space', push)
-  const pushTermsSales = (push: boolean = true): string => push2('/sales-conditions', push)
-  const pushTermsUse = (push: boolean = true): string => push2('/terms', push)
-  const pushPrivatePolicy = (push: boolean = true): string => push2('/privacy-policy', push)
-  const pushAboutUs = (push: boolean = true): string => push2('/about-us', push)
-  const pushLegal = (push: boolean = true): string => push2('/legal', push)
+  const pushStreamerDashboard = (push: boolean = true): string => push2('/streamer/dashboard', push)
 
 
   const pushSpaceStreamerForViewer = (streamer: string, push: boolean = true): string => push2('/viewer/streamer/space', push, { streamer })
   const pushStats = (userId: string, push: boolean = true): string => push2('/me/stats', push, { userId })
+
 
   return {
     push2,
@@ -78,10 +75,6 @@ export const useSpecialRouter = () => {
     pushSpaceStreamerForViewer,
     pushStats,
     pushBuyLouz,
-    pushTermsSales,
-    pushTermsUse,
-    pushPrivatePolicy,
-    pushAboutUs,
-    pushLegal
+    pushStreamerDashboard
   }
 }

@@ -13,6 +13,7 @@ const { runGetStreamerProfile, runDeletePlaylist } = useStreamerRepository()
 const { runGetTracksVersus, runGetPlaylistForStreamer } = usePlaylistRepository()
 const { showSuccess, showError } = useSpecialToast()
 const { subscribeToPlaylist } = usePlaylistTransmit()
+const { pushStreamerDashboard } = useSpecialRouter()
 const { updatePlaylist } = usePlaylistUpdater()
 
 const currentPlayListInfo = ref<PlaylistInfo | null>(null)
@@ -215,6 +216,14 @@ onUnmounted(async () => {
               size="xl"
               color="secondary"
               @click="isCreatePlaylistModalOpen = true"
+            />
+            <UButton
+              label="Mon dashboard"
+              type="button"
+              variant="solid"
+              size="xl"
+              color="secondary"
+              @click="pushStreamerDashboard()"
             />
           </section>
 
