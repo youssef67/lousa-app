@@ -3,13 +3,11 @@ import type { PlaylistViewer } from '~/types/playlist.type'
 import type { SpaceStreamerProfile } from '~/types/streamer.type'
 
 const route = useRoute()
-const spaceStreamerId = computed(
-  () => route.query.streamer as string | undefined
-)
+const spaceStreamerId = computed(() => route.query.streamer as string | undefined)
 
 const spaceStreamerProfile = ref<SpaceStreamerProfile | null>(null)
 const playlists = ref<PlaylistViewer[]>([])
-const isLoading = ref(true)
+const isLoading = ref(false)
 const isFavoriteStreamer = ref(false)
 
 const {
@@ -19,6 +17,7 @@ const {
 } = useViewerRepository()
 const toast = useSpecialToast()
 
+// --- Suivre ou retirer le streamer des favoris
 const toggleFavoriteStreamer = async () => {
   if (!spaceStreamerId.value) return
 
@@ -37,15 +36,11 @@ const toggleFavoriteStreamer = async () => {
   }
 }
 
-// Surveille les changements de `spaceStreamerId` pour éviter un appel API avec `undefined`
-watchEffect(async () => {
-  if (!spaceStreamerId.value) return
-
+// --- Récupération du profil
+const fetchStreamerProfile = async (id: string) => {
   isLoading.value = true
-
   try {
-    const response = await runGetStreamerProfile(spaceStreamerId.value)
-    console.log('response', response.playlists)
+    const response = await runGetStreamerProfile(id)
     if (response) {
       spaceStreamerProfile.value = response.spaceStreamerProfile || null
       playlists.value = response.playlists || []
@@ -58,6 +53,23 @@ watchEffect(async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+// --- Attend que le routeur soit prêt
+onMounted(() => {
+  if (spaceStreamerId.value) {
+    fetchStreamerProfile(spaceStreamerId.value)
+  }
+
+  // En cas de navigation dynamique dans l'app (changement d'ID)
+  watch(
+    () => spaceStreamerId.value,
+    (id) => {
+      if (id) {
+        fetchStreamerProfile(id)
+      }
+    }
+  )
 })
 </script>
 
@@ -75,7 +87,7 @@ watchEffect(async () => {
       </div>
     </template>
 
-    <!-- Affichage principal -->
+    <!-- Contenu principal -->
     <template v-else>
       <!-- Profil streamer -->
       <div class="flex flex-col items-center text-center mt-8 mb-6 space-y-4">
@@ -123,11 +135,10 @@ watchEffect(async () => {
         </div>
       </section>
 
-      <!-- Pas de playlists -->
+      <!-- Aucune playlist -->
       <p v-else class="text-center text-gray-400 mt-8">
         Aucune playlist disponible.
       </p>
     </template>
   </UContainer>
 </template>
-

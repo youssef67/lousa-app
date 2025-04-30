@@ -14,7 +14,7 @@ const { runDeleteFavoritePlaylist, runAddFavoritePlaylist } = useViewerRepositor
 const toast = useSpecialToast()
 const isFavoritePlaylist = ref(props.playlist.isFavorite)
 const isFollowModalOpen = ref(false)
-const hasPendingFavorite = ref(false) // ← Flag temporaire
+const hasPendingFavorite = ref(false)
 
 const toggleFavorites = async () => {
   if (isFavoritePlaylist.value) {
@@ -27,16 +27,12 @@ const toggleFavorites = async () => {
     }
   } else {
     const response = await runAddFavoritePlaylist(props.playlist.id)
-
     if (response) {
       isFavoritePlaylist.value = true
-
       if (props.playlist.onlyFollowers) {
-        // Ouvre la modal sans toast
         hasPendingFavorite.value = true
         isFollowModalOpen.value = true
       } else {
-        // Playlist ouverte : toast immédiat
         toast.showSuccess('Playlist ajoutée aux favoris')
       }
     } else {
@@ -46,50 +42,60 @@ const toggleFavorites = async () => {
 }
 
 const followStreamer = () => {
-  // Simule un appel API ou logique réelle ici
   toast.showSuccess('Playlist ajoutée aux favoris')
   isFollowModalOpen.value = false
   hasPendingFavorite.value = false
 }
 </script>
 
-
-
 <template>
-  <div class="flex items-center gap-4 bg-gray-800 p-4 rounded-xl shadow-md text-white max-w-sm">
-    <img :src="playlistImage" alt="Playlist Image" class="w-20 h-20 rounded-lg object-cover" />
+  <div class="flex gap-4 bg-gray-800 p-4 rounded-2xl shadow-lg text-white max-w-md w-full">
+    <img
+      :src="playlistImage"
+      alt="Playlist Image"
+      class="w-24 h-24 rounded-xl object-cover"
+    />
 
-    <div class="flex flex-col">
-      <h2 class="text-lg font-semibold">{{ props.playlist.playlistName }}</h2>
-      <p class="text-sm text-gray-400">{{ followersCount }} abonnés</p>
-      <p>{{ props.playlist.onlyFollowers ? 'fermée' : 'ouverte' }}</p>
-      <p>Nombre de musiques {{ props.playlist.nbTracks }}/{{ props.playlist.maxRankedTracks }}</p>
-
-      <div class="flex flex-col gap-2 mt-2 w-full">
-        <UButton
-          :label="props.playlist.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
-          type="submit"
-          variant="solid"
-          size="md"
-          color="secondary"
-          class="w-full"
-          :icon="isFavoritePlaylist ? 'i-heroicons-heart-20-solid' : 'i-heroicons-heart'"
-          @click="toggleFavorites"
-        />
+    <div class="flex flex-col justify-between w-full">
+      <div class="space-y-1">
+        <h2 class="text-xl font-bold">{{ props.playlist.playlistName }}</h2>
+        <p class="text-sm text-gray-400">{{ followersCount }} abonnés</p>
+        <p class="text-sm">
+          Accès : 
+          <span :class="props.playlist.onlyFollowers ? 'text-red-400' : 'text-green-400'">
+            {{ props.playlist.onlyFollowers ? 'Fermée' : 'Ouverte' }}
+          </span>
+        </p>
+        <p class="text-sm text-gray-300">
+          Musiques classées : {{ props.playlist.nbTracks }}/{{ props.playlist.maxRankedTracks }}
+        </p>
       </div>
+
+      <UButton
+        :label="isFavoritePlaylist ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        type="button"
+        variant="solid"
+        size="md"
+        color="secondary"
+        class="w-full mt-3"
+        :icon="isFavoritePlaylist ? 'i-heroicons-heart-20-solid' : 'i-heroicons-heart'"
+        @click="toggleFavorites"
+      />
     </div>
-    <UModal v-model="isFollowModalOpen">
-      <div class="p-6 space-y-4 text-center">
-        <h3 class="text-xl font-bold text-red-600">Playlist en mode fermé</h3>
-        <p class="text-gray-700">Pour accéder à cette playlist, vous devez suivre le streamer.</p>
-        <UButton
-          label="Follow le streamer"
-          color="primary"
-          variant="solid"
-          @click="followStreamer"
-          class="mx-auto"
-        />
-      </div>
-    </UModal>
   </div>
+
+  <!-- Modal de follow -->
+  <UModal v-model="isFollowModalOpen">
+    <div class="p-6 space-y-4 text-center">
+      <h3 class="text-xl font-bold text-red-600">Playlist en mode fermé</h3>
+      <p class="text-gray-700">Pour accéder à cette playlist, vous devez suivre le streamer.</p>
+      <UButton
+        label="Follow le streamer"
+        color="primary"
+        variant="solid"
+        @click="followStreamer"
+        class="mx-auto"
+      />
+    </div>
+  </UModal>
 </template>
