@@ -35,6 +35,8 @@ export interface GetSpaceStreamerInfoResponse {
 export interface StreamerPlaylist {
   id: string
   playlistName: string
+  onlyFollowers: boolean
+  maxRankedTracks: number
   nbTracks: number
   isSelected: boolean
   nbFollowers: number

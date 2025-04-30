@@ -48,9 +48,9 @@ export const useStreamerRepository = () => {
     }
   }
 
-  const runCreatePlaylist = async (playlistName: string) => {
+  const runCreatePlaylist = async (playlistName: string, onlyFollowers: boolean, maxRankedTracks: number) => {
     try {
-      const response = await createPlaylist(playlistName)
+      const response = await createPlaylist(playlistName, onlyFollowers, maxRankedTracks)
       return response
     } catch (error) {
       logger.e('Error logging out', error)

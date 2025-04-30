@@ -87,6 +87,7 @@ const handleUpdateAll = async () => {
 }
 
 const proceedResult = (playlist: StreamerPlaylist) => {
+  console.log('Playlist créée avec succès', playlist)
   streamerPlaylists.value = [...streamerPlaylists.value, playlist]
   isCreatePlaylistModalOpen.value = false
 }
@@ -170,11 +171,12 @@ onMounted(async () => {
       const tracksVersus = await runGetTracksVersus(spaceStreamer.currentPlaylist.id)
 
       currentTracksVersus.value = tracksVersus.currentTracksVersus
+
+      await setTransmitSubscription(spaceStreamer.currentPlaylist.id)
     }
 
     streamerPlaylists.value = spaceStreamer.otherPlaylists
 
-    await setTransmitSubscription(spaceStreamer.currentPlaylist.id)
   } catch (error) {
     console.error('Erreur lors du chargement des playlists :', error)
   } finally {

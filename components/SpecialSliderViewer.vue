@@ -16,7 +16,7 @@ const dataName = ref('')
 const favoritesPlaylists = ref<PlaylistFavorite[]>([])
 const favoritesSpaceStreamers = ref<SpaceStreamerFavorite[]>([])
 const toast = useSpecialToast()
-const displayPlaylist = ref(true) // true = Playlists, false = Streamers
+const displayPlaylist = ref(true)
 const emit = defineEmits(['update:isOpen', 'changePlaylist'])
 const { pushStreamers } = useSpecialRouter()
 const { runGetFavorites, runDeleteFavoritePlaylist } = useViewerRepository()
@@ -86,12 +86,6 @@ onMounted(async () => {
     favoritesPlaylists.value = response.playlistsFavorites
     favoritesSpaceStreamers.value = response.spaceStreamersFavorites
   }
-
-  // for (const playlist of favoritesPlaylists.value) {
-  //   if (playlist.isSelected) {
-  //     emit('changePlaylist', playlist.id)
-  //   }
-  // }
 })
 </script>
 
@@ -102,7 +96,6 @@ onMounted(async () => {
     side="left"
   >
     <div class="p-4 flex flex-col h-full">
-      <!-- Header : Logo + Close -->
       <div class="flex justify-between items-center mb-6">
         <UIcon name="my-icon:logo-name" size="40" mode="svg" />
         <UButton

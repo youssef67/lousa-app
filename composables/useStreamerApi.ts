@@ -72,11 +72,11 @@ export const useStreamerApi = () => {
     }
   }
 
-  const createPlaylist = async (playlistName: string): Promise<CreatePlaylistResponse> => {
+  const createPlaylist = async (playlistName: string, onlyFollowers: boolean, maxRankedTracks: number): Promise<CreatePlaylistResponse> => {
     try {
       const response = await fetch('/api/v1/streamer/playlist', {
         method: FetchMethod.POST,
-        body: { playlistName },
+        body: { playlistName, onlyFollowers, maxRankedTracks },
         headers: sessionStore.defaultHeaders(),
         cache: 'no-cache',
       })

@@ -70,4 +70,5 @@ export interface PlaylistFavorite {
   nbTracks: number
   isSelected: boolean
   nbFollowers: number
+  onlyFollowers: boolean
 }

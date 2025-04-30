@@ -29,6 +29,8 @@ const deleteFavorites = async () => {
     <UAvatar :src="item.spaceStreamerImg" alt="Avatar" />
     <p>Nombre de musique : {{ item.nbTracks }}</p>
     <p>Nombre de followers: {{ item.nbFollowers }}</p>
+    <p>{{ item.onlyFollowers ? 'fermée'  : 'ouverte'}}</p>
+
 
     <div class="flex flex-col gap-2 mt-2 w-full">
       <UButton

@@ -2,13 +2,16 @@
 const props = defineProps({
   isOpen: {
     type: Boolean,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const inputText = ref(null)
 const playlistName = ref('')
 const loading = ref(false)
+const onlyFollowers = ref(true)
+const maxRankedTracks = ref(10)
+
 const emit = defineEmits(['update:isOpen', 'proceedResult'])
 const toast = useSpecialToast()
 
@@ -25,7 +28,11 @@ const updateIsOpen = (value: boolean) => {
 async function onCreateClick() {
   loading.value = true
   try {
-    const response = await runCreatePlaylist(playlistName.value)
+    // 👇 Tu peux passer onlyFollowers et maxRankedTracks ici si besoin
+    console.log('onlyFollowers', onlyFollowers.value)
+    console.log('maxRankedTracks', maxRankedTracks.value)
+
+    const response = await runCreatePlaylist(playlistName.value, onlyFollowers.value, maxRankedTracks.value)
     toast.showSuccess('Playlist créée avec succès')
     emit('proceedResult', response.playlistCreated)
   } catch (error) {
@@ -71,10 +78,33 @@ watch(
           :placeholder="'Saisissez le nom de votre playlist'"
           required
           size="xl"
-          icon="i-tabler-mail"
+          icon="i-tabler-playlist"
           autocomplete="off"
           class="flex mt-12"
         />
+
+        <!-- Switch: followers only -->
+        <div class="flex items-center justify-between">
+          <label class="text-lg font-medium">Réservée aux followers</label>
+          <UToggle v-model="onlyFollowers" />
+        </div>
+
+        <!-- Input: max ranked tracks -->
+        <div class="flex flex-col gap-1">
+          <label for="max-ranked-tracks" class="text-lg font-medium"
+            >Nombre maximal de musiques classées</label
+          >
+          <UInput
+            id="max-ranked-tracks"
+            v-model="maxRankedTracks"
+            type="number"
+            :min="1"
+            :placeholder="'Ex: 20'"
+            size="xl"
+            icon="i-tabler-list-numbers"
+            class="flex"
+          />
+        </div>
 
         <UButton
           label="Créer la playlist"

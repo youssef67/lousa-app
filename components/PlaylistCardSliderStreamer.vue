@@ -29,6 +29,7 @@ const selectPlaylist = async () => {
     <h2>{{ playlist.playlistName }}</h2>
     <p>Nombre de musique : {{ playlist.nbTracks }}</p>
     <p>Nombre de followers: {{ playlist.nbFollowers }}</p>
+    <p>{{ playlist.onlyFollowers ? 'ouverte'  : 'fermée'}}</p>
     <div class="flex gap-2 mt-2 w-full">
       <UButton
         label="Sélectionner"

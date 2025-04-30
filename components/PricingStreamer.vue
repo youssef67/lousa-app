@@ -19,6 +19,7 @@
             <li>✅ 2 Golden Buzz par semaine</li>
             <li>✅ 5 Playlists maximum</li>
             <li>✅ 20 musiques par playlist</li>
+            <li>❌ Playlists réservées au followers</li>
             <li>❌ 20% de commission sur les Louz</li>
           </ul>
         </div>
@@ -35,6 +36,7 @@
             <li>✅ Golden Buzz illimités</li>
             <li>✅ 100 Playlists maximum</li>
             <li>✅ 100 musiques par playlist</li>
+            <li>✅ Playlists réservées au followers</li>
             <li>✅ 0% de commission</li>
           </ul>
         </div>

@@ -70,6 +70,9 @@ export interface PlaylistViewer {
   id: string
   playlistName: string
   isFavorite: boolean
+  maxRankedTracks: number
+  onlyFollowers: boolean
+  nbTracks: number
 }
 
 export interface ScoreAndLikes {

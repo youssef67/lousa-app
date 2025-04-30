@@ -45,6 +45,7 @@ watchEffect(async () => {
 
   try {
     const response = await runGetStreamerProfile(spaceStreamerId.value)
+    console.log('response', response.playlists)
     if (response) {
       spaceStreamerProfile.value = response.spaceStreamerProfile || null
       playlists.value = response.playlists || []
